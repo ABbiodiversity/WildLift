@@ -5,6 +5,7 @@ CaribouBC
 
 [![Linux build
 status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
+[![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
 ### Features
 
@@ -12,7 +13,9 @@ Describe features here.
 
 ### Installation
 
-    devtools::install_github("psolymos/CaribouBC")
+``` r
+devtools::install_github("psolymos/CaribouBC")
+```
 
 ### Usage
 
