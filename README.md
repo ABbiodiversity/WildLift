@@ -39,7 +39,7 @@ library(CaribouBC)
 #>  - c.surv.wild   :0.163
 #>  - f.surv.wild   :0.853
 #>  - f.surv.capt   :0.903
-#>  - preg          :0.92
+#>  - f.preg.wild   :0.92
 #>  - f.preg.capt   :0.92
 (s2 <- caribou_settings("pred.excl"))
 #> Caribou settings - pen type: pred.excl 
@@ -54,7 +54,7 @@ library(CaribouBC)
 #>  - c.surv.wild   :0.163
 #>  - f.surv.wild   :0.853
 #>  - f.surv.capt   :0.95
-#>  - preg          :0.92
+#>  - f.preg.wild   :0.92
 #>  - f.preg.capt   :0.92
 
 ## Modifying predefined settings
@@ -71,7 +71,7 @@ caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
 #>  - c.surv.wild   :0.163
 #>  - f.surv.wild   :0.853
 #>  - f.surv.capt   :0.903
-#>  - preg          :0.92
+#>  - f.preg.wild   :0.92
 #>  - f.preg.capt   :0.92
 
 ## Forecast based on settings for 75\% females penned
