@@ -18,6 +18,8 @@ If you have bcgovr installed and you use RStudio, click the 'Insert BCDevex Badg
 
 # CaribouBC
 
+[![Linux build status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
+
 Description of package
 
 ### Features
