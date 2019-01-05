@@ -1,5 +1,6 @@
 Package: CaribouBC
 Title: Caribou Population Forecasting
+Date: 2019-01-04
 Version: 0.0.1
 Authors@R: 
     c(person(given = "Peter",
@@ -23,8 +24,7 @@ Description: Caribou population forecasting.
 License: Apache License (== 2.0) | file LICENSE
 Encoding: UTF-8
 LazyData: true
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+Depends: popbio
 Suggests: 
     knitr,
     rmarkdown

@@ -22,8 +22,8 @@ function(pen.type=c("mat.pen",  "pred.excl"), ...) {
         parms$c.surv.wild <- 0.163       # calf survival rate in the wild, annual
         parms$f.surv.wild <- 0.853       # maternal survival when wild, annual
         parms$f.surv.capt <- 0.903      # maternal survival when captive higher than wild
-        parms$preg <- 0.92         # pregnancy rate, same for captive and wild
-        parms$f.preg.capt <- parms$preg       # pregnancy rate, same for captive and wild
+        parms$f.preg.wild <- 0.92         # pregnancy rate, same for captive and wild
+        parms$f.preg.capt <- parms$f.preg.wild       # pregnancy rate, same for captive and wild
     }
     if (pen.type=="pred.excl") {
         ## cost
@@ -45,8 +45,8 @@ function(pen.type=c("mat.pen",  "pred.excl"), ...) {
         parms$c.surv.wild <- 0.163       # calf survival rate in the wild, annual
         parms$f.surv.wild <- 0.853       # maternal survival when wild, annual
         parms$f.surv.capt <- 0.95       # maternal survival when captive higher than wild
-        parms$preg <- 0.92         # pregnancy rate, same for captive and wild
-        parms$f.preg.capt <- parms$preg       # pregnancy rate, same for captive and wild
+        parms$f.preg.wild <- 0.92         # pregnancy rate, same for captive and wild
+        parms$f.preg.capt <- parms$f.preg.wild       # pregnancy rate, same for captive and wild
     }
     dots <- list(...)
     if (length(dots) > 0L)

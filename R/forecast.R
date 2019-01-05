@@ -27,7 +27,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop=0)
     c.surv.wild <- settings$c.surv.wild
     f.surv.wild <- settings$f.surv.wild
     f.surv.capt <- settings$f.surv.capt
-    preg <- settings$preg
+    preg <- settings$f.preg.wild
     f.preg.capt <- settings$f.preg.capt
     # mean female surv = weighted av. of pen/wild vitals
     surv.f <- fpen.prop*f.surv.capt + (1-fpen.prop)*f.surv.wild
