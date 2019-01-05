@@ -12,19 +12,21 @@ knitr::opts_chunk$set(
 )
 ```
 
-<!-- Add a project state badge
-See https://github.com/BCDevExchange/Our-Project-Docs/blob/master/discussion/projectstates.md
-If you have bcgovr installed and you use RStudio, click the 'Insert BCDevex Badge' Addin. -->
-
 # CaribouBC
+
+> Caribou Population Forecasting
 
 [![Linux build status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
 
-Description of package
-
 ### Features
 
+Describe features here.
+
 ### Installation
+
+```
+devtools::install_github("psolymos/CaribouBC")
+```
 
 ### Usage
 
@@ -33,14 +35,42 @@ Description of package
 This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
-## basic example code
+library(CaribouBC)
+
+## Predefined settings
+(s1 <- caribou_settings("mat.pen"))
+(s2 <- caribou_settings("pred.excl"))
+
+## Modifying predefined settings
+caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
+
+## Forecast based on settings for 75\% females penned
+(f1 <- caribou_forecast(s1, fpen.prop = 0.75))
+(f2 <- caribou_forecast(s2, fpen.prop = 0.75))
+
+## Plot the results
+plot(f2)
+lines(f1, col = 2)
+legend("topleft", col = c(1,1,2), lty = c(2,1,1),
+    legend = c("No pen", "Mat pen", "Pred excl"))
+
+## Find 'breakeven' proportion of females penned where lambda=1
+(b1 <- caribou_breakeven(f1, lambda = 1))
+(b2 <- caribou_breakeven(f2, lambda = 1))
+f3 <- caribou_forecast(s1, fpen.prop = b1)
+f4 <- caribou_forecast(s2, fpen.prop = b2)
+## See that lines are truly flat
+op <- par(mfrow = c(1, 2))
+plot(f3, main = "Mat pen")
+plot(f4, main = "Pred excl")
+par(op)
 ```
 
 ### Project Status
 
 ### Getting Help or Reporting an Issue
 
-To report bugs/issues/feature requests, please file an [issue](https://github.com/bcgov/CaribouBC/issues/).
+To report bugs/issues/feature requests, please file an [issue](https://github.com/psolymos/CaribouBC/issues/).
 
 ### How to Contribute
 

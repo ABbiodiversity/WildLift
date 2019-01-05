@@ -1,3 +1,5 @@
-# CaribouBC 0.0.0.9000
+# User Visible Changes in the CaribouBC R Package
 
-* Added a `NEWS.md` file to track changes to the package.
+## Version 0.0.1
+
+* Added initial functionality to the package.
