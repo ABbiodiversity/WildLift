@@ -1,4 +1,4 @@
-#shiny::runApp("inst/shiny/pen")
+#shiny::runApp("inst/shiny/matpen")
 
 ## install/update CaribouBC package as needed
 ## need to install from github for rsconnect to work properly
