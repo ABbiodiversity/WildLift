@@ -23,7 +23,8 @@ dashboardPage(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Population forecast",
-              plotOutput("penningPlot", width = "100%", height = 400)
+              #plotOutput("penningPlot", width = "100%", height = 400)
+              plotlyOutput("penningPlot", width = "100%", height = 400)
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,

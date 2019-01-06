@@ -109,9 +109,17 @@ server <- function(input, output, session) {
             fpen.prop = caribou_breakeven(getF()))
     })
 
-    output$penningPlot <- renderPlot({
+    output$penningPlot <- renderPlotly({
         req(getF())
-        plot(getF())
+        #plot(getF())
+        df <- plot(getF(), plot=FALSE)
+        colnames(df)[colnames(df) == "Npen"] <- "Individuals"
+        p <- plot_ly(df, x = ~Years, y = ~Individuals,
+            name = 'Pen', type = 'scatter', mode = 'lines') %>%
+            add_trace(y = ~Nnopen, name = 'No pen',
+                mode = 'lines') %>%
+            layout(legend = list(x = 0.05, y = 0))
+        p
     })
     output$penningTable <- renderTable({
         req(getB())

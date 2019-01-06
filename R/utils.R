@@ -19,7 +19,7 @@ plot.caribou_forecast <- function(x, plot=TRUE, ...) {
         plot(N ~ Years, d1, type="l", lty=1, ylim=c(0, max(d0$N, d1$N)), ...)
         lines(N ~ Years, d0, lty=2, ...)
     }
-    invisible(x)
+    invisible(data.frame(Years=d0$Years, Nnopen=d0$N, Npen=d1$N))
 }
 lines.caribou_forecast <- function(x, pen=TRUE, plot=TRUE, ...) {
     d <- data.frame(Years=seq(0, x$tmax),

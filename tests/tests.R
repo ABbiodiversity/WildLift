@@ -22,52 +22,32 @@ lines(x1,col=2)
 input <- list(
     tmax = 20,
     pop.start = 100,
-    fpen.perc = 25, # note! this is percent, NOT proportion
-    penningDemCsw = 0.16,
-    penningDemCsc = 0.54,
-    penningDemFsw = 0.85,
-    penningDemFsc = 0.90,
-    penningDemFpw = 0.92,
-    penningDemFpc = 0.92,
-    penningCostPencap = 35,
-    penningCostSetup = 500,
-    penningCostProj = 80,
-    penningCostMaint = 250,
-    penningCostCapt = 250,
-    penningCostPred = 0)
+    fpen.perc = 25) # note! this is percent, NOT proportion
 
-s <- caribou_settings(input$penningType,
-    ## cost
-    pen.cap = input$penningCostPencap,
-    pen.cost.setup = input$penningCostSetup,
-    pen.cost.proj = input$penningCostProj,
-    pen.cost.maint = input$penningCostMaint,
-    pen.cost.capt = input$penningCostCapt,
-    pen.cost.pred = input$penningCostPred,
-    ## demography
-    c.surv.wild = input$penningDemCsw,
-    c.surv.capt = input$penningDemCsc,
-    f.surv.wild = input$penningDemFsw,
-    f.surv.capt = input$penningDemFsc,
-    f.preg.wild = input$penningDemFpw,
-    f.preg.capt = input$penningDemFpc)
-f <- caribou_forecast(s,
+f <- caribou_forecast(caribou_settings(),
     tmax = input$tmax,
     pop.start = input$pop.start,
     fpen.prop = input$fpen.perc / 100)
 getF <- function() f
-b <- caribou_breakeven(getF())
-getB <- function() b
-fb <- caribou_forecast(f$settings,
+b <- caribou_forecast(getF()$settings,
     tmax = input$tmax,
     pop.start = input$pop.start,
-    fpen.prop = getB())
-getFB <- function() fb
+    fpen.prop = caribou_breakeven(getF()))
+getB <- function() b
 
 tab <- cbind(
     Results=unlist(summary(getF())),
-    Breakeven=unlist(summary(getFB())))
-data.frame(tab[c(
+    Breakeven=unlist(summary(getB())))
+df <- data.frame(tab[c(
     "npens", "lam.pen", "lam.nopen",
     "Nend.nopen", "Nend.pen", "Nend.diff",
     "Cost.total", "Cost.percap"),])
+#DT::datatable(df)
+
+
+#library(plotly)
+#df <- plot(getF(), plot=FALSE)
+#p <- plot_ly(df, x = ~Years, y = ~Npen, name = 'Penned', type = 'scatter', mode = 'lines') %>%
+#  add_trace(y = ~Nnopen, name = 'Baseline (no pen)', mode = 'lines')
+#p
+
