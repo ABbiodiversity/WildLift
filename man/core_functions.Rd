@@ -34,6 +34,7 @@ caribou_breakeven(forecast, lambda = 1, tol = 0.001)
 \arguments{
   \item{pen.type}{
 character, maternity pen or predator exclusion pen.
+It can also be a settings object.
 }
   \item{settings}{
 a settings object returned by \code{caribou_settings}.
@@ -131,6 +132,7 @@ Both methods produce plots as a side effect.
 
 ## Modifying predefined settings
 caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
+caribou_settings(s1, c.surv.capt=0.65, pen.cap=30)
 
 ## Forecast based on settings for 75\% females penned
 (f1 <- caribou_forecast(s1, fpen.prop = 0.75))

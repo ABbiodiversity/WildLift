@@ -13,6 +13,5 @@ library(CaribouBC)
 ## OK - implement plot
 ## OK - implement summary
 ## - render dynamic settings sliders depending on observing pen type
-## - need some kind of help page
-## - add info popups?
-## - add download options?
+## - need some kind of help page / info popups?
+## - add download options? what to download?

@@ -1,69 +1,112 @@
 server <- function(input, output, session) {
-    if (FALSE) {
-    ## make colors depend on value displayed
-    output$lambda <- renderValueBox({
-        req(getF())
-        valueBox(
-            round(getF()$Npop$lam.pen[1L], 2),
-            "Growth rate",
-            color = "aqua",
-            icon = icon("divide")
+
+#  output$rSelection <- renderUI({
+#    if (!is.null(input$r_selected))
+#      sourcelist$rsel <- as.integer(input$r_selected)
+#    if (verbose)
+#      print(paste('# sources:', input$r, '--- selected:', sourcelist$rsel))
+#    selectInput("r_selected", "Factor to add sample to",
+#                choices=seq_len(as.integer(input$r)),
+#                selected = sourcelist$rsel)
+#  })
+
+    ## default settings to serve as prototype
+    values <- reactiveValues(s = caribou_settings())
+
+    ## this resets all settings when pen type changes
+    observeEvent(input$penningType, {
+        values$s <- caribou_settings(input$penningType)
+    })
+
+    ## dynamic rendering of demography sliders
+    output$penningDemControls <- renderUI({
+        tagList(
+            sliderInput("penningDemCsw", "Calf survival, wild",
+                min = 0, max = 1, value = values$s$c.surv.wild, step = 0.01),
+            sliderInput("penningDemCsc", "Calf survival, captive",
+                min = 0, max = 1, value = values$s$c.surv.capt, step = 0.01),
+            sliderInput("penningDemFsw", "Maternal survival, wild",
+                min = 0, max = 1, value = values$s$f.surv.wild, step = 0.01),
+            sliderInput("penningDemFsc", "Maternal survival, captive",
+                min = 0, max = 1, value = values$s$f.surv.capt, step = 0.01),
+            sliderInput("penningDemFpw", "Pregnancy rate, wild",
+                min = 0, max = 1, value = values$s$f.preg.wild, step = 0.01),
+            sliderInput("penningDemFpc", "Pregnancy rate, captive",
+                min = 0, max = 1, value = values$s$f.preg.capt, step = 0.01)
         )
     })
-    output$breakeven <- renderValueBox({
-        req(getB())
-        valueBox(
-            paste0(round(getB() * 100), "%"),
-            "Breakeven percentage",
-            color = "aqua",
-            icon = icon("equals")
+    ## observe every demography slider change
+    observeEvent(input$penningDemCsw, {
+        values$s$c.surv.wild <- input$penningDemCsw
+    })
+    observeEvent(input$penningDemCsc, {
+        values$s$c.surv.capt <- input$penningDemCsc
+    })
+    observeEvent(input$penningDemFsw, {
+        values$s$f.surv.wild <- input$penningDemFsw
+    })
+    observeEvent(input$penningDemFsc, {
+        values$s$f.surv.capt <- input$penningDemFsc
+    })
+    observeEvent(input$penningDemFpw, {
+        values$s$f.preg.wild <- input$penningDemFpw
+    })
+    observeEvent(input$penningDemFpc, {
+        values$s$f.preg.capt <- input$penningDemFpc
+    })
+
+    ## dynamic redering of cost sliders
+    output$penningCostControls <- renderUI({
+        tagList(
+            sliderInput("penningCostPencap", "Max in a single pen",
+                min = 1, max = 50, value = values$s$pen.cap, step = 1),
+            sliderInput("penningCostSetup", "Initial set up",
+                min = 0, max = 500, value = values$s$pen.cost.setup, step = 10),
+            sliderInput("penningCostProj", "Project manager",
+                min = 0, max = 500, value = values$s$pen.cost.proj, step = 10),
+            sliderInput("penningCostMaint", "Maintenance",
+                min = 0, max = 500, value = values$s$pen.cost.maint, step = 10),
+            sliderInput("penningCostCapt", "Capture/monitor",
+                min = 0, max = 500, value = values$s$pen.cost.capt, step = 10),
+            sliderInput("penningCostPred", "Removing predators",
+                min = 0, max = 500, value = values$s$pen.cost.pred, step = 10)
         )
     })
-    output$popsize <- renderValueBox({
-        req(getF())
-        valueBox(
-            floor(rev(getF()$Npop$N.pen)[1L]),
-            paste("Population size after", input$tmax, "years"),
-            color = "aqua",
-            icon = icon("chart-line")
-        )
+    ## observe every cost slider change
+    observeEvent(input$penningCostPencap, {
+        values$s$pen.cap <- input$penningCostPencap
     })
-    }
+    observeEvent(input$penningCostSetup, {
+        values$s$pen.cost.setup <- input$penningCostSetup
+    })
+    observeEvent(input$penningCostProj, {
+        values$s$pen.cost.proj <- input$penningCostProj
+    })
+    observeEvent(input$penningCostMaint, {
+        values$s$pen.cost.maint <- input$penningCostMaint
+    })
+    observeEvent(input$penningCostCapt, {
+        values$s$pen.cost.capt <- input$penningCostCapt
+    })
+    observeEvent(input$penningCostPred, {
+        values$s$pen.cost.pred <- input$penningCostPred
+    })
+
+
     ## apply settings and get forecast
     getF <- reactive({
-        s <- caribou_settings(input$penningType,
-            ## cost
-            pen.cap = input$penningCostPencap,
-            pen.cost.setup = input$penningCostSetup,
-            pen.cost.proj = input$penningCostProj,
-            pen.cost.maint = input$penningCostMaint,
-            pen.cost.capt = input$penningCostCapt,
-            pen.cost.pred = input$penningCostPred,
-            ## demography
-            c.surv.wild = input$penningDemCsw,
-            c.surv.capt = input$penningDemCsc,
-            f.surv.wild = input$penningDemFsw,
-            f.surv.capt = input$penningDemFsc,
-            f.preg.wild = input$penningDemFpw,
-            f.preg.capt = input$penningDemFpc)
-        f <- caribou_forecast(s,
+        caribou_forecast(values$s,
             tmax = input$tmax,
             pop.start = input$pop.start,
             fpen.prop = input$fpen.perc / 100)
-        return(f)
-    })
-    ## calculate breakeven percentage
-    getB <- reactive({
-        req(getF())
-        caribou_breakeven(getF())
     })
     ## make summary table
-    getFB <- reactive({
-        req(getB())
+    getB <- reactive({
+        req(getF())
         caribou_forecast(getF()$settings,
             tmax = input$tmax,
             pop.start = input$pop.start,
-            fpen.prop = getB())
+            fpen.prop = caribou_breakeven(getF()))
     })
 
     output$penningPlot <- renderPlot({
@@ -71,10 +114,10 @@ server <- function(input, output, session) {
         plot(getF())
     })
     output$penningTable <- renderTable({
-        req(getFB())
+        req(getB())
         tab <- cbind(
             Results=unlist(summary(getF())),
-            Breakeven=unlist(summary(getFB())))
+            Breakeven=unlist(summary(getB())))
         data.frame(tab[c(
             "npens", "lam.pen", "lam.nopen",
             "Nend.nopen", "Nend.pen", "Nend.diff",

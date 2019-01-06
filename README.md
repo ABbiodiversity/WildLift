@@ -7,7 +7,9 @@ CaribouBC
 status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
 [![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
-[Shiny app](https://psolymos.shinyapps.io/matpen/)
+Try the [Shiny app](https://psolymos.shinyapps.io/matpen/) or run
+locally as
+`shiny::runGitHub("psolymos/CaribouBC", subdir = "inst/shiny/matpen")`.
 
 Installation
 ------------
@@ -74,18 +76,40 @@ caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
 #>  - f.preg.capt   :0.92
 
 ## Forecast based on settings for 75% females penned
-(f1 <- caribou_forecast(s1, fpen.prop = 0.75))
+f1 <- caribou_forecast(s1, fpen.prop = 0.75)
+f2 <- caribou_forecast(s2, fpen.prop = 0.75)
+
+## Most important results summarized
+summary(f1)
 #> Caribou forecast - pen type: mat.pen 
 #> 
 #>  - tmax     :20
 #>  - pop.start:100
 #>  - fpen.prop:0.75
-(f2 <- caribou_forecast(s2, fpen.prop = 0.75))
+#> 
+#>  - npens      :5
+#>  - lam.pen    :1.02
+#>  - lam.nopen  :0.914
+#>  - Nend.nopen :17
+#>  - Nend.pen   :163
+#>  - Nend.diff  :146
+#>  - Cost.total :73
+#>  - Cost.percap:0.5
+summary(f2)
 #> Caribou forecast - pen type: pred.excl 
 #> 
 #>  - tmax     :20
 #>  - pop.start:100
 #>  - fpen.prop:0.75
+#> 
+#>  - npens      :16
+#>  - lam.pen    :1.09
+#>  - lam.nopen  :0.914
+#>  - Nend.nopen :17
+#>  - Nend.pen   :556
+#>  - Nend.diff  :539
+#>  - Cost.total :184
+#>  - Cost.percap:0.341
 
 ## Plot the results
 plot(f2)

@@ -19,7 +19,8 @@ knitr::opts_chunk$set(
 [![Linux build status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
 [![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
-[Shiny app](https://psolymos.shinyapps.io/matpen/)
+Try the [Shiny app](https://psolymos.shinyapps.io/matpen/) or run locally as 
+`shiny::runGitHub("psolymos/CaribouBC", subdir = "inst/shiny/matpen")`.
 
 ## Installation
 
@@ -40,8 +41,12 @@ library(CaribouBC)
 caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
 
 ## Forecast based on settings for 75% females penned
-(f1 <- caribou_forecast(s1, fpen.prop = 0.75))
-(f2 <- caribou_forecast(s2, fpen.prop = 0.75))
+f1 <- caribou_forecast(s1, fpen.prop = 0.75)
+f2 <- caribou_forecast(s2, fpen.prop = 0.75)
+
+## Most important results summarized
+summary(f1)
+summary(f2)
 
 ## Plot the results
 plot(f2)
