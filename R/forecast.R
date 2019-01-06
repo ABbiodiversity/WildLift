@@ -169,8 +169,21 @@ function(settings, tmax=20, pop.start=100, fpen.prop=0)
         s.f.pop.nopen=surv.f2)
     # add year 0 data to projection data
     Npop <- rbind(Npop.r1, Npop)
+    # summaries
+    Nend_nopen <- floor(Npop$N.nopen[tmax + 1L])
+    Nend_pen <- floor(Npop$N.pen[tmax + 1L])
+    Nend_diff <- Nend_pen - Nend_nopen
+    Cost_total <- sum(Npop$pens.cost.t)
+    Cost_percap <- if (Nend_diff <= 0) NA else Cost_total / Nend_diff
     out <- list(Npop=Npop, settings=settings,
-        tmax=tmax, pop.start=pop.start, fpen.prop=fpen.prop)
+        tmax=tmax,
+        pop.start=pop.start,
+        fpen.prop=fpen.prop,
+        Nend_nopen = Nend_nopen,
+        Nend_pen = Nend_pen,
+        Nend_diff = Nend_diff,
+        Cost_total = Cost_total,
+        Cost_percap = Cost_percap)
     class(out) <- "caribou_forecast"
     out
 }

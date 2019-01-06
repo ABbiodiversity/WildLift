@@ -7,6 +7,8 @@
 \alias{print.caribou_forecast}
 \alias{plot.caribou_forecast}
 \alias{lines.caribou_forecast}
+\alias{summary.caribou_forecast}
+\alias{print.summary.caribou_forecast}
 \title{
 Caribou Population Forecasting
 }
@@ -15,16 +17,18 @@ Functions to set demographic and cost parameter, to perform
 forecasting, and to inspect the results.
 }
 \usage{
-caribou_settings(pen.type=c("mat.pen",  "pred.excl"), ...)
+caribou_settings(pen.type = c("mat.pen",  "pred.excl"), ...)
 
-caribou_forecast(settings, tmax=20, pop.start=100, fpen.prop=0)
+caribou_forecast(settings, tmax = 20, pop.start = 100, fpen.prop = 0)
 
-caribou_breakeven(forecast, lambda=1, tol=0.001)
+caribou_breakeven(forecast, lambda = 1, tol = 0.001)
 
 \method{print}{caribou_settings}(x, ...)
 \method{print}{caribou_forecast}(x, ...)
-\method{plot}{caribou_forecast}(x, plot=TRUE, ...)
-\method{lines}{caribou_forecast}(x, pen=TRUE, plot=TRUE, ...)
+\method{plot}{caribou_forecast}(x, plot = TRUE, ...)
+\method{lines}{caribou_forecast}(x, pen = TRUE, plot = TRUE, ...)
+\method{summary}{caribou_forecast}(x, ...)
+\method{print}{summary.caribou_forecast}(x, ...)
 
 }
 \arguments{
@@ -87,9 +91,9 @@ survey, calf collar.
 
 The following demographic parameters can be set by \code{caribou_settings}:
 
-\code{c.surv.capt}: calf survival rate when captive, annual.
-
 \code{c.surv.wild}: calf survival rate in the wild, annual.
+
+\code{c.surv.capt}: calf survival rate when captive, annual.
 
 \code{f.surv.wild}: maternal survival when wild, annual.
 
@@ -112,6 +116,9 @@ alongside a warning.
 
 The \code{print} method returns the input object \code{x} invisibly.
 
+The \code{summary} method returns population and cost summaries
+for the forecast object.
+
 The \code{plot} and \code{lines} methods return the plotted data invisibly
 (years, pen and no-pen population size for \code{plot};
 years, pen or no-pen population size for \code{lines}).
@@ -128,6 +135,10 @@ caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
 ## Forecast based on settings for 75\% females penned
 (f1 <- caribou_forecast(s1, fpen.prop = 0.75))
 (f2 <- caribou_forecast(s2, fpen.prop = 0.75))
+
+## Get population and cost summaries
+summary(f1)
+summary(f2)
 
 ## Plot the results
 plot(f2)

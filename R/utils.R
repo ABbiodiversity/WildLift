@@ -28,3 +28,18 @@ lines.caribou_forecast <- function(x, pen=TRUE, plot=TRUE, ...) {
         lines(N ~ Years, d, ...)
     invisible(d)
 }
+summary.caribou_forecast <- function(object, ...) {
+    object$Npop <- NULL
+    class(object) <- "summary.caribou_forecast"
+    object
+}
+print.summary.caribou_forecast <- function(x, ...) {
+    cat("Caribou forecast - pen type:", attr(x$settings, "pen.type"),
+        "\n\n")
+    str(x[c("tmax", "pop.start", "fpen.prop")],
+        give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
+    cat("\n")
+    str(x[c("Nend_nopen", "Nend_pen", "Nend_diff", "Cost_total", "Cost_percap")],
+        give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
+    invisible(x)
+}

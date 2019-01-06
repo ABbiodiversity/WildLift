@@ -4,6 +4,8 @@ export("caribou_settings",
 
 S3method("print", "caribou_settings")
 S3method("print", "caribou_forecast")
+S3method("summary", "caribou_forecast")
+S3method("print", "summary.caribou_forecast")
 S3method("plot", "caribou_forecast")
 S3method("lines", "caribou_forecast")
 

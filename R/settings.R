@@ -16,10 +16,10 @@ function(pen.type=c("mat.pen",  "pred.excl"), ...) {
         parms$pen.cost.capt <- 250 # cost in thousands to capture cows, monitor, survey, calf collar
         parms$pen.cost.pred <- 0 # cost in thousands for removing predators annually
         ## demography
+        parms$c.surv.wild <- 0.163       # calf survival rate in the wild, annual
         c.surv1.capt <- 0.9       # calf survival rate when captive, 0-1 month
         c.surv2.capt <- 0.6       # calf survival rate when captive, 1-12 months
         parms$c.surv.capt <- c.surv1.capt*c.surv2.capt # calf survival rate when captive, annual
-        parms$c.surv.wild <- 0.163       # calf survival rate in the wild, annual
         parms$f.surv.wild <- 0.853       # maternal survival when wild, annual
         parms$f.surv.capt <- 0.903      # maternal survival when captive higher than wild
         parms$f.preg.wild <- 0.92         # pregnancy rate, same for captive and wild
@@ -39,10 +39,10 @@ function(pen.type=c("mat.pen",  "pred.excl"), ...) {
         parms$pen.cost.capt <- 250 # cost in thousands to capture cows, monitor, survey, calf collar
         parms$pen.cost.pred <- 80 # cost in thousands for removing predators annually
         ## demography
+        parms$c.surv.wild <- 0.163       # calf survival rate in the wild, annual
         c.surv1.capt <- 0.9       # calf survival rate when captive, 0-1 month
         c.surv2.capt <- 0.8       # calf survival rate when captive, 1-12 months
         parms$c.surv.capt <- c.surv1.capt*c.surv2.capt # calf survival rate when captive, annual
-        parms$c.surv.wild <- 0.163       # calf survival rate in the wild, annual
         parms$f.surv.wild <- 0.853       # maternal survival when wild, annual
         parms$f.surv.capt <- 0.95       # maternal survival when captive higher than wild
         parms$f.preg.wild <- 0.92         # pregnancy rate, same for captive and wild
