@@ -7,21 +7,17 @@ CaribouBC
 status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
 [![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
-### Features
+[Shiny app](https://psolymos.shinyapps.io/matpen/)
 
-Describe features here.
-
-### Installation
+Installation
+------------
 
 ``` r
 devtools::install_github("psolymos/CaribouBC")
 ```
 
-### Usage
-
-#### Example
-
-This is a basic example which shows you how to solve a common problem:
+Usage
+-----
 
 ``` r
 library(CaribouBC)
@@ -38,8 +34,8 @@ library(CaribouBC)
 #>  - pen.cost.maint:500
 #>  - pen.cost.capt :250
 #>  - pen.cost.pred :0
-#>  - c.surv.capt   :0.54
 #>  - c.surv.wild   :0.163
+#>  - c.surv.capt   :0.54
 #>  - f.surv.wild   :0.853
 #>  - f.surv.capt   :0.903
 #>  - f.preg.wild   :0.92
@@ -53,8 +49,8 @@ library(CaribouBC)
 #>  - pen.cost.maint:500
 #>  - pen.cost.capt :250
 #>  - pen.cost.pred :80
-#>  - c.surv.capt   :0.72
 #>  - c.surv.wild   :0.163
+#>  - c.surv.capt   :0.72
 #>  - f.surv.wild   :0.853
 #>  - f.surv.capt   :0.95
 #>  - f.preg.wild   :0.92
@@ -70,14 +66,14 @@ caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
 #>  - pen.cost.maint:500
 #>  - pen.cost.capt :250
 #>  - pen.cost.pred :0
-#>  - c.surv.capt   :0.65
 #>  - c.surv.wild   :0.163
+#>  - c.surv.capt   :0.65
 #>  - f.surv.wild   :0.853
 #>  - f.surv.capt   :0.903
 #>  - f.preg.wild   :0.92
 #>  - f.preg.capt   :0.92
 
-## Forecast based on settings for 75\% females penned
+## Forecast based on settings for 75% females penned
 (f1 <- caribou_forecast(s1, fpen.prop = 0.75))
 #> Caribou forecast - pen type: mat.pen 
 #> 
@@ -121,14 +117,14 @@ plot(f4, main = "Pred excl")
 par(op)
 ```
 
-### Project Status
-
-### Getting Help or Reporting an Issue
+Getting Help or Reporting an Issue
+----------------------------------
 
 To report bugs/issues/feature requests, please file an
 [issue](https://github.com/psolymos/CaribouBC/issues/).
 
-### How to Contribute
+How to Contribute
+-----------------
 
 If you would like to contribute to the package, please see our
 [CONTRIBUTING](CONTRIBUTING.md) guidelines.
@@ -137,7 +133,8 @@ Please note that this project is released with a [Contributor Code of
 Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree
 to abide by its terms.
 
-### License
+License
+-------
 
     Copyright 2018 Province of British Columbia
 

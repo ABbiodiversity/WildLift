@@ -19,21 +19,15 @@ knitr::opts_chunk$set(
 [![Linux build status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
 [![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
-### Features
+[Shiny app](https://psolymos.shinyapps.io/matpen/)
 
-Describe features here.
-
-### Installation
+## Installation
 
 ```{r install,eval=FALSE}
 devtools::install_github("psolymos/CaribouBC")
 ```
 
-### Usage
-
-#### Example
-
-This is a basic example which shows you how to solve a common problem:
+## Usage
 
 ```{r example}
 library(CaribouBC)
@@ -67,20 +61,18 @@ plot(f4, main = "Pred excl")
 par(op)
 ```
 
-### Project Status
-
-### Getting Help or Reporting an Issue
+## Getting Help or Reporting an Issue
 
 To report bugs/issues/feature requests, please file an [issue](https://github.com/psolymos/CaribouBC/issues/).
 
-### How to Contribute
+## How to Contribute
 
 If you would like to contribute to the package, please see our 
 [CONTRIBUTING](CONTRIBUTING.md) guidelines.
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-### License
+## License
 
 ```
 Copyright 2018 Province of British Columbia
