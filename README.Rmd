@@ -45,7 +45,7 @@ library(CaribouBC)
 ## Modifying predefined settings
 caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
 
-## Forecast based on settings for 75\% females penned
+## Forecast based on settings for 75% females penned
 (f1 <- caribou_forecast(s1, fpen.prop = 0.75))
 (f2 <- caribou_forecast(s2, fpen.prop = 0.75))
 

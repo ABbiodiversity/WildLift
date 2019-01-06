@@ -27,7 +27,7 @@ caribou_breakeven(forecast, lambda = 1, tol = 0.001)
 \method{print}{caribou_forecast}(x, ...)
 \method{plot}{caribou_forecast}(x, plot = TRUE, ...)
 \method{lines}{caribou_forecast}(x, pen = TRUE, plot = TRUE, ...)
-\method{summary}{caribou_forecast}(x, ...)
+\method{summary}{caribou_forecast}(object, ...)
 \method{print}{summary.caribou_forecast}(x, ...)
 
 }
@@ -58,8 +58,8 @@ numeric, tolerance limit, i.e. the maximum acceptable deviation
 from \code{lambda} when solving for 'breakeven'
 proportion of females penned.
 }
-  \item{x}{
-an object to print, plot, etc.
+  \item{x, object}{
+an object to print, summarize, plot, etc.
 }
   \item{plot}{
 logical, whether a plot is to be produced.

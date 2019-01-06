@@ -39,7 +39,8 @@ print.summary.caribou_forecast <- function(x, ...) {
     str(x[c("tmax", "pop.start", "fpen.prop")],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     cat("\n")
-    str(x[c("Nend_nopen", "Nend_pen", "Nend_diff", "Cost_total", "Cost_percap")],
+    str(x[c("npens", "lam.pen", "lam.nopen",
+        "Nend.nopen", "Nend.pen", "Nend.diff", "Cost.total", "Cost.percap")],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     invisible(x)
 }

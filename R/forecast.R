@@ -179,11 +179,14 @@ function(settings, tmax=20, pop.start=100, fpen.prop=0)
         tmax=tmax,
         pop.start=pop.start,
         fpen.prop=fpen.prop,
-        Nend_nopen = Nend_nopen,
-        Nend_pen = Nend_pen,
-        Nend_diff = Nend_diff,
-        Cost_total = Cost_total,
-        Cost_percap = Cost_percap)
+        npens=Npop$pens.needed[tmax + 1L],
+        lam.pen=Npop$lam.pen[tmax + 1L],
+        lam.nopen=Npop$lam.nopen[tmax + 1L],
+        Nend.nopen = Nend_nopen,
+        Nend.pen = Nend_pen,
+        Nend.diff = Nend_diff,
+        Cost.total = Cost_total,
+        Cost.percap = Cost_percap)
     class(out) <- "caribou_forecast"
     out
 }

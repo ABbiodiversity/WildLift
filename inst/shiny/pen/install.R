@@ -1,6 +1,7 @@
 ## list of required packages
 pkgs <- c(
     "shiny",
+    #"DT",
     "shinydashboard")
 
 ## avoid compilation
