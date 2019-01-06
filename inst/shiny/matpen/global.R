@@ -1,6 +1,11 @@
 #shiny::runApp("inst/shiny/pen")
 
-source("install.R")
+## install/update CaribouBC package as needed
+## need to install from github for rsconnect to work properly
+#devtools::install_github("psolymos/CaribouBC")
+
+library(shiny)
+library(shinydashboard)
 library(CaribouBC)
 
 ## TODO:

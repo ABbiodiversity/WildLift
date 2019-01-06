@@ -1,0 +1,12 @@
+name: matpen
+title: matpen
+username:
+account: psolymos
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 627694
+bundleId: 1798470
+url: https://psolymos.shinyapps.io/matpen/
+when: 1546740117.175
+asMultiple: FALSE
+asStatic: FALSE
