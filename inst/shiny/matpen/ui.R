@@ -20,14 +20,14 @@ dashboardPage(
         fluidRow(
           column(width=8,
             box(
-              width = NULL, status = "info", solidHeader = TRUE,
+              width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Population forecast",
               #plotOutput("penningPlot", width = "100%", height = 400)
               plotlyOutput("penningPlot", width = "100%", height = 400)
             ),
             box(
-              width = NULL, status = "info", solidHeader = TRUE,
+              width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Summary",
               tableOutput("penningTable")
