@@ -126,9 +126,12 @@ server <- function(input, output, session) {
         tab <- cbind(
             Results=unlist(summary(getF())),
             Breakeven=unlist(summary(getB())))
-        data.frame(tab[c(
-            "npens", "lam.pen", "lam.nopen",
+        df <- data.frame(tab[c(
+            "fpen.prop", "npens", "lam.pen", "lam.nopen",
             "Nend.nopen", "Nend.pen", "Nend.diff",
             "Cost.total", "Cost.percap"),])
+        rownames(df)[1L] <- "Percent.penned"
+        df[1L,] <- df[1L,]*100
+        df
     }, rownames=TRUE, colnames=TRUE)
 }

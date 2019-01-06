@@ -39,9 +39,11 @@ tab <- cbind(
     Results=unlist(summary(getF())),
     Breakeven=unlist(summary(getB())))
 df <- data.frame(tab[c(
-    "npens", "lam.pen", "lam.nopen",
+    "fpen.prop", "npens", "lam.pen", "lam.nopen",
     "Nend.nopen", "Nend.pen", "Nend.diff",
     "Cost.total", "Cost.percap"),])
+rownames(df)[1L] <- "Percent.penned"
+df[1L,] <- df[1L,]*100
 #DT::datatable(df)
 
 
