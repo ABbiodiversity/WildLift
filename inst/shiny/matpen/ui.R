@@ -27,7 +27,8 @@ dashboardPage(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Summary",
-              tableOutput("penning_Table")
+              tableOutput("penning_Table"),
+              downloadButton("penning_download", "Download results as Excel file")
             )
           ),
           column(width=4,
@@ -48,9 +49,9 @@ dashboardPage(
                 min = 0, max = 1, value = inits$penning$c.surv.wild, step = 0.01),
               sliderInput("penning_DemCsc", "Calf survival, captive",
                 min = 0, max = 1, value = inits$penning$c.surv.capt, step = 0.01),
-              sliderInput("penning_DemFsw", "Maternal survival, wild",
+              sliderInput("penning_DemFsw", "Adult female survival, wild",
                 min = 0, max = 1, value = inits$penning$f.surv.wild, step = 0.01),
-              sliderInput("penning_DemFsc", "Maternal survival, captive",
+              sliderInput("penning_DemFsc", "Adult female survival, captive",
                 min = 0, max = 1, value = inits$penning$f.surv.capt, step = 0.01),
               sliderInput("penning_DemFpw", "Pregnancy rate, wild",
                 min = 0, max = 1, value = inits$penning$f.preg.wild, step = 0.01),

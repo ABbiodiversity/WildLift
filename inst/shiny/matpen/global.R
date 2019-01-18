@@ -7,6 +7,7 @@
 library(shiny)
 library(shinydashboard)
 library(plotly)
+library(openxlsx)
 library(CaribouBC)
 
 ## initialize sliders for the different pen types

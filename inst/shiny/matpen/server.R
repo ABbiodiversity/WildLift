@@ -85,6 +85,39 @@ server <- function(input, output, session) {
             pop.start = input$pop.start,
             fpen.prop = p)
     })
+
+    penning_getT <- reactive({
+        req(penning_getF())
+        bev <- if (is.null(penning_getB()))
+            NA else unlist(summary(penning_getB()))
+        tab <- cbind(
+            Results=unlist(summary(penning_getF())),
+            Breakeven=bev)
+        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
+            "Nend.pen", "Nend.nopen", "Nend.diff",
+            "Cost.total", "Cost.percap")
+        df <- tab[subs,,drop=FALSE]
+        df[1L,] <- df[1L,]*100
+        rownames(df) <- c("% penned",
+            "# pens", "&lambda; (pen)", "&lambda; (no pen)",
+            "N (end, pen)", "N (end, no pen)", "N (end, difference)",
+            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+        if (values$penning_compare) {
+            bev0 <- if (is.null(penning_getB0()))
+                NA else unlist(summary(penning_getB0()))
+            tab0 <- cbind(
+                Results=unlist(summary(penning_getF0())),
+                Breakeven=bev0)
+            df0 <- tab0[subs,,drop=FALSE]
+            df0[1L,] <- df0[1L,]*100
+            rownames(df0) <- rownames(df)
+            df <- cbind(df0, df)
+            colnames(df) <- c("Results, reference", "Breakeven, reference",
+                "Results", "Breakeven")
+        }
+        df
+    })
+
     penning_getF0 <- reactive({
         if (!values$penning_compare)
             return(NULL)
@@ -125,37 +158,37 @@ server <- function(input, output, session) {
         p
     })
     output$penning_Table <- renderTable({
-        req(penning_getF())
-        bev <- if (is.null(penning_getB()))
-            NA else unlist(summary(penning_getB()))
-        tab <- cbind(
-            Results=unlist(summary(penning_getF())),
-            Breakeven=bev)
-        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
-            "Nend.pen", "Nend.nopen", "Nend.diff",
-            "Cost.total", "Cost.percap")
-        df <- tab[subs,,drop=FALSE]
-        df[1L,] <- df[1L,]*100
-        rownames(df) <- c("% penned",
-            "# pens", "&lambda; (pen)", "&lambda; (no pen)",
-            "N (end, pen)", "N (end, no pen)", "N (end, difference)",
-            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
-        if (values$penning_compare) {
-            bev0 <- if (is.null(penning_getB0()))
-                NA else unlist(summary(penning_getB0()))
-            tab0 <- cbind(
-                Results=unlist(summary(penning_getF0())),
-                Breakeven=bev0)
-            df0 <- tab0[subs,,drop=FALSE]
-            df0[1L,] <- df0[1L,]*100
-            rownames(df0) <- rownames(df)
-            df <- cbind(df0, df)
-            colnames(df) <- c("Results, reference", "Breakeven, reference",
-                "Results", "Breakeven")
-        }
-        df
+        req(penning_getT())
+        penning_getT()
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
     sanitize.text.function = function(x) x)
+
+    penning_xlslist <- reactive({
+        req(penning_getF())
+        req(penning_getT())
+        TS <- plot(penning_getF(), plot=FALSE)
+        if (values$penning_compare) {
+            TS <- cbind(plot(penning_getF0(), plot=FALSE), TS[,-1])
+            colnames(TS) <- c("Years",
+                "N no pen, reference", "N pen, reference",
+                "N no pen", "N pen")
+        }
+        df <- penning_getT()
+        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
+        list(
+            TimeSeries=TS,
+            Summary=cbind(Variable=rownames(df), df))
+    })
+
+    output$penning_download <- downloadHandler(
+        filename = function() {
+            paste0("CaribouBC_output_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(penning_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
 
 }
