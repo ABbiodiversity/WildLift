@@ -16,6 +16,8 @@ b2
 plot(x2)
 lines(x1,col=2)
 
+x3 <- caribou_forecast(caribou_settings("mat.pen", c.surv.wild=0.64), fpen.prop = 0.5)
+
 ## imitate Shiny
 
 
