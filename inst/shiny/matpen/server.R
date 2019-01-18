@@ -1,137 +1,161 @@
 server <- function(input, output, session) {
 
-#  output$rSelection <- renderUI({
-#    if (!is.null(input$r_selected))
-#      sourcelist$rsel <- as.integer(input$r_selected)
-#    if (verbose)
-#      print(paste('# sources:', input$r, '--- selected:', sourcelist$rsel))
-#    selectInput("r_selected", "Factor to add sample to",
-#                choices=seq_len(as.integer(input$r)),
-#                selected = sourcelist$rsel)
-#  })
+    ## set values based inits
+    values <- reactiveValues(
+        penning = inits$penning,
+        penning0 = NULL,
+        penning_compare = inits$penning_compare)
 
-    ## default settings to serve as prototype
-    values <- reactiveValues(s = caribou_settings())
-
-    ## this resets all settings when pen type changes
-    observeEvent(input$penningType, {
-        values$s <- caribou_settings(input$penningType)
-    })
-
-    ## dynamic rendering of demography sliders
-    output$penningDemControls <- renderUI({
+    ## dynamically render button
+    output$penning_button <- renderUI({
         tagList(
-            sliderInput("penningDemCsw", "Calf survival, wild",
-                min = 0, max = 1, value = values$s$c.surv.wild, step = 0.01),
-            sliderInput("penningDemCsc", "Calf survival, captive",
-                min = 0, max = 1, value = values$s$c.surv.capt, step = 0.01),
-            sliderInput("penningDemFsw", "Maternal survival, wild",
-                min = 0, max = 1, value = values$s$f.surv.wild, step = 0.01),
-            sliderInput("penningDemFsc", "Maternal survival, captive",
-                min = 0, max = 1, value = values$s$f.surv.capt, step = 0.01),
-            sliderInput("penningDemFpw", "Pregnancy rate, wild",
-                min = 0, max = 1, value = values$s$f.preg.wild, step = 0.01),
-            sliderInput("penningDemFpc", "Pregnancy rate, captive",
-                min = 0, max = 1, value = values$s$f.preg.capt, step = 0.01)
+            actionButton("penning_button",
+                if (values$penning_compare) "Reset" else "Compare")
         )
     })
+    observeEvent(input$penning_button, {
+        values$penning_compare <- !values$penning_compare
+        if (values$penning_compare) {
+            values$penning0 <- values$penning
+        } else {
+            values$penning0 <- NULL
+        }
+    })
+
+    ## observe fpen perc slider change
+    observeEvent(input$penning_FpenPerc, {
+        values$penning$fpen.prop <- input$penning_FpenPerc / 100
+    })
+
     ## observe every demography slider change
-    observeEvent(input$penningDemCsw, {
-        values$s$c.surv.wild <- input$penningDemCsw
+    observeEvent(input$penning_DemCsw, {
+        values$penning$c.surv.wild <- input$penning_DemCsw
     })
-    observeEvent(input$penningDemCsc, {
-        values$s$c.surv.capt <- input$penningDemCsc
+    observeEvent(input$penning_DemCsc, {
+        values$penning$c.surv.capt <- input$penning_DemCsc
     })
-    observeEvent(input$penningDemFsw, {
-        values$s$f.surv.wild <- input$penningDemFsw
+    observeEvent(input$penning_DemFsw, {
+        values$penning$f.surv.wild <- input$penning_DemFsw
     })
-    observeEvent(input$penningDemFsc, {
-        values$s$f.surv.capt <- input$penningDemFsc
+    observeEvent(input$penning_DemFsc, {
+        values$penning$f.surv.capt <- input$penning_DemFsc
     })
-    observeEvent(input$penningDemFpw, {
-        values$s$f.preg.wild <- input$penningDemFpw
+    observeEvent(input$penning_DemFpw, {
+        values$penning$f.preg.wild <- input$penning_DemFpw
     })
-    observeEvent(input$penningDemFpc, {
-        values$s$f.preg.capt <- input$penningDemFpc
+    observeEvent(input$penning_DemFpc, {
+        values$penning$f.preg.capt <- input$penning_DemFpc
     })
 
-    ## dynamic redering of cost sliders
-    output$penningCostControls <- renderUI({
-        tagList(
-            sliderInput("penningCostPencap", "Max in a single pen",
-                min = 1, max = 50, value = values$s$pen.cap, step = 1),
-            sliderInput("penningCostSetup", "Initial set up",
-                min = 0, max = 500, value = values$s$pen.cost.setup, step = 10),
-            sliderInput("penningCostProj", "Project manager",
-                min = 0, max = 500, value = values$s$pen.cost.proj, step = 10),
-            sliderInput("penningCostMaint", "Maintenance",
-                min = 0, max = 500, value = values$s$pen.cost.maint, step = 10),
-            sliderInput("penningCostCapt", "Capture/monitor",
-                min = 0, max = 500, value = values$s$pen.cost.capt, step = 10),
-            sliderInput("penningCostPred", "Removing predators",
-                min = 0, max = 500, value = values$s$pen.cost.pred, step = 10)
-        )
-    })
     ## observe every cost slider change
-    observeEvent(input$penningCostPencap, {
-        values$s$pen.cap <- input$penningCostPencap
+    observeEvent(input$penning_CostPencap, {
+        values$penning$pen.cap <- input$penning_CostPencap
     })
-    observeEvent(input$penningCostSetup, {
-        values$s$pen.cost.setup <- input$penningCostSetup
+    observeEvent(input$penning_CostSetup, {
+        values$penning$pen.cost.setup <- input$penning_CostSetup
     })
-    observeEvent(input$penningCostProj, {
-        values$s$pen.cost.proj <- input$penningCostProj
+    observeEvent(input$penning_CostProj, {
+        values$penning$pen.cost.proj <- input$penning_CostProj
     })
-    observeEvent(input$penningCostMaint, {
-        values$s$pen.cost.maint <- input$penningCostMaint
+    observeEvent(input$penning_CostMaint, {
+        values$penning$pen.cost.maint <- input$penning_CostMaint
     })
-    observeEvent(input$penningCostCapt, {
-        values$s$pen.cost.capt <- input$penningCostCapt
+    observeEvent(input$penning_CostCapt, {
+        values$penning$pen.cost.capt <- input$penning_CostCapt
     })
-    observeEvent(input$penningCostPred, {
-        values$s$pen.cost.pred <- input$penningCostPred
+    observeEvent(input$penning_CostPred, {
+        values$penning$pen.cost.pred <- input$penning_CostPred
     })
-
 
     ## apply settings and get forecast
-    getF <- reactive({
-        caribou_forecast(values$s,
+    penning_getF <- reactive({
+        caribou_forecast(values$penning,
             tmax = input$tmax,
             pop.start = input$pop.start,
-            fpen.prop = input$fpen.perc / 100)
+            fpen.prop = values$penning$fpen.prop)
     })
     ## make summary table
-    getB <- reactive({
-        req(getF())
-        caribou_forecast(getF()$settings,
+    penning_getB <- reactive({
+        req(penning_getF())
+        p <- suppressWarnings(caribou_breakeven(penning_getF()))
+        if (is.na(p))
+            return(NULL)
+        caribou_forecast(penning_getF()$settings,
             tmax = input$tmax,
             pop.start = input$pop.start,
-            fpen.prop = caribou_breakeven(getF()))
+            fpen.prop = p)
+    })
+    penning_getF0 <- reactive({
+        if (!values$penning_compare)
+            return(NULL)
+        caribou_forecast(values$penning0,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = values$penning0$fpen.prop)
+    })
+    ## make summary table
+    penning_getB0 <- reactive({
+        req(penning_getF0())
+        p <- suppressWarnings(caribou_breakeven(penning_getF0()))
+        if (is.na(p))
+            return(NULL)
+        caribou_forecast(penning_getF0()$settings,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = p)
     })
 
-    output$penningPlot <- renderPlotly({
-        req(getF())
-        #plot(getF())
-        df <- plot(getF(), plot=FALSE)
+    output$penning_Plot <- renderPlotly({
+        req(penning_getF())
+        df <- plot(penning_getF(), plot=FALSE)
         colnames(df)[colnames(df) == "Npen"] <- "Individuals"
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
-            name = 'Pen', type = 'scatter', mode = 'lines') %>%
+            name = 'Pen', type = 'scatter', mode = 'lines',
+            color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'No pen',
-                mode = 'lines') %>%
-            layout(legend = list(x = 0.05, y = 0))
+                mode = 'lines', color=I('blue'))
+        if (values$penning_compare) {
+            df0 <- plot(penning_getF0(), plot=FALSE)
+            p <- p %>% add_trace(y = ~Npen, name = 'Pen, reference', data = df0,
+                    line=list(dash = 'dash', color='red')) %>%
+                add_trace(y = ~Nnopen, name = 'No pen, reference', data = df0,
+                    line=list(dash = 'dash', color='blue'))
+        }
+        p <- p %>% layout(legend = list(x = 0.05, y = 0))
         p
     })
-    output$penningTable <- renderTable({
-        req(getB())
+    output$penning_Table <- renderTable({
+        req(penning_getF())
+        bev <- if (is.null(penning_getB()))
+            NA else unlist(summary(penning_getB()))
         tab <- cbind(
-            Results=unlist(summary(getF())),
-            Breakeven=unlist(summary(getB())))
-        df <- data.frame(tab[c(
-            "fpen.prop", "npens", "lam.pen", "lam.nopen",
-            "Nend.nopen", "Nend.pen", "Nend.diff",
-            "Cost.total", "Cost.percap"),])
-        rownames(df)[1L] <- "Percent.penned"
+            Results=unlist(summary(penning_getF())),
+            Breakeven=bev)
+        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
+            "Nend.pen", "Nend.nopen", "Nend.diff",
+            "Cost.total", "Cost.percap")
+        df <- tab[subs,,drop=FALSE]
         df[1L,] <- df[1L,]*100
+        rownames(df) <- c("% penned",
+            "# pens", "&lambda; (pen)", "&lambda; (no pen)",
+            "N (end, pen)", "N (end, no pen)", "N (end, difference)",
+            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+        if (values$penning_compare) {
+            bev0 <- if (is.null(penning_getB0()))
+                NA else unlist(summary(penning_getB0()))
+            tab0 <- cbind(
+                Results=unlist(summary(penning_getF0())),
+                Breakeven=bev0)
+            df0 <- tab0[subs,,drop=FALSE]
+            df0[1L,] <- df0[1L,]*100
+            rownames(df0) <- rownames(df)
+            df <- cbind(df0, df)
+            colnames(df) <- c("Results, reference", "Breakeven, reference",
+                "Results", "Breakeven")
+        }
         df
-    }, rownames=TRUE, colnames=TRUE)
+    }, rownames=TRUE, colnames=TRUE,
+    striped=TRUE, bordered=TRUE, na="n/a",
+    sanitize.text.function = function(x) x)
+
 }

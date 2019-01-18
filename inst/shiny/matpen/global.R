@@ -9,6 +9,13 @@ library(shinydashboard)
 library(plotly)
 library(CaribouBC)
 
+## initialize sliders for the different pen types
+inits <- list(
+    penning = c(
+        fpen.prop = 0.25,
+        caribou_settings("mat.pen")),
+    penning_compare = FALSE)
+
 ## TODO:
 ## OK - add static settings sliders
 ## OK - implement plot
