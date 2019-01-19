@@ -10,7 +10,10 @@ server <- function(input, output, session) {
     output$penning_button <- renderUI({
         tagList(
             actionButton("penning_button",
-                if (values$penning_compare) "Reset" else "Compare")
+                if (values$penning_compare)
+                    "Single scenario" else "Compare scenarios",
+                icon = icon(if (values$penning_compare)
+                    "stop-circle" else "arrows-alt-h"))
         )
     })
     observeEvent(input$penning_button, {
@@ -74,7 +77,7 @@ server <- function(input, output, session) {
             pop.start = input$pop.start,
             fpen.prop = values$penning$fpen.prop)
     })
-    ## make summary table
+    ## try to find breakeven point
     penning_getB <- reactive({
         req(penning_getF())
         p <- suppressWarnings(caribou_breakeven(penning_getF()))
@@ -85,7 +88,26 @@ server <- function(input, output, session) {
             pop.start = input$pop.start,
             fpen.prop = p)
     })
-
+    ## these are similar functions to the bechmark scenario
+    penning_getF0 <- reactive({
+        if (!values$penning_compare)
+            return(NULL)
+        caribou_forecast(values$penning0,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = values$penning0$fpen.prop)
+    })
+    penning_getB0 <- reactive({
+        req(penning_getF0())
+        p <- suppressWarnings(caribou_breakeven(penning_getF0()))
+        if (is.na(p))
+            return(NULL)
+        caribou_forecast(penning_getF0()$settings,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = p)
+    })
+    ## making nice table of the results
     penning_getT <- reactive({
         req(penning_getF())
         bev <- if (is.null(penning_getB()))
@@ -117,27 +139,50 @@ server <- function(input, output, session) {
         }
         df
     })
-
-    penning_getF0 <- reactive({
-        if (!values$penning_compare)
-            return(NULL)
-        caribou_forecast(values$penning0,
-            tmax = input$tmax,
-            pop.start = input$pop.start,
-            fpen.prop = values$penning0$fpen.prop)
+    ## making nice table of the settings
+    penning_getS <- reactive({
+        req(penning_getF())
+        bev <- if (is.null(penning_getB()))
+            NA else get_settings(penning_getB())
+        tab <- cbind(
+            Results=get_settings(penning_getF()),
+            Breakeven=bev)
+        SNAM <- c(
+            "tmax" = "T max",
+            "pop.start" = "N start",
+            "fpen.prop" = "% females penned",
+            "c.surv.wild" = "Calf survival, wild",
+            "c.surv.capt" = "Calf survival, captive",
+            "f.surv.wild" = "Adult female survival, wild",
+            "f.surv.capt" = "Adult female survival, captive",
+            "f.preg.wild" = "Pregnancy rate, wild",
+            "f.preg.capt" = "Pregnancy rate, captive",
+            "pen.cap" = "Max in a single pen",
+            "pen.cost.setup" = "Initial set up (x $1000)",
+            "pen.cost.proj" = "Project manager (x $1000)",
+            "pen.cost.maint" = "Maintenance (x $1000)",
+            "pen.cost.capt" = "Capture/monitor (x $1000)",
+            "pen.cost.pred" = "Removing predators (x $1000)")
+        df <- tab[names(SNAM),,drop=FALSE]
+        df["fpen.prop",] <- df["fpen.prop",]*100
+        rownames(df) <- SNAM
+        if (values$penning_compare) {
+            bev0 <- if (is.null(penning_getB0()))
+                NA else get_settings(penning_getB0())
+            tab0 <- cbind(
+                Results=get_settings(penning_getF0()),
+                Breakeven=bev0)
+            df0 <- tab0[names(SNAM),,drop=FALSE]
+            df0["fpen.prop",] <- df0["fpen.prop",]*100
+            rownames(df0) <- SNAM
+            df <- cbind(df0, df)
+            colnames(df) <- c("Results, reference", "Breakeven, reference",
+                "Results", "Breakeven")
+        }
+        df
     })
-    ## make summary table
-    penning_getB0 <- reactive({
-        req(penning_getF0())
-        p <- suppressWarnings(caribou_breakeven(penning_getF0()))
-        if (is.na(p))
-            return(NULL)
-        caribou_forecast(penning_getF0()$settings,
-            tmax = input$tmax,
-            pop.start = input$pop.start,
-            fpen.prop = p)
-    })
 
+    ## plot
     output$penning_Plot <- renderPlotly({
         req(penning_getF())
         df <- plot(penning_getF(), plot=FALSE)
@@ -157,6 +202,8 @@ server <- function(input, output, session) {
         p <- p %>% layout(legend = list(x = 0.05, y = 0))
         p
     })
+
+    ## table
     output$penning_Table <- renderTable({
         req(penning_getT())
         penning_getT()
@@ -164,6 +211,7 @@ server <- function(input, output, session) {
     striped=TRUE, bordered=TRUE, na="n/a",
     sanitize.text.function = function(x) x)
 
+    ## dowload
     penning_xlslist <- reactive({
         req(penning_getF())
         req(penning_getT())
@@ -176,11 +224,22 @@ server <- function(input, output, session) {
         }
         df <- penning_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
-        list(
-            TimeSeries=TS,
-            Summary=cbind(Variable=rownames(df), df))
+        ss <- penning_getS()
+        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
+            fields="Version")
+        out <- list(
+            Info=data.frame(CaribouBC=paste0(
+                c("R package version: ", "Date of analysis: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+            Settings=as.data.frame(ss),
+            TimeSeries=as.data.frame(TS),
+            Summary=as.data.frame(df))
+        out$Settings$Parameters <- rownames(ss)
+        out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
+        out$Summary$Variables <- rownames(df)
+        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
+        out
     })
-
     output$penning_download <- downloadHandler(
         filename = function() {
             paste0("CaribouBC_output_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
