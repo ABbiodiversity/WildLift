@@ -15,15 +15,12 @@ inits <- list(
     penning = c(
         fpen.prop = 0.25,
         caribou_settings("mat.pen")),
-    penning_compare = FALSE,
     predator = c(
         fpen.prop = 0.25,
         caribou_settings("pred.excl")),
-    predator_compare = FALSE,
     moose = c(
         fpen.prop = 0.25,
-        caribou_settings("moose.red")),
-    moose_compare = FALSE)
+        caribou_settings("moose.red")))
 
 get_settings <- function(x) {
     c(tmax = x$tmax,
@@ -36,6 +33,6 @@ get_settings <- function(x) {
 ## OK - add static settings sliders
 ## OK - implement plot
 ## OK - implement summary
-## OK - add download options? what to download?
-## - remove pred cost slider where not relevant
+## OK - add download options
+## OK - remove pred cost slider where not relevant
 ## - need some kind of help page / info popups?

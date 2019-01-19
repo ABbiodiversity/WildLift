@@ -1,10 +1,22 @@
 server <- function(input, output, session) {
 
+
+    ## >>> common part for all 3 tabs <<<====================
+
     ## set values based inits
     values <- reactiveValues(
         penning = inits$penning,
         penning0 = NULL,
-        penning_compare = inits$penning_compare)
+        penning_compare = FALSE,
+        predator = inits$predator,
+        predator0 = NULL,
+        predator_compare = FALSE,
+        moose = inits$moose,
+        moose0 = NULL,
+        moose_compare = FALSE)
+
+
+    ## >>> penning tab <<<=====================================
 
     ## dynamically render button
     output$penning_button <- renderUI({
@@ -16,6 +28,7 @@ server <- function(input, output, session) {
                     "stop-circle" else "arrows-alt-h"))
         )
     })
+    ## observers
     observeEvent(input$penning_button, {
         values$penning_compare <- !values$penning_compare
         if (values$penning_compare) {
@@ -24,13 +37,9 @@ server <- function(input, output, session) {
             values$penning0 <- NULL
         }
     })
-
-    ## observe fpen perc slider change
     observeEvent(input$penning_FpenPerc, {
         values$penning$fpen.prop <- input$penning_FpenPerc / 100
     })
-
-    ## observe every demography slider change
     observeEvent(input$penning_DemCsw, {
         values$penning$c.surv.wild <- input$penning_DemCsw
     })
@@ -49,8 +58,6 @@ server <- function(input, output, session) {
     observeEvent(input$penning_DemFpc, {
         values$penning$f.preg.capt <- input$penning_DemFpc
     })
-
-    ## observe every cost slider change
     observeEvent(input$penning_CostPencap, {
         values$penning$pen.cap <- input$penning_CostPencap
     })
@@ -66,10 +73,9 @@ server <- function(input, output, session) {
     observeEvent(input$penning_CostCapt, {
         values$penning$pen.cost.capt <- input$penning_CostCapt
     })
-    observeEvent(input$penning_CostPred, {
-        values$penning$pen.cost.pred <- input$penning_CostPred
-    })
-
+    #observeEvent(input$penning_CostPred, {
+    #    values$penning$pen.cost.pred <- input$penning_CostPred
+    #})
     ## apply settings and get forecast
     penning_getF <- reactive({
         caribou_forecast(values$penning,
@@ -181,7 +187,6 @@ server <- function(input, output, session) {
         }
         df
     })
-
     ## plot
     output$penning_Plot <- renderPlotly({
         req(penning_getF())
@@ -202,7 +207,6 @@ server <- function(input, output, session) {
         p <- p %>% layout(legend = list(x = 0.05, y = 0))
         p
     })
-
     ## table
     output$penning_Table <- renderTable({
         req(penning_getT())
@@ -210,7 +214,6 @@ server <- function(input, output, session) {
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
     sanitize.text.function = function(x) x)
-
     ## dowload
     penning_xlslist <- reactive({
         req(penning_getF())
@@ -246,6 +249,482 @@ server <- function(input, output, session) {
         },
         content = function(file) {
             write.xlsx(penning_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
+
+
+    ## >>> predator tab <<<=====================================
+
+    ## dynamically render button
+    output$predator_button <- renderUI({
+        tagList(
+            actionButton("predator_button",
+                if (values$predator_compare)
+                    "Single scenario" else "Compare scenarios",
+                icon = icon(if (values$predator_compare)
+                    "stop-circle" else "arrows-alt-h"))
+        )
+    })
+    ## observers
+    observeEvent(input$predator_button, {
+        values$predator_compare <- !values$predator_compare
+        if (values$predator_compare) {
+            values$predator0 <- values$predator
+        } else {
+            values$predator0 <- NULL
+        }
+    })
+    observeEvent(input$predator_FpenPerc, {
+        values$predator$fpen.prop <- input$predator_FpenPerc / 100
+    })
+    observeEvent(input$predator_DemCsw, {
+        values$predator$c.surv.wild <- input$predator_DemCsw
+    })
+    observeEvent(input$predator_DemCsc, {
+        values$predator$c.surv.capt <- input$predator_DemCsc
+    })
+    observeEvent(input$predator_DemFsw, {
+        values$predator$f.surv.wild <- input$predator_DemFsw
+    })
+    observeEvent(input$predator_DemFsc, {
+        values$predator$f.surv.capt <- input$predator_DemFsc
+    })
+    observeEvent(input$predator_DemFpw, {
+        values$predator$f.preg.wild <- input$predator_DemFpw
+    })
+    observeEvent(input$predator_DemFpc, {
+        values$predator$f.preg.capt <- input$predator_DemFpc
+    })
+    observeEvent(input$predator_CostPencap, {
+        values$predator$pen.cap <- input$predator_CostPencap
+    })
+    observeEvent(input$predator_CostSetup, {
+        values$predator$pen.cost.setup <- input$predator_CostSetup
+    })
+    observeEvent(input$predator_CostProj, {
+        values$predator$pen.cost.proj <- input$predator_CostProj
+    })
+    observeEvent(input$predator_CostMaint, {
+        values$predator$pen.cost.maint <- input$predator_CostMaint
+    })
+    observeEvent(input$predator_CostCapt, {
+        values$predator$pen.cost.capt <- input$predator_CostCapt
+    })
+    observeEvent(input$predator_CostPred, {
+        values$predator$pen.cost.pred <- input$predator_CostPred
+    })
+    ## apply settings and get forecast
+    predator_getF <- reactive({
+        caribou_forecast(values$predator,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = values$predator$fpen.prop)
+    })
+    ## try to find breakeven point
+    predator_getB <- reactive({
+        req(predator_getF())
+        p <- suppressWarnings(caribou_breakeven(predator_getF()))
+        if (is.na(p))
+            return(NULL)
+        caribou_forecast(predator_getF()$settings,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = p)
+    })
+    ## these are similar functions to the bechmark scenario
+    predator_getF0 <- reactive({
+        if (!values$predator_compare)
+            return(NULL)
+        caribou_forecast(values$predator0,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = values$predator0$fpen.prop)
+    })
+    predator_getB0 <- reactive({
+        req(predator_getF0())
+        p <- suppressWarnings(caribou_breakeven(predator_getF0()))
+        if (is.na(p))
+            return(NULL)
+        caribou_forecast(predator_getF0()$settings,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = p)
+    })
+    ## making nice table of the results
+    predator_getT <- reactive({
+        req(predator_getF())
+        bev <- if (is.null(predator_getB()))
+            NA else unlist(summary(predator_getB()))
+        tab <- cbind(
+            Results=unlist(summary(predator_getF())),
+            Breakeven=bev)
+        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
+            "Nend.pen", "Nend.nopen", "Nend.diff",
+            "Cost.total", "Cost.percap")
+        df <- tab[subs,,drop=FALSE]
+        df[1L,] <- df[1L,]*100
+        rownames(df) <- c("% penned",
+            "# pens", "&lambda; (pen)", "&lambda; (no pen)",
+            "N (end, pen)", "N (end, no pen)", "N (end, difference)",
+            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+        if (values$predator_compare) {
+            bev0 <- if (is.null(predator_getB0()))
+                NA else unlist(summary(predator_getB0()))
+            tab0 <- cbind(
+                Results=unlist(summary(predator_getF0())),
+                Breakeven=bev0)
+            df0 <- tab0[subs,,drop=FALSE]
+            df0[1L,] <- df0[1L,]*100
+            rownames(df0) <- rownames(df)
+            df <- cbind(df0, df)
+            colnames(df) <- c("Results, reference", "Breakeven, reference",
+                "Results", "Breakeven")
+        }
+        df
+    })
+    ## making nice table of the settings
+    predator_getS <- reactive({
+        req(predator_getF())
+        bev <- if (is.null(predator_getB()))
+            NA else get_settings(predator_getB())
+        tab <- cbind(
+            Results=get_settings(predator_getF()),
+            Breakeven=bev)
+        SNAM <- c(
+            "tmax" = "T max",
+            "pop.start" = "N start",
+            "fpen.prop" = "% females penned",
+            "c.surv.wild" = "Calf survival, wild",
+            "c.surv.capt" = "Calf survival, captive",
+            "f.surv.wild" = "Adult female survival, wild",
+            "f.surv.capt" = "Adult female survival, captive",
+            "f.preg.wild" = "Pregnancy rate, wild",
+            "f.preg.capt" = "Pregnancy rate, captive",
+            "pen.cap" = "Max in a single pen",
+            "pen.cost.setup" = "Initial set up (x $1000)",
+            "pen.cost.proj" = "Project manager (x $1000)",
+            "pen.cost.maint" = "Maintenance (x $1000)",
+            "pen.cost.capt" = "Capture/monitor (x $1000)",
+            "pen.cost.pred" = "Removing predators (x $1000)")
+        df <- tab[names(SNAM),,drop=FALSE]
+        df["fpen.prop",] <- df["fpen.prop",]*100
+        rownames(df) <- SNAM
+        if (values$predator_compare) {
+            bev0 <- if (is.null(predator_getB0()))
+                NA else get_settings(predator_getB0())
+            tab0 <- cbind(
+                Results=get_settings(predator_getF0()),
+                Breakeven=bev0)
+            df0 <- tab0[names(SNAM),,drop=FALSE]
+            df0["fpen.prop",] <- df0["fpen.prop",]*100
+            rownames(df0) <- SNAM
+            df <- cbind(df0, df)
+            colnames(df) <- c("Results, reference", "Breakeven, reference",
+                "Results", "Breakeven")
+        }
+        df
+    })
+    ## plot
+    output$predator_Plot <- renderPlotly({
+        req(predator_getF())
+        df <- plot(predator_getF(), plot=FALSE)
+        colnames(df)[colnames(df) == "Npen"] <- "Individuals"
+        p <- plot_ly(df, x = ~Years, y = ~Individuals,
+            name = 'Pen', type = 'scatter', mode = 'lines',
+            color=I('red')) %>%
+            add_trace(y = ~Nnopen, name = 'No pen',
+                mode = 'lines', color=I('blue'))
+        if (values$predator_compare) {
+            df0 <- plot(predator_getF0(), plot=FALSE)
+            p <- p %>% add_trace(y = ~Npen, name = 'Pen, reference', data = df0,
+                    line=list(dash = 'dash', color='red')) %>%
+                add_trace(y = ~Nnopen, name = 'No pen, reference', data = df0,
+                    line=list(dash = 'dash', color='blue'))
+        }
+        p <- p %>% layout(legend = list(x = 0.05, y = 0))
+        p
+    })
+    ## table
+    output$predator_Table <- renderTable({
+        req(predator_getT())
+        predator_getT()
+    }, rownames=TRUE, colnames=TRUE,
+    striped=TRUE, bordered=TRUE, na="n/a",
+    sanitize.text.function = function(x) x)
+    ## dowload
+    predator_xlslist <- reactive({
+        req(predator_getF())
+        req(predator_getT())
+        TS <- plot(predator_getF(), plot=FALSE)
+        if (values$predator_compare) {
+            TS <- cbind(plot(predator_getF0(), plot=FALSE), TS[,-1])
+            colnames(TS) <- c("Years",
+                "N no pen, reference", "N pen, reference",
+                "N no pen", "N pen")
+        }
+        df <- predator_getT()
+        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
+        ss <- predator_getS()
+        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
+            fields="Version")
+        out <- list(
+            Info=data.frame(CaribouBC=paste0(
+                c("R package version: ", "Date of analysis: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+            Settings=as.data.frame(ss),
+            TimeSeries=as.data.frame(TS),
+            Summary=as.data.frame(df))
+        out$Settings$Parameters <- rownames(ss)
+        out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
+        out$Summary$Variables <- rownames(df)
+        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
+        out
+    })
+    output$predator_download <- downloadHandler(
+        filename = function() {
+            paste0("CaribouBC_output_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(predator_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
+
+
+    ## >>> moose tab <<<=====================================
+
+    ## dynamically render button
+    output$moose_button <- renderUI({
+        tagList(
+            actionButton("moose_button",
+                if (values$moose_compare)
+                    "Single scenario" else "Compare scenarios",
+                icon = icon(if (values$moose_compare)
+                    "stop-circle" else "arrows-alt-h"))
+        )
+    })
+    ## observers
+    observeEvent(input$moose_button, {
+        values$moose_compare <- !values$moose_compare
+        if (values$moose_compare) {
+            values$moose0 <- values$moose
+        } else {
+            values$moose0 <- NULL
+        }
+    })
+    observeEvent(input$moose_FpenPerc, {
+        values$moose$fpen.prop <- input$moose_FpenPerc / 100
+    })
+    observeEvent(input$moose_DemCsw, {
+        values$moose$c.surv.wild <- input$moose_DemCsw
+    })
+    observeEvent(input$moose_DemCsc, {
+        values$moose$c.surv.capt <- input$moose_DemCsc
+    })
+    observeEvent(input$moose_DemFsw, {
+        values$moose$f.surv.wild <- input$moose_DemFsw
+    })
+    observeEvent(input$moose_DemFsc, {
+        values$moose$f.surv.capt <- input$moose_DemFsc
+    })
+    observeEvent(input$moose_DemFpw, {
+        values$moose$f.preg.wild <- input$moose_DemFpw
+    })
+    observeEvent(input$moose_DemFpc, {
+        values$moose$f.preg.capt <- input$moose_DemFpc
+    })
+    observeEvent(input$moose_CostPencap, {
+        values$moose$pen.cap <- input$moose_CostPencap
+    })
+    observeEvent(input$moose_CostSetup, {
+        values$moose$pen.cost.setup <- input$moose_CostSetup
+    })
+    observeEvent(input$moose_CostProj, {
+        values$moose$pen.cost.proj <- input$moose_CostProj
+    })
+    observeEvent(input$moose_CostMaint, {
+        values$moose$pen.cost.maint <- input$moose_CostMaint
+    })
+    observeEvent(input$moose_CostCapt, {
+        values$moose$pen.cost.capt <- input$moose_CostCapt
+    })
+    #observeEvent(input$moose_CostPred, {
+    #    values$moose$pen.cost.pred <- input$moose_CostPred
+    #})
+    ## apply settings and get forecast
+    moose_getF <- reactive({
+        caribou_forecast(values$moose,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = values$moose$fpen.prop)
+    })
+    ## try to find breakeven point
+    moose_getB <- reactive({
+        req(moose_getF())
+        p <- suppressWarnings(caribou_breakeven(moose_getF()))
+        if (is.na(p))
+            return(NULL)
+        caribou_forecast(moose_getF()$settings,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = p)
+    })
+    ## these are similar functions to the bechmark scenario
+    moose_getF0 <- reactive({
+        if (!values$moose_compare)
+            return(NULL)
+        caribou_forecast(values$moose0,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = values$moose0$fpen.prop)
+    })
+    moose_getB0 <- reactive({
+        req(moose_getF0())
+        p <- suppressWarnings(caribou_breakeven(moose_getF0()))
+        if (is.na(p))
+            return(NULL)
+        caribou_forecast(moose_getF0()$settings,
+            tmax = input$tmax,
+            pop.start = input$pop.start,
+            fpen.prop = p)
+    })
+    ## making nice table of the results
+    moose_getT <- reactive({
+        req(moose_getF())
+        bev <- if (is.null(moose_getB()))
+            NA else unlist(summary(moose_getB()))
+        tab <- cbind(
+            Results=unlist(summary(moose_getF())),
+            Breakeven=bev)
+        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
+            "Nend.pen", "Nend.nopen", "Nend.diff",
+            "Cost.total", "Cost.percap")
+        df <- tab[subs,,drop=FALSE]
+        df[1L,] <- df[1L,]*100
+        rownames(df) <- c("% penned",
+            "# pens", "&lambda; (pen)", "&lambda; (no pen)",
+            "N (end, pen)", "N (end, no pen)", "N (end, difference)",
+            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+        if (values$moose_compare) {
+            bev0 <- if (is.null(moose_getB0()))
+                NA else unlist(summary(moose_getB0()))
+            tab0 <- cbind(
+                Results=unlist(summary(moose_getF0())),
+                Breakeven=bev0)
+            df0 <- tab0[subs,,drop=FALSE]
+            df0[1L,] <- df0[1L,]*100
+            rownames(df0) <- rownames(df)
+            df <- cbind(df0, df)
+            colnames(df) <- c("Results, reference", "Breakeven, reference",
+                "Results", "Breakeven")
+        }
+        df
+    })
+    ## making nice table of the settings
+    moose_getS <- reactive({
+        req(moose_getF())
+        bev <- if (is.null(moose_getB()))
+            NA else get_settings(moose_getB())
+        tab <- cbind(
+            Results=get_settings(moose_getF()),
+            Breakeven=bev)
+        SNAM <- c(
+            "tmax" = "T max",
+            "pop.start" = "N start",
+            "fpen.prop" = "% females penned",
+            "c.surv.wild" = "Calf survival, wild",
+            "c.surv.capt" = "Calf survival, captive",
+            "f.surv.wild" = "Adult female survival, wild",
+            "f.surv.capt" = "Adult female survival, captive",
+            "f.preg.wild" = "Pregnancy rate, wild",
+            "f.preg.capt" = "Pregnancy rate, captive",
+            "pen.cap" = "Max in a single pen",
+            "pen.cost.setup" = "Initial set up (x $1000)",
+            "pen.cost.proj" = "Project manager (x $1000)",
+            "pen.cost.maint" = "Maintenance (x $1000)",
+            "pen.cost.capt" = "Capture/monitor (x $1000)",
+            "pen.cost.pred" = "Removing mooses (x $1000)")
+        df <- tab[names(SNAM),,drop=FALSE]
+        df["fpen.prop",] <- df["fpen.prop",]*100
+        rownames(df) <- SNAM
+        if (values$moose_compare) {
+            bev0 <- if (is.null(moose_getB0()))
+                NA else get_settings(moose_getB0())
+            tab0 <- cbind(
+                Results=get_settings(moose_getF0()),
+                Breakeven=bev0)
+            df0 <- tab0[names(SNAM),,drop=FALSE]
+            df0["fpen.prop",] <- df0["fpen.prop",]*100
+            rownames(df0) <- SNAM
+            df <- cbind(df0, df)
+            colnames(df) <- c("Results, reference", "Breakeven, reference",
+                "Results", "Breakeven")
+        }
+        df
+    })
+    ## plot
+    output$moose_Plot <- renderPlotly({
+        req(moose_getF())
+        df <- plot(moose_getF(), plot=FALSE)
+        colnames(df)[colnames(df) == "Npen"] <- "Individuals"
+        p <- plot_ly(df, x = ~Years, y = ~Individuals,
+            name = 'Pen', type = 'scatter', mode = 'lines',
+            color=I('red')) %>%
+            add_trace(y = ~Nnopen, name = 'No pen',
+                mode = 'lines', color=I('blue'))
+        if (values$moose_compare) {
+            df0 <- plot(moose_getF0(), plot=FALSE)
+            p <- p %>% add_trace(y = ~Npen, name = 'Pen, reference', data = df0,
+                    line=list(dash = 'dash', color='red')) %>%
+                add_trace(y = ~Nnopen, name = 'No pen, reference', data = df0,
+                    line=list(dash = 'dash', color='blue'))
+        }
+        p <- p %>% layout(legend = list(x = 0.05, y = 0))
+        p
+    })
+    ## table
+    output$moose_Table <- renderTable({
+        req(moose_getT())
+        moose_getT()
+    }, rownames=TRUE, colnames=TRUE,
+    striped=TRUE, bordered=TRUE, na="n/a",
+    sanitize.text.function = function(x) x)
+    ## dowload
+    moose_xlslist <- reactive({
+        req(moose_getF())
+        req(moose_getT())
+        TS <- plot(moose_getF(), plot=FALSE)
+        if (values$moose_compare) {
+            TS <- cbind(plot(moose_getF0(), plot=FALSE), TS[,-1])
+            colnames(TS) <- c("Years",
+                "N no pen, reference", "N pen, reference",
+                "N no pen", "N pen")
+        }
+        df <- moose_getT()
+        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
+        ss <- moose_getS()
+        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
+            fields="Version")
+        out <- list(
+            Info=data.frame(CaribouBC=paste0(
+                c("R package version: ", "Date of analysis: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+            Settings=as.data.frame(ss),
+            TimeSeries=as.data.frame(TS),
+            Summary=as.data.frame(df))
+        out$Settings$Parameters <- rownames(ss)
+        out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
+        out$Summary$Variables <- rownames(df)
+        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
+        out
+    })
+    output$moose_download <- downloadHandler(
+        filename = function() {
+            paste0("CaribouBC_output_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(moose_xlslist(), file=file, overwrite=TRUE)
         },
         contentType="application/octet-stream"
     )

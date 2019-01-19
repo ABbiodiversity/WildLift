@@ -74,9 +74,9 @@ dashboardPage(
               sliderInput("penning_CostMaint", "Maintenance",
                 min = 0, max = 1000, value = inits$penning$pen.cost.maint, step = 10),
               sliderInput("penning_CostCapt", "Capture/monitor",
-                min = 0, max = 500, value = inits$penning$pen.cost.capt, step = 10),
-              sliderInput("penning_CostPred", "Removing predators",
-                min = 0, max = 500, value = inits$penning$pen.cost.pred, step = 10)
+                min = 0, max = 500, value = inits$penning$pen.cost.capt, step = 10)#,
+              #sliderInput("penning_CostPred", "Removing predators",
+              #  min = 0, max = 500, value = inits$penning$pen.cost.pred, step = 10)
             )
           )
         )
@@ -206,9 +206,9 @@ dashboardPage(
               sliderInput("moose_CostMaint", "Maintenance",
                 min = 0, max = 1000, value = inits$moose$pen.cost.maint, step = 10),
               sliderInput("moose_CostCapt", "Capture/monitor",
-                min = 0, max = 500, value = inits$moose$pen.cost.capt, step = 10),
-              sliderInput("moose_CostPred", "Removing predators",
-                min = 0, max = 500, value = inits$moose$pen.cost.pred, step = 10)
+                min = 0, max = 500, value = inits$moose$pen.cost.capt, step = 10)#,
+              #sliderInput("moose_CostPred", "Removing predators",
+              #  min = 0, max = 500, value = inits$moose$pen.cost.pred, step = 10)
             )
           )
         )
