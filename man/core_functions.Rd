@@ -17,9 +17,11 @@ Functions to set demographic and cost parameter, to perform
 forecasting, and to inspect the results.
 }
 \usage{
-caribou_settings(pen.type = c("mat.pen",  "pred.excl"), ...)
+caribou_settings(pen.type = c("mat.pen",  "pred.excl",
+    "moose.red"), ...)
 
-caribou_forecast(settings, tmax = 20, pop.start = 100, fpen.prop = 0)
+caribou_forecast(settings, tmax = 20, pop.start = 100,
+    fpen.prop = 0)
 
 caribou_breakeven(forecast, lambda = 1, tol = 0.001)
 
@@ -33,7 +35,7 @@ caribou_breakeven(forecast, lambda = 1, tol = 0.001)
 }
 \arguments{
   \item{pen.type}{
-character, maternity pen or predator exclusion pen.
+character: maternity penning, predator exclusion, or moose reduction.
 It can also be a settings object.
 }
   \item{settings}{
@@ -96,9 +98,9 @@ The following demographic parameters can be set by \code{caribou_settings}:
 
 \code{c.surv.capt}: calf survival rate when captive, annual.
 
-\code{f.surv.wild}: maternal survival when wild, annual.
+\code{f.surv.wild}: adult female survival when wild, annual.
 
-\code{f.surv.capt}: maternal survival when captive, annual.
+\code{f.surv.capt}: adult female survival when captive, annual.
 
 \code{f.preg.wild}: pregnancy rate when wild.
 
