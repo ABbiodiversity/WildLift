@@ -27,5 +27,9 @@ LazyData: true
 Depends: popbio
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    shiny,
+    shinydashboard,
+    plotly,
+    openxlsx
 VignetteBuilder: knitr
