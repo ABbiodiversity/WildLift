@@ -10,7 +10,7 @@ function(pen.type=c("mat.pen",  "pred.excl", "moose.red"), ...) {
             parms$pen.cap <- 35       # how many individual caribou can live in mat pen?
             parms$pen.cost.setup <- 500 # cost in thousands to set up pen
             parms$pen.cost.proj <- 80 # costs of project manager
-            parms$pen.cost.maint <- 500 # cost in thousands for patrolling and repairing fence
+            parms$pen.cost.maint <- 300 # cost in thousands for patrolling and repairing fence + shepherd + contingencies
             parms$pen.cost.capt <- 250 # cost in thousands to capture cows, monitor, survey, calf collar
             parms$pen.cost.pred <- 0 # cost in thousands for removing predators annually
             ## demography
@@ -28,7 +28,7 @@ function(pen.type=c("mat.pen",  "pred.excl", "moose.red"), ...) {
             parms$pen.cap <- 35        # how many individual caribou can live in big pen?
             parms$pen.cost.setup <- (77*24) + 20 # cost in thousands to set up pen
             parms$pen.cost.proj <- 80 # costs of project manager
-            parms$pen.cost.maint <- 500 # cost in thousands for patrolling and repairing fence
+            parms$pen.cost.maint <- 600 # cost in thousands for patrolling and repairing fence + contingencies
             parms$pen.cost.capt <- 200 # cost in thousands to capture cows, monitor, survey, calf collar
             parms$pen.cost.pred <- 80 # cost in thousands for removing predators annually
             ## demography
