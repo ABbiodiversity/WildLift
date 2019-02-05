@@ -164,52 +164,6 @@ dashboardPage(
               tableOutput("moose_Table"),
               downloadButton("moose_download", "Download results as Excel file")
             )
-          ),
-          column(width=4,
-            box(
-              width = NULL, status = "info", solidHeader = TRUE,
-              collapsible = FALSE, collapsed = FALSE,
-              title = "Penning",
-              sliderInput("moose_FpenPerc", "Percent of females penned",
-                min = 0, max = 100, value = round(100*inits$moose$fpen.prop),
-                step = 1),
-              uiOutput("moose_button")
-            ),
-            box(
-              width = NULL, status = "info", solidHeader = TRUE,
-              collapsible = TRUE, collapsed = TRUE,
-              title = "Demography",
-              sliderInput("moose_DemCsw", "Calf survival, wild",
-                min = 0, max = 1, value = inits$moose$c.surv.wild, step = 0.01),
-              sliderInput("moose_DemCsc", "Calf survival, captive",
-                min = 0, max = 1, value = inits$moose$c.surv.capt, step = 0.01),
-              sliderInput("moose_DemFsw", "Adult female survival, wild",
-                min = 0, max = 1, value = inits$moose$f.surv.wild, step = 0.01),
-              sliderInput("moose_DemFsc", "Adult female survival, captive",
-                min = 0, max = 1, value = inits$moose$f.surv.capt, step = 0.01),
-              sliderInput("moose_DemFpw", "Pregnancy rate, wild",
-                min = 0, max = 1, value = inits$moose$f.preg.wild, step = 0.01),
-              sliderInput("moose_DemFpc", "Pregnancy rate, captive",
-                min = 0, max = 1, value = inits$moose$f.preg.capt, step = 0.01)
-            ),
-            box(
-              width = NULL, status = "info", solidHeader = TRUE,
-              collapsible = TRUE, collapsed = TRUE,
-              title = "Cost (x $1000)",
-              sliderInput("moose_CostPencap", "Max in a single pen",
-                min = 1, max = 100, value = inits$moose$pen.cap, step = 1),
-              sliderInput("moose_CostSetup", "Initial set up",
-                min = 0, max = 2000, value = 100*round(inits$moose$pen.cost.setup/100),
-                step = 100),
-              sliderInput("moose_CostProj", "Project manager",
-                min = 0, max = 500, value = inits$moose$pen.cost.proj, step = 10),
-              sliderInput("moose_CostMaint", "Maintenance",
-                min = 0, max = 1000, value = inits$moose$pen.cost.maint, step = 10),
-              sliderInput("moose_CostCapt", "Capture/monitor",
-                min = 0, max = 500, value = inits$moose$pen.cost.capt, step = 10)#,
-              #sliderInput("moose_CostPred", "Removing predators",
-              #  min = 0, max = 500, value = inits$moose$pen.cost.pred, step = 10)
-            )
           )
         )
       )

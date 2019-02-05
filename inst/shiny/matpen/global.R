@@ -19,8 +19,12 @@ inits <- list(
         fpen.prop = 0.25,
         caribou_settings("pred.excl")),
     moose = c(
-        fpen.prop = 0.25,
-        caribou_settings("moose.red")))
+        fpen.prop = 0,
+        caribou_settings("mat.pen", f.surv.wild = 0.87)),
+    moose0 = c(
+        fpen.prop = 0,
+        caribou_settings("mat.pen"))
+)
 
 get_settings <- function(x) {
     c(tmax = x$tmax,

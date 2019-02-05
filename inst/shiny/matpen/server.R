@@ -12,8 +12,8 @@ server <- function(input, output, session) {
         predator0 = NULL,
         predator_compare = FALSE,
         moose = inits$moose,
-        moose0 = NULL,
-        moose_compare = FALSE)
+        moose0 = inits$moose0,
+        moose_compare = TRUE)
 
 
     ## >>> penning tab <<<=====================================
@@ -494,64 +494,6 @@ server <- function(input, output, session) {
 
     ## >>> moose tab <<<=====================================
 
-    ## dynamically render button
-    output$moose_button <- renderUI({
-        tagList(
-            actionButton("moose_button",
-                if (values$moose_compare)
-                    "Single scenario" else "Compare scenarios",
-                icon = icon(if (values$moose_compare)
-                    "stop-circle" else "arrows-alt-h"))
-        )
-    })
-    ## observers
-    observeEvent(input$moose_button, {
-        values$moose_compare <- !values$moose_compare
-        if (values$moose_compare) {
-            values$moose0 <- values$moose
-        } else {
-            values$moose0 <- NULL
-        }
-    })
-    observeEvent(input$moose_FpenPerc, {
-        values$moose$fpen.prop <- input$moose_FpenPerc / 100
-    })
-    observeEvent(input$moose_DemCsw, {
-        values$moose$c.surv.wild <- input$moose_DemCsw
-    })
-    observeEvent(input$moose_DemCsc, {
-        values$moose$c.surv.capt <- input$moose_DemCsc
-    })
-    observeEvent(input$moose_DemFsw, {
-        values$moose$f.surv.wild <- input$moose_DemFsw
-    })
-    observeEvent(input$moose_DemFsc, {
-        values$moose$f.surv.capt <- input$moose_DemFsc
-    })
-    observeEvent(input$moose_DemFpw, {
-        values$moose$f.preg.wild <- input$moose_DemFpw
-    })
-    observeEvent(input$moose_DemFpc, {
-        values$moose$f.preg.capt <- input$moose_DemFpc
-    })
-    observeEvent(input$moose_CostPencap, {
-        values$moose$pen.cap <- input$moose_CostPencap
-    })
-    observeEvent(input$moose_CostSetup, {
-        values$moose$pen.cost.setup <- input$moose_CostSetup
-    })
-    observeEvent(input$moose_CostProj, {
-        values$moose$pen.cost.proj <- input$moose_CostProj
-    })
-    observeEvent(input$moose_CostMaint, {
-        values$moose$pen.cost.maint <- input$moose_CostMaint
-    })
-    observeEvent(input$moose_CostCapt, {
-        values$moose$pen.cost.capt <- input$moose_CostCapt
-    })
-    #observeEvent(input$moose_CostPred, {
-    #    values$moose$pen.cost.pred <- input$moose_CostPred
-    #})
     ## apply settings and get forecast
     moose_getF <- reactive({
         caribou_forecast(values$moose,
@@ -597,15 +539,20 @@ server <- function(input, output, session) {
         tab <- cbind(
             Results=unlist(summary(moose_getF())),
             Breakeven=bev)
-        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
-            "Nend.pen", "Nend.nopen", "Nend.diff",
-            "Cost.total", "Cost.percap")
+#        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
+#            "Nend.pen", "Nend.nopen", "Nend.diff",
+#            "Cost.total", "Cost.percap")
+        subs <- c("lam.pen", "lam.nopen",
+            "Nend.pen", "Nend.nopen", "Nend.diff")
         df <- tab[subs,,drop=FALSE]
         df[1L,] <- df[1L,]*100
-        rownames(df) <- c("% penned",
-            "# pens", "&lambda; (moose reduction)", "&lambda; (no moose reduction)",
-            "N (end, moose reduction)", "N (end, no moose reduction)", "N (end, difference)",
-            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+#        rownames(df) <- c("% penned",
+#            "# pens", "&lambda; (moose reduction)", "&lambda; (no moose reduction)",
+#            "N (end, moose reduction)", "N (end, no moose reduction)", "N (end, difference)",
+#            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+        rownames(df) <- c(
+            "&lambda; (moose reduction)", "&lambda; (no moose reduction)",
+            "N (end, moose reduction)", "N (end, no moose reduction)", "N (end, difference)")
         if (values$moose_compare) {
             bev0 <- if (is.null(moose_getB0()))
                 NA else unlist(summary(moose_getB0()))
@@ -632,21 +579,21 @@ server <- function(input, output, session) {
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
-            "fpen.prop" = "% females penned",
+            #"fpen.prop" = "% females penned",
             "c.surv.wild" = "Calf survival, wild",
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
             "f.surv.capt" = "Adult female survival, captive",
             "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate, captive",
-            "pen.cap" = "Max in a single pen",
-            "pen.cost.setup" = "Initial set up (x $1000)",
-            "pen.cost.proj" = "Project manager (x $1000)",
-            "pen.cost.maint" = "Maintenance (x $1000)",
-            "pen.cost.capt" = "Capture/monitor (x $1000)",
-            "pen.cost.pred" = "Removing mooses (x $1000)")
+            "f.preg.capt" = "Pregnancy rate, captive")#,
+            #"pen.cap" = "Max in a single pen",
+            #"pen.cost.setup" = "Initial set up (x $1000)",
+            #"pen.cost.proj" = "Project manager (x $1000)",
+            #"pen.cost.maint" = "Maintenance (x $1000)",
+            #"pen.cost.capt" = "Capture/monitor (x $1000)",
+            #"pen.cost.pred" = "Removing mooses (x $1000)")
         df <- tab[names(SNAM),,drop=FALSE]
-        df["fpen.prop",] <- df["fpen.prop",]*100
+        #df["fpen.prop",] <- df["fpen.prop",]*100
         rownames(df) <- SNAM
         if (values$moose_compare) {
             bev0 <- if (is.null(moose_getB0()))
@@ -655,7 +602,7 @@ server <- function(input, output, session) {
                 Results=get_settings(moose_getF0()),
                 Breakeven=bev0)
             df0 <- tab0[names(SNAM),,drop=FALSE]
-            df0["fpen.prop",] <- df0["fpen.prop",]*100
+            #df0["fpen.prop",] <- df0["fpen.prop",]*100
             rownames(df0) <- SNAM
             df <- cbind(df0, df)
             colnames(df) <- c("Results, reference", "Breakeven, reference",
