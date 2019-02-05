@@ -501,17 +501,6 @@ server <- function(input, output, session) {
             pop.start = input$pop.start,
             fpen.prop = values$moose$fpen.prop)
     })
-    ## try to find breakeven point
-    moose_getB <- reactive({
-        req(moose_getF())
-        p <- suppressWarnings(caribou_breakeven(moose_getF()))
-        if (is.na(p))
-            return(NULL)
-        caribou_forecast(moose_getF()$settings,
-            tmax = input$tmax,
-            pop.start = input$pop.start,
-            fpen.prop = p)
-    })
     ## these are similar functions to the bechmark scenario
     moose_getF0 <- reactive({
         if (!values$moose_compare)
@@ -521,112 +510,50 @@ server <- function(input, output, session) {
             pop.start = input$pop.start,
             fpen.prop = values$moose0$fpen.prop)
     })
-    moose_getB0 <- reactive({
-        req(moose_getF0())
-        p <- suppressWarnings(caribou_breakeven(moose_getF0()))
-        if (is.na(p))
-            return(NULL)
-        caribou_forecast(moose_getF0()$settings,
-            tmax = input$tmax,
-            pop.start = input$pop.start,
-            fpen.prop = p)
-    })
     ## making nice table of the results
     moose_getT <- reactive({
         req(moose_getF())
-        bev <- if (is.null(moose_getB()))
-            NA else unlist(summary(moose_getB()))
         tab <- cbind(
-            Results=unlist(summary(moose_getF())),
-            Breakeven=bev)
-#        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
-#            "Nend.pen", "Nend.nopen", "Nend.diff",
-#            "Cost.total", "Cost.percap")
-        subs <- c("lam.pen", "lam.nopen",
-            "Nend.pen", "Nend.nopen", "Nend.diff")
+            moose=unlist(summary(moose_getF())),
+            moose0=unlist(summary(moose_getF0())))
+        subs <- c("lam.pen", "Nend.pen")
         df <- tab[subs,,drop=FALSE]
-        df[1L,] <- df[1L,]*100
-#        rownames(df) <- c("% penned",
-#            "# pens", "&lambda; (moose reduction)", "&lambda; (no moose reduction)",
-#            "N (end, moose reduction)", "N (end, no moose reduction)", "N (end, difference)",
-#            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
-        rownames(df) <- c(
-            "&lambda; (moose reduction)", "&lambda; (no moose reduction)",
-            "N (end, moose reduction)", "N (end, no moose reduction)", "N (end, difference)")
-        if (values$moose_compare) {
-            bev0 <- if (is.null(moose_getB0()))
-                NA else unlist(summary(moose_getB0()))
-            tab0 <- cbind(
-                Results=unlist(summary(moose_getF0())),
-                Breakeven=bev0)
-            df0 <- tab0[subs,,drop=FALSE]
-            df0[1L,] <- df0[1L,]*100
-            rownames(df0) <- rownames(df)
-            df <- cbind(df0, df)
-            colnames(df) <- c("Results, reference", "Breakeven, reference",
-                "Results", "Breakeven")
-        }
+        rownames(df) <- c("&lambda;", "N (end)")
+        colnames(df) <- c("Moose reduction", "No moose reduction")
         df
     })
     ## making nice table of the settings
     moose_getS <- reactive({
         req(moose_getF())
-        bev <- if (is.null(moose_getB()))
-            NA else get_settings(moose_getB())
         tab <- cbind(
-            Results=get_settings(moose_getF()),
-            Breakeven=bev)
+            moose=get_settings(moose_getF()),
+            moose=get_settings(moose_getF0()))
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
-            #"fpen.prop" = "% females penned",
             "c.surv.wild" = "Calf survival, wild",
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
             "f.surv.capt" = "Adult female survival, captive",
             "f.preg.wild" = "Pregnancy rate, wild",
             "f.preg.capt" = "Pregnancy rate, captive")#,
-            #"pen.cap" = "Max in a single pen",
-            #"pen.cost.setup" = "Initial set up (x $1000)",
-            #"pen.cost.proj" = "Project manager (x $1000)",
-            #"pen.cost.maint" = "Maintenance (x $1000)",
-            #"pen.cost.capt" = "Capture/monitor (x $1000)",
-            #"pen.cost.pred" = "Removing mooses (x $1000)")
         df <- tab[names(SNAM),,drop=FALSE]
-        #df["fpen.prop",] <- df["fpen.prop",]*100
         rownames(df) <- SNAM
-        if (values$moose_compare) {
-            bev0 <- if (is.null(moose_getB0()))
-                NA else get_settings(moose_getB0())
-            tab0 <- cbind(
-                Results=get_settings(moose_getF0()),
-                Breakeven=bev0)
-            df0 <- tab0[names(SNAM),,drop=FALSE]
-            #df0["fpen.prop",] <- df0["fpen.prop",]*100
-            rownames(df0) <- SNAM
-            df <- cbind(df0, df)
-            colnames(df) <- c("Results, reference", "Breakeven, reference",
-                "Results", "Breakeven")
-        }
+        colnames(df) <- c("Moose reduction", "No moose reduction")
         df
     })
     ## plot
     output$moose_Plot <- renderPlotly({
         req(moose_getF())
         df <- plot(moose_getF(), plot=FALSE)
+        df0 <- plot(moose_getF0(), plot=FALSE)
+        df$Nnopen <- df0$Npen
         colnames(df)[colnames(df) == "Npen"] <- "Individuals"
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
             name = 'Moose reduction', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'No moose reduction',
                 mode = 'lines', color=I('blue'))
-        if (values$moose_compare) {
-            df0 <- plot(moose_getF0(), plot=FALSE)
-            p <- p %>% add_trace(y = ~Npen, name = 'Moose reduction, reference', data = df0,
-                    line=list(dash = 'dash', color='red')) %>%
-                add_trace(y = ~Nnopen, name = 'No moose reduction, reference', data = df0,
-                    line=list(dash = 'dash', color='blue'))
-        }
         p <- p %>% layout(legend = list(x = 0.05, y = 0))
         p
     })
@@ -642,12 +569,10 @@ server <- function(input, output, session) {
         req(moose_getF())
         req(moose_getT())
         TS <- plot(moose_getF(), plot=FALSE)
-        if (values$moose_compare) {
-            TS <- cbind(plot(moose_getF0(), plot=FALSE), TS[,-1])
-            colnames(TS) <- c("Years",
-                "N no moose reduction, reference", "N moose reduction, reference",
-                "N no moose reduction", "N moose reduction")
-        }
+        TS0 <- plot(moose_getF0(), plot=FALSE)
+        TS$Npen <- TS0$Npen
+        colnames(TS) <- c("Years",
+            "N moose reduction", "N no moose reduction")
         df <- moose_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- moose_getS()
