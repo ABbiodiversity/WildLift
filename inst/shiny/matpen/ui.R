@@ -88,13 +88,13 @@ dashboardPage(
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Population forecast: Predator control",
+              title = "Population forecast: Predator exclosure",
               plotlyOutput("predator_Plot", width = "100%", height = 400)
             ),
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Summary: Predator control",
+              title = "Summary: Predator exclosure",
               tableOutput("predator_Table"),
               downloadButton("predator_download", "Download results as Excel file")
             )
