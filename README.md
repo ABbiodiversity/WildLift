@@ -7,9 +7,9 @@ CaribouBC
 status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
 [![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
-Try the [Shiny app](https://psolymos.shinyapps.io/matpen/) or run
+Try the [Shiny app](https://psolymos.shinyapps.io/CaribouBC/) or run
 locally as
-`shiny::runGitHub("psolymos/CaribouBC", subdir = "inst/shiny/matpen")`.
+`shiny::runGitHub("psolymos/CaribouBC", subdir = "inst/shiny/CaribouBC")`.
 
 Installation
 ------------
