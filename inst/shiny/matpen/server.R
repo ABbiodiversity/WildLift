@@ -127,8 +127,8 @@ server <- function(input, output, session) {
         df <- tab[subs,,drop=FALSE]
         df[1L,] <- df[1L,]*100
         rownames(df) <- c("% penned",
-            "# pens", "&lambda; (pen)", "&lambda; (no pen)",
-            "N (end, pen)", "N (end, no pen)", "N (end, difference)",
+            "# pens", "&lambda; (maternity pen)", "&lambda; (no maternity pen)",
+            "N (end, maternity pen)", "N (end, no maternity pen)", "N (end, difference)",
             "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
@@ -193,15 +193,15 @@ server <- function(input, output, session) {
         df <- plot(penning_getF(), plot=FALSE)
         colnames(df)[colnames(df) == "Npen"] <- "Individuals"
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
-            name = 'Pen', type = 'scatter', mode = 'lines',
+            name = 'Maternity pen', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Nnopen, name = 'No pen',
+            add_trace(y = ~Nnopen, name = 'No maternity pen',
                 mode = 'lines', color=I('blue'))
         if (values$penning_compare) {
             df0 <- plot(penning_getF0(), plot=FALSE)
-            p <- p %>% add_trace(y = ~Npen, name = 'Pen, reference', data = df0,
+            p <- p %>% add_trace(y = ~Npen, name = 'Maternity pen, reference', data = df0,
                     line=list(dash = 'dash', color='red')) %>%
-                add_trace(y = ~Nnopen, name = 'No pen, reference', data = df0,
+                add_trace(y = ~Nnopen, name = 'No maternity pen, reference', data = df0,
                     line=list(dash = 'dash', color='blue'))
         }
         p <- p %>% layout(legend = list(x = 0.05, y = 0))
@@ -222,8 +222,8 @@ server <- function(input, output, session) {
         if (values$penning_compare) {
             TS <- cbind(plot(penning_getF0(), plot=FALSE), TS[,-1])
             colnames(TS) <- c("Years",
-                "N no pen, reference", "N pen, reference",
-                "N no pen", "N pen")
+                "N no maternity pen, reference", "N maternity pen, reference",
+                "N no maternity pen", "N maternity pen")
         }
         df <- penning_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
@@ -245,7 +245,7 @@ server <- function(input, output, session) {
     })
     output$penning_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_output_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("CaribouBC_maternity_pen_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(penning_xlslist(), file=file, overwrite=TRUE)
@@ -365,8 +365,8 @@ server <- function(input, output, session) {
         df <- tab[subs,,drop=FALSE]
         df[1L,] <- df[1L,]*100
         rownames(df) <- c("% penned",
-            "# pens", "&lambda; (pen)", "&lambda; (no pen)",
-            "N (end, pen)", "N (end, no pen)", "N (end, difference)",
+            "# pens", "&lambda; (predator exclosure)", "&lambda; (no predator exclosure)",
+            "N (end, predator exclosure)", "N (end, no predator exclosure)", "N (end, difference)",
             "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
@@ -431,15 +431,15 @@ server <- function(input, output, session) {
         df <- plot(predator_getF(), plot=FALSE)
         colnames(df)[colnames(df) == "Npen"] <- "Individuals"
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
-            name = 'Pen', type = 'scatter', mode = 'lines',
+            name = 'Predator exclosure', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Nnopen, name = 'No pen',
+            add_trace(y = ~Nnopen, name = 'No predator exclosure',
                 mode = 'lines', color=I('blue'))
         if (values$predator_compare) {
             df0 <- plot(predator_getF0(), plot=FALSE)
-            p <- p %>% add_trace(y = ~Npen, name = 'Pen, reference', data = df0,
+            p <- p %>% add_trace(y = ~Npen, name = 'Predator exclosure, reference', data = df0,
                     line=list(dash = 'dash', color='red')) %>%
-                add_trace(y = ~Nnopen, name = 'No pen, reference', data = df0,
+                add_trace(y = ~Nnopen, name = 'No predator exclosure, reference', data = df0,
                     line=list(dash = 'dash', color='blue'))
         }
         p <- p %>% layout(legend = list(x = 0.05, y = 0))
@@ -460,8 +460,8 @@ server <- function(input, output, session) {
         if (values$predator_compare) {
             TS <- cbind(plot(predator_getF0(), plot=FALSE), TS[,-1])
             colnames(TS) <- c("Years",
-                "N no pen, reference", "N pen, reference",
-                "N no pen", "N pen")
+                "N no predator exclosure, reference", "N predator exclosure, reference",
+                "N no predator exclosure", "N predator exclosure")
         }
         df <- predator_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
@@ -483,7 +483,7 @@ server <- function(input, output, session) {
     })
     output$predator_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_output_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("CaribouBC_predator_exclosure_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(predator_xlslist(), file=file, overwrite=TRUE)
@@ -603,8 +603,8 @@ server <- function(input, output, session) {
         df <- tab[subs,,drop=FALSE]
         df[1L,] <- df[1L,]*100
         rownames(df) <- c("% penned",
-            "# pens", "&lambda; (pen)", "&lambda; (no pen)",
-            "N (end, pen)", "N (end, no pen)", "N (end, difference)",
+            "# pens", "&lambda; (moose reduction)", "&lambda; (no moose reduction)",
+            "N (end, moose reduction)", "N (end, no moose reduction)", "N (end, difference)",
             "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
         if (values$moose_compare) {
             bev0 <- if (is.null(moose_getB0()))
@@ -669,15 +669,15 @@ server <- function(input, output, session) {
         df <- plot(moose_getF(), plot=FALSE)
         colnames(df)[colnames(df) == "Npen"] <- "Individuals"
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
-            name = 'Pen', type = 'scatter', mode = 'lines',
+            name = 'Moose reduction', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Nnopen, name = 'No pen',
+            add_trace(y = ~Nnopen, name = 'No moose reduction',
                 mode = 'lines', color=I('blue'))
         if (values$moose_compare) {
             df0 <- plot(moose_getF0(), plot=FALSE)
-            p <- p %>% add_trace(y = ~Npen, name = 'Pen, reference', data = df0,
+            p <- p %>% add_trace(y = ~Npen, name = 'Moose reduction, reference', data = df0,
                     line=list(dash = 'dash', color='red')) %>%
-                add_trace(y = ~Nnopen, name = 'No pen, reference', data = df0,
+                add_trace(y = ~Nnopen, name = 'No moose reduction, reference', data = df0,
                     line=list(dash = 'dash', color='blue'))
         }
         p <- p %>% layout(legend = list(x = 0.05, y = 0))
@@ -698,8 +698,8 @@ server <- function(input, output, session) {
         if (values$moose_compare) {
             TS <- cbind(plot(moose_getF0(), plot=FALSE), TS[,-1])
             colnames(TS) <- c("Years",
-                "N no pen, reference", "N pen, reference",
-                "N no pen", "N pen")
+                "N no moose reduction, reference", "N moose reduction, reference",
+                "N no moose reduction", "N moose reduction")
         }
         df <- moose_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
@@ -721,7 +721,7 @@ server <- function(input, output, session) {
     })
     output$moose_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_output_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("CaribouBC_moose_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(moose_xlslist(), file=file, overwrite=TRUE)

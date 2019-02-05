@@ -9,7 +9,7 @@ dashboardPage(
     ),
     sidebarMenu(
       menuItem("Maternity pen", tabName = "penning"),
-      menuItem("Predator control", tabName = "predator"),
+      menuItem("Predator exclosure", tabName = "predator"),
       menuItem("Moose reduction", tabName = "moose")
     )
   ),
