@@ -204,7 +204,7 @@ server <- function(input, output, session) {
                 add_trace(y = ~Nnopen, name = 'No maternity pen, reference', data = df0,
                     line=list(dash = 'dash', color='blue'))
         }
-        p <- p %>% layout(legend = list(x = 0.05, y = 0))
+        p <- p %>% layout(legend = list(x = 100, y = 0))
         p
     })
     ## table
@@ -442,7 +442,7 @@ server <- function(input, output, session) {
                 add_trace(y = ~Nnopen, name = 'No predator exclosure, reference', data = df0,
                     line=list(dash = 'dash', color='blue'))
         }
-        p <- p %>% layout(legend = list(x = 0.05, y = 0))
+        p <- p %>% layout(legend = list(x = 100, y = 0))
         p
     })
     ## table
@@ -554,7 +554,7 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'No moose reduction',
                 mode = 'lines', color=I('blue'))
-        p <- p %>% layout(legend = list(x = 0.05, y = 0))
+        p <- p %>% layout(legend = list(x = 100, y = 0))
         p
     })
     ## table
