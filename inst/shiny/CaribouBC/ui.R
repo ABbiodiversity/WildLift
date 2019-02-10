@@ -1,12 +1,15 @@
 dashboardPage(
   dashboardHeader(title = "Caribou BC"),
   dashboardSidebar(
+    selectInput("herd", "Herd", c("Default"="Default", Herds)),
     sliderInput("tmax", "Number of years to forecast",
       min = 1, max = 100, value = 20, step = 1
     ),
     sliderInput("popstart", "Initial population size",
       min = 1, max = 200, value = 100, step = 1
     ),
+    bsTooltip("herd",
+      "Select a herd for herd specific demography parameters."),
     bsTooltip("tmax",
       "Number of years in which the caribou population is forecasted. Default set, but the user can change the value by slider."),
     bsTooltip("popstart",
@@ -45,7 +48,9 @@ dashboardPage(
               sliderInput("penning_FpenPerc", "Percent of females penned",
                 min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
                 step = 1),
-              uiOutput("penning_button")
+              uiOutput("penning_button"),
+              bsTooltip("penning_button",
+                "Click this button to compare 2 scenarios: one with current settings, one with new settings.")
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,
@@ -111,7 +116,9 @@ dashboardPage(
               sliderInput("predator_FpenPerc", "Percent of females penned",
                 min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
                 step = 1),
-              uiOutput("predator_button")
+              uiOutput("predator_button"),
+              bsTooltip("predator_button",
+                "Click this button to compare 2 scenarios: one with current settings, one with new settings.")
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,

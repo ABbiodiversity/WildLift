@@ -21,9 +21,9 @@ inits <- list(
         caribou_settings("pred.excl")),
     moose = c(
         fpen.prop = 0,
-        caribou_settings("mat.pen", f.surv.wild = 0.87)),
+        caribou_settings("moose.red")),
     moose0 = c(
-        fpen.prop = 0,
+        fpen.prop = 0.25,
         caribou_settings("mat.pen"))
 )
 
@@ -33,6 +33,14 @@ get_settings <- function(x) {
         fpen.prop = x$fpen.prop,
         unlist(x$settings))
 }
+
+Herds <- c(
+    "Columbia North" = "ColumbiaNorth",
+    "Columbia South" = "ColumbiaSouth",
+    "Frisby-Queest" = "FrisbyQueest",
+    "Wells Grey South" = "WellsGreySouth",
+    "Groundhog" = "Groundhog",
+    "Parsnip" = "Parsnip")
 
 ## TODO:
 ## OK - add static settings sliders

@@ -15,6 +15,36 @@ server <- function(input, output, session) {
         moose0 = inits$moose0,
         moose_compare = TRUE)
 
+    observeEvent(input$herd, {
+        HERD <- input$herd
+        if (HERD == "Default")
+            HERD <- NULL
+        values$penning <- c(
+            fpen.prop = values$penning$fpen.prop,
+            caribou_settings("mat.pen", HERD))
+        if (values$penning_compare) {
+            values$penning0 <- values$penning
+        } else {
+            values$penning0 <- NULL
+        }
+
+        values$predator <- c(
+            fpen.prop = values$predator$fpen.prop,
+            caribou_settings("mat.pen", HERD))
+        if (values$predator_compare) {
+            values$predator0 <- values$predator
+        } else {
+            values$predator0 <- NULL
+        }
+
+        values$moose <- c(
+            fpen.prop = values$moose$fpen.prop,
+            caribou_settings("moose.red", HERD))
+        values$moose0 <- c(
+            fpen.prop = values$moose0$fpen.prop,
+            caribou_settings("mat.pen", HERD))
+    })
+
 
     ## >>> penning tab <<<=====================================
 
@@ -232,8 +262,8 @@ server <- function(input, output, session) {
             fields="Version")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
@@ -470,8 +500,8 @@ server <- function(input, output, session) {
             fields="Version")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
@@ -580,8 +610,8 @@ server <- function(input, output, session) {
             fields="Version")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
