@@ -19,6 +19,7 @@ server <- function(input, output, session) {
         HERD <- input$herd
         if (HERD == "Default")
             HERD <- NULL
+
         values$penning <- c(
             fpen.prop = values$penning$fpen.prop,
             caribou_settings("mat.pen", HERD))
@@ -524,6 +525,7 @@ server <- function(input, output, session) {
 
     ## >>> moose tab <<<=====================================
 
+if (FALSE) {
     ## apply settings and get forecast
     moose_getF <- reactive({
         caribou_forecast(values$moose,
@@ -630,5 +632,164 @@ server <- function(input, output, session) {
         },
         contentType="application/octet-stream"
     )
+}
+
+    ## observers
+    observeEvent(input$moose_FpenPerc, {
+        values$moose$fpen.prop <- input$moose_FpenPerc / 100
+        values$moose0$fpen.prop <- input$moose_FpenPerc / 100
+    })
+    ## moose reduction with penning
+    moose_getF <- reactive({
+        caribou_forecast(values$moose,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            fpen.prop = values$moose$fpen.prop)
+    })
+    ## no moose reduction with penning
+    moose_getB <- reactive({
+        caribou_forecast(values$moose0,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            fpen.prop = values$moose0$fpen.prop)
+    })
+    ## moose reduction without penning
+    moose_getF0 <- reactive({
+        caribou_forecast(values$moose,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            fpen.prop = 0)
+    })
+    ## no moose reduction without penning
+    moose_getB0 <- reactive({
+        caribou_forecast(values$moose0,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            fpen.prop = 0)
+    })
+    ## making nice table of the results
+    moose_getT <- reactive({
+        req(moose_getF(),
+            moose_getB(),
+            moose_getF0(),
+            moose_getB0())
+        tab <- cbind(
+            MooseNoPen=unlist(summary(moose_getF0())),
+            MoosePen=unlist(summary(moose_getF())),
+            NoMooseNoPen=unlist(summary(moose_getB0())),
+            NoMoosePen=unlist(summary(moose_getB()))
+        )
+        subs <- c("lam.pen", "Nend.pen")
+        df <- tab[subs,,drop=FALSE]
+        rownames(df) <- c("&lambda;", "N (end)")
+        colnames(df) <- c(
+            "Moose reduction, no pen",
+            "Moose reduction, penned",
+            "No moose reduction, no pen",
+            "No moose reduction, penned")
+        df
+    })
+    ## making nice table of the settings
+    moose_getS <- reactive({
+        req(moose_getF(),
+            moose_getB(),
+            moose_getF0(),
+            moose_getB0())
+        tab <- cbind(
+            MooseNoPen=get_settings(moose_getF0()),
+            MoosePen=get_settings(moose_getF()),
+            NoMooseNoPen=get_settings(moose_getB0()),
+            NoMoosePen=get_settings(moose_getB())
+        )
+        SNAM <- c(
+            "tmax" = "T max",
+            "pop.start" = "N start",
+            "fpen.prop" = "% females penned",
+            "c.surv.wild" = "Calf survival, wild",
+            "c.surv.capt" = "Calf survival, captive",
+            "f.surv.wild" = "Adult female survival, wild",
+            "f.surv.capt" = "Adult female survival, captive",
+            "f.preg.wild" = "Pregnancy rate, wild",
+            "f.preg.capt" = "Pregnancy rate, captive",
+            "pen.cap" = "Max in a single pen")
+        df <- tab[names(SNAM),,drop=FALSE]
+        df["fpen.prop",] <- df["fpen.prop",]*100
+        rownames(df) <- SNAM
+        colnames(df) <- c(
+            "Moose reduction, no pen",
+            "Moose reduction, penned",
+            "No moose reduction, no pen",
+            "No moose reduction, penned")
+        df
+    })
+    ## plot
+    output$moose_Plot <- renderPlotly({
+        req(moose_getF())
+        dF0 <- plot(moose_getF0(), plot=FALSE)
+        dF <- plot(moose_getF(), plot=FALSE)
+        dB0 <- plot(moose_getB0(), plot=FALSE)
+        dB <- plot(moose_getB(), plot=FALSE)
+        colnames(dF0)[colnames(dF0) == "Npen"] <- "Individuals"
+        p <- plot_ly(dF0, x = ~Years, y = ~Individuals,
+            name = 'Moose reduction, no pen', type = 'scatter', mode = 'lines',
+            color=I('red')) %>%
+            add_trace(y = ~Npen, name = 'Moose reduction, penned', data = dF,
+                mode = 'lines', color=I('blue')) %>%
+            add_trace(y = ~Npen, name = 'No moose reduction, no pen', data = dB0,
+                    line=list(dash = 'dash', color='red')) %>%
+            add_trace(y = ~Npen, name = 'No moose reduction, penned', data = dB,
+                line=list(dash = 'dash', color='blue')) %>%
+            layout(legend = list(x = 100, y = 0))
+        p
+    })
+    ## table
+    output$moose_Table <- renderTable({
+        req(moose_getT())
+        moose_getT()
+    }, rownames=TRUE, colnames=TRUE,
+    striped=TRUE, bordered=TRUE, na="n/a",
+    sanitize.text.function = function(x) x)
+    ## dowload
+    moose_xlslist <- reactive({
+        req(moose_getF(), moose_getF0(), moose_getB(), moose_getB0())
+        req(moose_getT())
+        TS <- cbind(
+            plot(moose_getF0(), plot=FALSE)[,c("Years", "Npen")],
+            plot(moose_getF(), plot=FALSE)[,"Npen"],
+            plot(moose_getB0(), plot=FALSE)[,"Npen"],
+            plot(moose_getB(), plot=FALSE)[,"Npen"])
+        colnames(TS) <- c("Years",
+            "N moose reduction, no pen",
+            "N moose reduction, penned",
+            "N no moose reduction, no pen",
+            "N no moose reduction, penned")
+        df <- moose_getT()
+        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
+        ss <- moose_getS()
+        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
+            fields="Version")
+        out <- list(
+            Info=data.frame(CaribouBC=paste0(
+                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
+            Settings=as.data.frame(ss),
+            TimeSeries=as.data.frame(TS),
+            Summary=as.data.frame(df))
+        out$Settings$Parameters <- rownames(ss)
+        out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
+        out$Summary$Variables <- rownames(df)
+        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
+        out
+    })
+    output$moose_download <- downloadHandler(
+        filename = function() {
+            paste0("CaribouBC_moose_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(moose_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
+
 
 }

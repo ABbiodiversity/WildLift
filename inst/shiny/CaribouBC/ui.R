@@ -48,6 +48,8 @@ dashboardPage(
               sliderInput("penning_FpenPerc", "Percent of females penned",
                 min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
                 step = 1),
+              bsTooltip("penning_FpenPerc",
+                "Use this slider to change the % of females penned."),
               uiOutput("penning_button"),
               bsTooltip("penning_button",
                 "Click this button to compare 2 scenarios: one with current settings, one with new settings.")
@@ -116,6 +118,8 @@ dashboardPage(
               sliderInput("predator_FpenPerc", "Percent of females penned",
                 min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
                 step = 1),
+              bsTooltip("predator_FpenPerc",
+                "Use this slider to change the % of females penned."),
               uiOutput("predator_button"),
               bsTooltip("predator_button",
                 "Click this button to compare 2 scenarios: one with current settings, one with new settings.")
@@ -175,10 +179,21 @@ dashboardPage(
               tableOutput("moose_Table"),
               downloadButton("moose_download", "Download results as Excel file")
             )
+          ),
+          column(width=4,
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Penning",
+              sliderInput("moose_FpenPerc", "Percent of females penned",
+                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
+                step = 1),
+              bsTooltip("moose_FpenPerc",
+                "Use this slider to change the % of females penned.")
+            )
           )
         )
       )
-
     )
   )
 )

@@ -20,7 +20,7 @@ inits <- list(
         fpen.prop = 0.25,
         caribou_settings("pred.excl")),
     moose = c(
-        fpen.prop = 0,
+        fpen.prop = 0.25,
         caribou_settings("moose.red")),
     moose0 = c(
         fpen.prop = 0.25,
