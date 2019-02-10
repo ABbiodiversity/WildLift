@@ -58,18 +58,7 @@ dashboardPage(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
               title = "Demography",
-              sliderInput("penning_DemCsw", "Calf survival, wild",
-                min = 0, max = 1, value = inits$penning$c.surv.wild, step = 0.01),
-              sliderInput("penning_DemCsc", "Calf survival, captive",
-                min = 0, max = 1, value = inits$penning$c.surv.capt, step = 0.01),
-              sliderInput("penning_DemFsw", "Adult female survival, wild",
-                min = 0, max = 1, value = inits$penning$f.surv.wild, step = 0.01),
-              sliderInput("penning_DemFsc", "Adult female survival, captive",
-                min = 0, max = 1, value = inits$penning$f.surv.capt, step = 0.01),
-              sliderInput("penning_DemFpw", "Pregnancy rate, wild",
-                min = 0, max = 1, value = inits$penning$f.preg.wild, step = 0.01),
-              sliderInput("penning_DemFpc", "Pregnancy rate, captive",
-                min = 0, max = 1, value = inits$penning$f.preg.capt, step = 0.01)
+              uiOutput("penning_demogr_sliders")
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,
@@ -86,8 +75,6 @@ dashboardPage(
                 min = 0, max = 1000, value = inits$penning$pen.cost.maint, step = 10),
               sliderInput("penning_CostCapt", "Capture/monitor",
                 min = 0, max = 500, value = inits$penning$pen.cost.capt, step = 10)#,
-              #sliderInput("penning_CostPred", "Removing predators",
-              #  min = 0, max = 500, value = inits$penning$pen.cost.pred, step = 10)
             )
           )
         )
@@ -128,18 +115,7 @@ dashboardPage(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
               title = "Demography",
-              sliderInput("predator_DemCsw", "Calf survival, wild",
-                min = 0, max = 1, value = inits$predator$c.surv.wild, step = 0.01),
-              sliderInput("predator_DemCsc", "Calf survival, captive",
-                min = 0, max = 1, value = inits$predator$c.surv.capt, step = 0.01),
-              sliderInput("predator_DemFsw", "Adult female survival, wild",
-                min = 0, max = 1, value = inits$predator$f.surv.wild, step = 0.01),
-              sliderInput("predator_DemFsc", "Adult female survival, captive",
-                min = 0, max = 1, value = inits$predator$f.surv.capt, step = 0.01),
-              sliderInput("predator_DemFpw", "Pregnancy rate, wild",
-                min = 0, max = 1, value = inits$predator$f.preg.wild, step = 0.01),
-              sliderInput("predator_DemFpc", "Pregnancy rate, captive",
-                min = 0, max = 1, value = inits$predator$f.preg.capt, step = 0.01)
+              uiOutput("predator_demogr_sliders")
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,

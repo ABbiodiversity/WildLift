@@ -49,6 +49,25 @@ server <- function(input, output, session) {
 
     ## >>> penning tab <<<=====================================
 
+    ## dynamically render sliders
+    output$penning_demogr_sliders <- renderUI({
+        if (input$herd != "Default")
+            return(p("Demography settings not available for specific herds."))
+        tagList(
+            sliderInput("penning_DemCsw", "Calf survival, wild",
+                min = 0, max = 1, value = inits$penning$c.surv.wild, step = 0.01),
+            sliderInput("penning_DemCsc", "Calf survival, captive",
+                min = 0, max = 1, value = inits$penning$c.surv.capt, step = 0.01),
+            sliderInput("penning_DemFsw", "Adult female survival, wild",
+                min = 0, max = 1, value = inits$penning$f.surv.wild, step = 0.01),
+            sliderInput("penning_DemFsc", "Adult female survival, captive",
+                min = 0, max = 1, value = inits$penning$f.surv.capt, step = 0.01),
+            sliderInput("penning_DemFpw", "Pregnancy rate, wild",
+                min = 0, max = 1, value = inits$penning$f.preg.wild, step = 0.01),
+            sliderInput("penning_DemFpc", "Pregnancy rate, captive",
+                min = 0, max = 1, value = inits$penning$f.preg.capt, step = 0.01)
+        )
+    })
     ## dynamically render button
     output$penning_button <- renderUI({
         tagList(
@@ -287,6 +306,25 @@ server <- function(input, output, session) {
 
     ## >>> predator tab <<<=====================================
 
+    ## dynamically render sliders
+    output$predator_demogr_sliders <- renderUI({
+        if (input$herd != "Default")
+            return(p("Demography settings not available for specific herds."))
+        tagList(
+             sliderInput("predator_DemCsw", "Calf survival, wild",
+                min = 0, max = 1, value = inits$predator$c.surv.wild, step = 0.01),
+             sliderInput("predator_DemCsc", "Calf survival, captive",
+                min = 0, max = 1, value = inits$predator$c.surv.capt, step = 0.01),
+             sliderInput("predator_DemFsw", "Adult female survival, wild",
+                min = 0, max = 1, value = inits$predator$f.surv.wild, step = 0.01),
+             sliderInput("predator_DemFsc", "Adult female survival, captive",
+                min = 0, max = 1, value = inits$predator$f.surv.capt, step = 0.01),
+             sliderInput("predator_DemFpw", "Pregnancy rate, wild",
+                min = 0, max = 1, value = inits$predator$f.preg.wild, step = 0.01),
+             sliderInput("predator_DemFpc", "Pregnancy rate, captive",
+                min = 0, max = 1, value = inits$predator$f.preg.capt, step = 0.01)
+        )
+    })
     ## dynamically render button
     output$predator_button <- renderUI({
         tagList(
@@ -524,115 +562,6 @@ server <- function(input, output, session) {
 
 
     ## >>> moose tab <<<=====================================
-
-if (FALSE) {
-    ## apply settings and get forecast
-    moose_getF <- reactive({
-        caribou_forecast(values$moose,
-            tmax = input$tmax,
-            pop.start = input$popstart,
-            fpen.prop = values$moose$fpen.prop)
-    })
-    ## these are similar functions to the bechmark scenario
-    moose_getF0 <- reactive({
-        if (!values$moose_compare)
-            return(NULL)
-        caribou_forecast(values$moose0,
-            tmax = input$tmax,
-            pop.start = input$popstart,
-            fpen.prop = values$moose0$fpen.prop)
-    })
-    ## making nice table of the results
-    moose_getT <- reactive({
-        req(moose_getF())
-        tab <- cbind(
-            moose=unlist(summary(moose_getF())),
-            moose0=unlist(summary(moose_getF0())))
-        subs <- c("lam.pen", "Nend.pen")
-        df <- tab[subs,,drop=FALSE]
-        rownames(df) <- c("&lambda;", "N (end)")
-        colnames(df) <- c("Moose reduction", "No moose reduction")
-        df
-    })
-    ## making nice table of the settings
-    moose_getS <- reactive({
-        req(moose_getF())
-        tab <- cbind(
-            moose=get_settings(moose_getF()),
-            moose=get_settings(moose_getF0()))
-        SNAM <- c(
-            "tmax" = "T max",
-            "pop.start" = "N start",
-            "c.surv.wild" = "Calf survival, wild",
-            "c.surv.capt" = "Calf survival, captive",
-            "f.surv.wild" = "Adult female survival, wild",
-            "f.surv.capt" = "Adult female survival, captive",
-            "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate, captive")#,
-        df <- tab[names(SNAM),,drop=FALSE]
-        rownames(df) <- SNAM
-        colnames(df) <- c("Moose reduction", "No moose reduction")
-        df
-    })
-    ## plot
-    output$moose_Plot <- renderPlotly({
-        req(moose_getF())
-        df <- plot(moose_getF(), plot=FALSE)
-        df0 <- plot(moose_getF0(), plot=FALSE)
-        df$Nnopen <- df0$Npen
-        colnames(df)[colnames(df) == "Npen"] <- "Individuals"
-        p <- plot_ly(df, x = ~Years, y = ~Individuals,
-            name = 'Moose reduction', type = 'scatter', mode = 'lines',
-            color=I('red')) %>%
-            add_trace(y = ~Nnopen, name = 'No moose reduction',
-                mode = 'lines', color=I('blue'))
-        p <- p %>% layout(legend = list(x = 100, y = 0))
-        p
-    })
-    ## table
-    output$moose_Table <- renderTable({
-        req(moose_getT())
-        moose_getT()
-    }, rownames=TRUE, colnames=TRUE,
-    striped=TRUE, bordered=TRUE, na="n/a",
-    sanitize.text.function = function(x) x)
-    ## dowload
-    moose_xlslist <- reactive({
-        req(moose_getF())
-        req(moose_getT())
-        TS <- plot(moose_getF(), plot=FALSE)
-        TS0 <- plot(moose_getF0(), plot=FALSE)
-        TS$Npen <- TS0$Npen
-        colnames(TS) <- c("Years",
-            "N moose reduction", "N no moose reduction")
-        df <- moose_getT()
-        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
-        ss <- moose_getS()
-        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
-            fields="Version")
-        out <- list(
-            Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
-            Settings=as.data.frame(ss),
-            TimeSeries=as.data.frame(TS),
-            Summary=as.data.frame(df))
-        out$Settings$Parameters <- rownames(ss)
-        out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
-        out$Summary$Variables <- rownames(df)
-        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
-        out
-    })
-    output$moose_download <- downloadHandler(
-        filename = function() {
-            paste0("CaribouBC_moose_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
-        },
-        content = function(file) {
-            write.xlsx(moose_xlslist(), file=file, overwrite=TRUE)
-        },
-        contentType="application/octet-stream"
-    )
-}
 
     ## observers
     observeEvent(input$moose_FpenPerc, {
