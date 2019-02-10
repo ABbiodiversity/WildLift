@@ -6,6 +6,7 @@
 
 library(shiny)
 library(shinydashboard)
+library(shinyBS)
 library(plotly)
 library(openxlsx)
 library(CaribouBC)

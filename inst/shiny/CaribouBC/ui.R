@@ -4,9 +4,13 @@ dashboardPage(
     sliderInput("tmax", "Number of years to forecast",
       min = 1, max = 100, value = 20, step = 1
     ),
-    sliderInput("pop.start", "Initial population size",
+    sliderInput("popstart", "Initial population size",
       min = 1, max = 200, value = 100, step = 1
     ),
+    bsTooltip("tmax",
+      "Number of years in which the caribou population is forecasted. Default set, but the user can change the value by slider."),
+    bsTooltip("popstart",
+      "Number of caribou in the starting population. Default set, but the user can change the value by slider."),
     sidebarMenu(
       menuItem("Maternity pen", tabName = "penning"),
       menuItem("Predator exclosure", tabName = "predator"),

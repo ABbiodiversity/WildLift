@@ -80,7 +80,7 @@ server <- function(input, output, session) {
     penning_getF <- reactive({
         caribou_forecast(values$penning,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = values$penning$fpen.prop)
     })
     ## try to find breakeven point
@@ -91,7 +91,7 @@ server <- function(input, output, session) {
             return(NULL)
         caribou_forecast(penning_getF()$settings,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = p)
     })
     ## these are similar functions to the bechmark scenario
@@ -100,7 +100,7 @@ server <- function(input, output, session) {
             return(NULL)
         caribou_forecast(values$penning0,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = values$penning0$fpen.prop)
     })
     penning_getB0 <- reactive({
@@ -110,7 +110,7 @@ server <- function(input, output, session) {
             return(NULL)
         caribou_forecast(penning_getF0()$settings,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = p)
     })
     ## making nice table of the results
@@ -318,7 +318,7 @@ server <- function(input, output, session) {
     predator_getF <- reactive({
         caribou_forecast(values$predator,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = values$predator$fpen.prop)
     })
     ## try to find breakeven point
@@ -329,7 +329,7 @@ server <- function(input, output, session) {
             return(NULL)
         caribou_forecast(predator_getF()$settings,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = p)
     })
     ## these are similar functions to the bechmark scenario
@@ -338,7 +338,7 @@ server <- function(input, output, session) {
             return(NULL)
         caribou_forecast(values$predator0,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = values$predator0$fpen.prop)
     })
     predator_getB0 <- reactive({
@@ -348,7 +348,7 @@ server <- function(input, output, session) {
             return(NULL)
         caribou_forecast(predator_getF0()$settings,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = p)
     })
     ## making nice table of the results
@@ -498,7 +498,7 @@ server <- function(input, output, session) {
     moose_getF <- reactive({
         caribou_forecast(values$moose,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = values$moose$fpen.prop)
     })
     ## these are similar functions to the bechmark scenario
@@ -507,7 +507,7 @@ server <- function(input, output, session) {
             return(NULL)
         caribou_forecast(values$moose0,
             tmax = input$tmax,
-            pop.start = input$pop.start,
+            pop.start = input$popstart,
             fpen.prop = values$moose0$fpen.prop)
     })
     ## making nice table of the results
