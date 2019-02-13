@@ -1,6 +1,7 @@
 dashboardPage(
   dashboardHeader(title = "Caribou BC"),
   dashboardSidebar(
+    tags$script(src = "tips.js"),
     selectInput("herd", "Herd", c("Default"="Default", Herds)),
     sliderInput("tmax", "Number of years to forecast",
       min = 1, max = 100, value = 20, step = 1
@@ -9,7 +10,8 @@ dashboardPage(
       min = 1, max = 200, value = 100, step = 1
     ),
     bsTooltip("herd",
-      "Select a herd for herd specific demography parameters."),
+      "Select a herd for herd specific demography parameters.",
+      placement="right"),
     bsTooltip("tmax",
       "Number of years in which the caribou population is forecasted. Default set, but the user can change the value by slider."),
     bsTooltip("popstart",
@@ -30,14 +32,23 @@ dashboardPage(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Population forecast: Maternity pen",
-              plotlyOutput("penning_Plot", width = "100%", height = 400)
+              plotlyOutput("penning_Plot", width = "100%", height = 400),
+              bsTooltip("penning_Plot",
+                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                placement="right")
             ),
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Summary: Maternity pen",
               tableOutput("penning_Table"),
-              downloadButton("penning_download", "Download results as Excel file")
+              downloadButton("penning_download", "Download results as Excel file"),
+              bsTooltip("penning_Table",
+                "Table summarizing reports. Click below to download the full summary.",
+                placement="right"),
+              bsTooltip("penning_download",
+                "Click here to download results.",
+                placement="top")
             )
           ),
           column(width=4,
@@ -49,10 +60,10 @@ dashboardPage(
                 min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
                 step = 1),
               bsTooltip("penning_FpenPerc",
-                "Use this slider to change the % of females penned."),
+                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
               uiOutput("penning_button"),
               bsTooltip("penning_button",
-                "Click this button to compare 2 scenarios: one with current settings, one with new settings.")
+                "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,
@@ -87,14 +98,23 @@ dashboardPage(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Population forecast: Predator exclosure",
-              plotlyOutput("predator_Plot", width = "100%", height = 400)
+              plotlyOutput("predator_Plot", width = "100%", height = 400),
+              bsTooltip("predator_Plot",
+                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                placement="right")
             ),
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Summary: Predator exclosure",
               tableOutput("predator_Table"),
-              downloadButton("predator_download", "Download results as Excel file")
+              downloadButton("predator_download", "Download results as Excel file"),
+              bsTooltip("predator_Table",
+                "Table summarizing reports. Click below to download the full summary.",
+                placement="right"),
+              bsTooltip("predator_download",
+                "Click here to download results.",
+                placement="top")
             )
           ),
           column(width=4,
@@ -106,10 +126,10 @@ dashboardPage(
                 min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
                 step = 1),
               bsTooltip("predator_FpenPerc",
-                "Use this slider to change the % of females penned."),
+                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
               uiOutput("predator_button"),
               bsTooltip("predator_button",
-                "Click this button to compare 2 scenarios: one with current settings, one with new settings.")
+                "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,
@@ -146,14 +166,23 @@ dashboardPage(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Population forecast: Moose reduction",
-              plotlyOutput("moose_Plot", width = "100%", height = 400)
+              plotlyOutput("moose_Plot", width = "100%", height = 400),
+              bsTooltip("moose_Plot",
+                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                placement="right")
             ),
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Summary: Moose reduction",
               tableOutput("moose_Table"),
-              downloadButton("moose_download", "Download results as Excel file")
+              downloadButton("moose_download", "Download results as Excel file"),
+              bsTooltip("moose_Table",
+                "Table summarizing reports. Click below to download the full summary.",
+                placement="right"),
+              bsTooltip("moose_download",
+                "Click here to download results.",
+                placement="top")
             )
           ),
           column(width=4,
@@ -165,7 +194,10 @@ dashboardPage(
                 min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
                 step = 1),
               bsTooltip("moose_FpenPerc",
-                "Use this slider to change the % of females penned.")
+                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
+              uiOutput("moose_button"),
+              bsTooltip("moose_button",
+                "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
             )
           )
         )
