@@ -72,7 +72,7 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red"), herd=NULL) {
         }
     }
     if (pen.type == "moose.red") {
-        parms$f.surv.wild <- 0.875
+        parms$f.surv.wild <- 0.879
     }
     parms
 }
