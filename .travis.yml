@@ -1,0 +1,18 @@
+language: r
+sudo: required
+cache: packages
+
+r_packages:
+  - covr
+
+branches:
+  only:
+    - master
+
+r:
+  - release
+  - devel
+  - oldrel
+
+after_success:
+  - Rscript -e 'library(covr);codecov()'

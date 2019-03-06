@@ -1,0 +1,15 @@
+export("caribou_settings",
+       "caribou_forecast",
+       "caribou_breakeven")
+
+S3method("print", "caribou_settings")
+S3method("print", "caribou_forecast")
+S3method("summary", "caribou_forecast")
+S3method("print", "summary.caribou_forecast")
+S3method("plot", "caribou_forecast")
+S3method("lines", "caribou_forecast")
+
+importFrom("popbio", "eigen.analysis")
+importFrom("graphics", "lines")
+importFrom("stats", "optimize")
+importFrom("utils", "str")
