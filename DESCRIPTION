@@ -1,0 +1,35 @@
+Package: CaribouBC
+Title: Caribou Population Forecasting
+Date: 2019-02-24
+Version: 0.1.0
+Authors@R: 
+    c(person(given = "Peter",
+             family = "Solymos",
+             comment = c(ORCID = "0000-0001-7337-1740"),
+             role = c("aut", "cre"),
+             email = "psolymos@gmail.com"),
+      person(given = "Sophie",
+             family = "Gilbert",
+             comment = c(ORCID = "0000-0002-9974-5146"),
+             role = c("aut")),
+      person(given = "Rob",
+             family = "Serrouya",
+             role = c("aut")),
+      person(given = "Melanie",
+             family = "Dickie",
+             role = c("aut")),
+      person(given = "Province of British Columbia",
+             role = "cph"))
+Description: Caribou population forecasting.
+License: Apache License (== 2.0) | file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends: popbio
+Suggests: 
+    knitr,
+    rmarkdown,
+    shiny,
+    shinydashboard,
+    plotly,
+    openxlsx
+VignetteBuilder: knitr

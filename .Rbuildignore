@@ -1,0 +1,11 @@
+^CODE_OF_CONDUCT\.md$
+^CONTRIBUTING\.md$
+^README\.Rmd$
+^README\.md$
+.git*
+.DS_Store
+.*~
+.travis.yml
+appveyor.yml
+^.*\.Rproj$
+^\.Rproj\.user$
