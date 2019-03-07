@@ -1,28 +1,6 @@
 # CaribouBC
 
-An open-source tool to guide caribou management decisions in British Columbia
-
-Usage
-Contact tyler.muhly@gov.bc.ca for questions.
-
-Requirements
-N/A
-
-Getting Help or Reporting an Issue
-Use the Issues tab to get help or report any issues.
-
-Descriptions:
-License
-Copyright 2018-2019 Province of British Columbia
-
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-
-
-> Caribou Population Forecasting
+> An open-source tool to guide caribou management decisions in British Columbia
 
 [![Linux build
 status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
@@ -30,13 +8,13 @@ status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://tra
 
 Try the [Shiny app](https://psolymos.shinyapps.io/CaribouBC/) or run
 locally as
-`shiny::runGitHub("psolymos/CaribouBC", subdir = "inst/shiny/CaribouBC")`.
+`shiny::runGitHub("bcgov/CaribouBC", subdir = "inst/shiny/CaribouBC")`.
 
 Installation
 ------------
 
 ``` r
-devtools::install_github("psolymos/CaribouBC")
+devtools::install_github("bcgov/CaribouBC")
 ```
 
 Usage
@@ -166,7 +144,9 @@ Getting Help or Reporting an Issue
 ----------------------------------
 
 To report bugs/issues/feature requests, please file an
-[issue](https://github.com/psolymos/CaribouBC/issues/).
+[issue](https://github.com/bcgov/CaribouBC/issues/) or
+contact tyler.muhly@gov.bc.ca for questions.
+
 
 How to Contribute
 -----------------
