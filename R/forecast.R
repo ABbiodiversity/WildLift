@@ -18,6 +18,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     fpen.inds.vec <- numeric(tmax) # default is 0
     if (missing(fpen.prop) && missing(fpen.inds)) {
         USE_PROP <- TRUE
+        fpen.prop <- 0
     }
     if (!missing(fpen.prop) && missing(fpen.inds)) {
         if (length(fpen.prop) > 1)
