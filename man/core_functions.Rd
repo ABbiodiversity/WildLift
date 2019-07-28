@@ -21,7 +21,7 @@ caribou_settings(pen.type = c("mat.pen",  "pred.excl",
     "moose.red"), herd = NULL, ...)
 
 caribou_forecast(settings, tmax = 20, pop.start = 100,
-    fpen.prop = 0)
+    fpen.prop, fpen.inds)
 
 caribou_breakeven(forecast, lambda = 1, tol = 0.001)
 
@@ -53,8 +53,13 @@ positive integer, number of years to forecast after initial year 0.
   \item{pop.start}{
 positive integer, initial population size in year 0.
 }
-  \item{fpen.prop}{
-numeric between 0 and 1, proportion of females penned.
+  \item{fpen.prop, fpen.inds}{
+\code{fpen.prop} is a single numeric value between 0 and 1
+for the proportion of females penned;
+\code{fpen.inds} is a nonnegative integer
+for the number of females penned, can be a vector giving
+number of females penned in each year to be accumulated.
+Only one of \code{fpen.prop} or \code{fpen.inds} can be provided.
 }
   \item{forecast}{
 a forecast object returned by \code{caribou_forecast}.

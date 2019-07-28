@@ -1,5 +1,5 @@
 caribou_forecast <-
-function(settings, tmax=20, pop.start=100, fpen.prop=0)
+function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
 {
     if (tmax < 1)
         stop("Argument tmax must be >= 1.")
@@ -11,8 +11,30 @@ function(settings, tmax=20, pop.start=100, fpen.prop=0)
     if (abs(round(pop.start) - pop.start) > 0.0001)
         warning("Argument pop.start was rounded to nearest integer.")
     pop.start <- as.integer(round(pop.start))
-    if (fpen.prop > 1 || fpen.prop < 0)
-        stop("Argument fpen.prop must be in the [0, 1] interval.")
+    ## penned prop or inds
+    if (!missing(fpen.prop) && !missing(fpen.inds)) {
+        stop("Aprovide fpen.prop or fpen.inds but not both.")
+    }
+    fpen.inds.vec <- numeric(tmax) # default is 0
+    if (missing(fpen.prop) && missing(fpen.inds)) {
+        USE_PROP <- TRUE
+    }
+    if (!missing(fpen.prop) && missing(fpen.inds)) {
+        if (length(fpen.prop) > 1)
+            stop("Penned proportion must be a single value.")
+        if (fpen.prop > 1 || fpen.prop < 0)
+            stop("Argument fpen.prop must be in the [0, 1] interval.")
+        USE_PROP <- TRUE
+    }
+    if (missing(fpen.prop) && !missing(fpen.inds)) {
+        if (any(fpen.inds < 0))
+            stop("Argument fpen.inds must not be negative.")
+        USE_PROP <- FALSE
+        # cannot be longer than tmax - silently truncated
+        if (length(fpen.inds) > tmax)
+            fpen.inds <- fpen.inds[seq_len(tmax)]
+        fpen.inds.vec[seq_along(fpen.inds)] <- as.integer(fpen.inds)
+    }
     ## settings
     pen.type <- attr(settings, "type")
     ## Cost
@@ -29,6 +51,12 @@ function(settings, tmax=20, pop.start=100, fpen.prop=0)
     f.surv.capt <- settings$f.surv.capt
     preg <- settings$f.preg.wild
     f.preg.capt <- settings$f.preg.capt
+
+    ## get stable stage distribution for year 1
+    if (!USE_PROP) {
+        ## initial proportion (yr 1)
+        fpen.prop <- fpen.inds.vec[1] / pop.start
+    }
     # mean female surv = weighted av. of pen/wild vitals
     surv.f <- fpen.prop*f.surv.capt + (1-fpen.prop)*f.surv.wild
     # and for pregnancy
@@ -46,8 +74,17 @@ function(settings, tmax=20, pop.start=100, fpen.prop=0)
     Nstart <- matrix(pop.start*Stable.st, ncol=1)
     # starting populations for time loop
     N1 <- N2 <- Nstart
+
     # loop through time to project population
     for(i in seq_len(tmax)) {
+        ## reset prop for later years (divide by rep.adult.pen)
+        if (!USE_PROP) {
+            ## original code says: fpen.prop <- fpen.inds.vec[i] / N1[4,]
+            ## but I think it should be the cumulative number,
+            ## but we need to incorporate mortality,
+            ## therefore new penned inds added to fpen.prop*N1[4,]
+            fpen.prop <- (fpen.inds.vec[i] + fpen.prop*N1[4,]) / N1[4,]
+        }
         # .f1 denotes vitals for pop that's partially penned
         surv.f1 <- fpen.prop*f.surv.capt + (1-fpen.prop)*f.surv.wild
         preg.f1 <- fpen.prop*f.preg.capt + (1-fpen.prop)*preg
@@ -71,9 +108,9 @@ function(settings, tmax=20, pop.start=100, fpen.prop=0)
         # performance of pen pop if pen removed, at  t
         pen.removed <- A2 %*% N1
         # project population (w/pen) to t
-        N1 <- A1%*%N1
+        N1 <- A1 %*% N1
         # project population (no pen) to t
-        N2 <- A2%*%N2
+        N2 <- A2 %*% N2
         # eigen analysis of each population
         eigs.A1 <- eigen.analysis(A1)
         eigs.A2 <- eigen.analysis(A2)
