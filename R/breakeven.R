@@ -1,4 +1,5 @@
-## find fpan.prop where lambda=1 within tolerance
+## find fpen.prop where lambda=1 within tolerance
+## note, this will not do multiple years (i.e. vector of fpen.inds)
 caribou_breakeven <- function(forecast, lambda=1, tol=0.001) {
     if (lambda <= 0)
         stop("Argument lambda must be > 0.")
