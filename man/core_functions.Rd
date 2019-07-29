@@ -18,7 +18,7 @@ forecasting, and to inspect the results.
 }
 \usage{
 caribou_settings(pen.type = c("mat.pen",  "pred.excl",
-    "moose.red"), herd = NULL, ...)
+    "moose.red", "wolf.red"), herd = NULL, ...)
 
 caribou_forecast(settings, tmax = 20, pop.start = 100,
     fpen.prop, fpen.inds)
@@ -35,14 +35,20 @@ caribou_breakeven(forecast, lambda = 1, tol = 0.001)
 }
 \arguments{
   \item{pen.type}{
-character: maternity penning, predator exclusion, or moose reduction.
+character: maternity penning, predator exclusion, moose reduction,
+or wolf reduction.
 It can also be a settings object.
 }
   \item{herd}{
-\code{NULL} (default) or character (herd name: one of
+\code{NULL} (default) or character. The following herds are available:
 \code{"ColumbiaNorth"}, \code{"ColumbiaSouth"},
 \code{"FrisbyQueest"}, \code{"WellsGreySouth"},
-\code{"Groundhog"}, \code{"Parsnip"}).
+\code{"Groundhog"}, \code{"Parsnip"},
+\code{"KennedySiding"}, \code{"KlinsezaMoberly"}, \code{"Quintette"}.
+Note: only \code{"KennedySiding"}, \code{"KlinsezaMoberly"},
+or \code{"Quintette"} can be selected when \code{pen.type = "wolf.red"},
+i.e. user must pick a herd for that treatment
+and \code{herd} cannot be \code{NULL}.
 }
   \item{settings}{
 a settings object returned by \code{caribou_settings}.
