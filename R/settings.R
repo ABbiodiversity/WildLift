@@ -1,6 +1,8 @@
 ## preset demography parameters
 .get_demography <-
-function(pen.type=c("mat.pen", "pred.excl", "moose.red"), herd=NULL) {
+function(
+pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red"),
+herd=NULL) {
     pen.type <- match.arg(pen.type)
     parms <- list()
     if (pen.type != "pred.excl") {
@@ -22,53 +24,106 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red"), herd=NULL) {
         parms$f.preg.wild <- 0.92         # pregnancy rate, same for captive and wild
         parms$f.preg.capt <- parms$f.preg.wild       # pregnancy rate, same for captive and wild
     }
+    if (pen.type == "wolf.red" && is.null(herd))
+        stop("Must specify a herd for wolf reduction.")
     if (!is.null(herd)) {
-        Herds <- c(
-            "ColumbiaNorth",
-            "ColumbiaSouth",
-            "FrisbyQueest",
-            "WellsGreySouth",
-            "Groundhog",
-            "Parsnip")
-        herd <- match.arg(herd, Herds)
-        #baseline calf survival and AFS for 6 ranges
-        if (herd == "ColumbiaNorth") {
-            parms$c.surv.wild <- 0.217
-            parms$f.surv.wild <- 0.784
-        }
-        if (herd == "ColumbiaSouth") {
-            parms$c.surv.wild <- 0.285
-            parms$f.surv.wild <- 0.767
-        }
-        if (herd == "FrisbyQueest") {
-            parms$c.surv.wild <- 0.363
-            parms$f.surv.wild <- 0.853 # default value
-        }
-        if (herd == "WellsGreySouth") {
-            parms$c.surv.wild <- 0.239
-            parms$f.surv.wild <- 0.868
-        }
-        if (herd == "Groundhog") {
-            parms$c.surv.wild <- 0.234
-            parms$f.surv.wild <- 0.853 # default value
-        }
-        if (herd == "Parsnip") {
-            parms$c.surv.wild <- 0.163 # default value
-            parms$f.surv.wild <- 0.875
-        }
-        # Maternity Pen:
-        # - AFS increases by 0.05 for each of the ranges.
-        # - Calf Survival always increases to 0.54.
-        if (pen.type == "mat.pen") {
-            parms$c.surv.capt <- 0.54
-            parms$f.surv.capt <- parms$f.surv.wild + 0.05
-        }
-        # Predator Exclosures:
-        # - AFS always increases to 0.95 and
-        # - Calf Survival always increases to 0.72.
-        if (pen.type == "pred.excl") {
-            parms$c.surv.capt <- 0.72
-            parms$f.surv.capt <- 0.95
+        if (pen.type == "wolf.red") {
+            Herds <- c(
+                "KennedySiding",
+                "KlinsezaMoberly",
+                "Quintette")
+            herd <- match.arg(herd, Herds)
+            # these are herds from wolf reduction study: WITH wolf reduction
+            if (herd == "KennedySiding") {
+                parms$f.surv.capt <- 0.894
+                parms$f.surv.wild <- 0.962
+                parms$c.surv.capt <- 0.540
+                parms$c.surv.wild <- 0.5543
+            }
+            if (herd == "KlinsezaMoberly") {
+                parms$f.surv.capt <- 0.798
+                parms$f.surv.wild <- 0.860
+                parms$c.surv.capt <- 0.540
+                parms$c.surv.wild <- 0.506
+            }
+            if (herd == "Quintette") {
+                parms$f.surv.capt <- 0.860
+                parms$f.surv.wild <- 0.917
+                parms$c.surv.capt <- 0.540
+                parms$c.surv.wild <- 0.489
+            }
+        } else {
+            Herds <- c(
+                "ColumbiaNorth",
+                "ColumbiaSouth",
+                "FrisbyQueest",
+                "WellsGreySouth",
+                "Groundhog",
+                "Parsnip",
+                "KennedySiding",
+                "KlinsezaMoberly",
+                "Quintette")
+            herd <- match.arg(herd, Herds)
+            #baseline calf survival and AFS for 6 ranges
+            if (herd == "ColumbiaNorth") {
+                parms$c.surv.wild <- 0.217
+                parms$f.surv.wild <- 0.784
+            }
+            if (herd == "ColumbiaSouth") {
+                parms$c.surv.wild <- 0.285
+                parms$f.surv.wild <- 0.767
+            }
+            if (herd == "FrisbyQueest") {
+                parms$c.surv.wild <- 0.363
+                parms$f.surv.wild <- 0.853 # default value
+            }
+            if (herd == "WellsGreySouth") {
+                parms$c.surv.wild <- 0.239
+                parms$f.surv.wild <- 0.868
+            }
+            if (herd == "Groundhog") {
+                parms$c.surv.wild <- 0.234
+                parms$f.surv.wild <- 0.853 # default value
+            }
+            if (herd == "Parsnip") {
+                parms$c.surv.wild <- 0.163 # default value
+                parms$f.surv.wild <- 0.875
+            }
+
+            # these are herds from wolf reduction study: NO wolf reduction
+            if (herd == "KennedySiding") {
+                parms$f.surv.capt <- 0.894
+                parms$f.surv.wild <- 0.844
+                parms$c.surv.capt <- 0.540
+                parms$c.surv.wild <- 0.283
+            }
+            if (herd == "KlinsezaMoberly") {
+                parms$f.surv.capt <- 0.798
+                parms$f.surv.wild <- 0.748
+                parms$c.surv.capt <- 0.540
+                parms$c.surv.wild <- 0.308
+            }
+            if (herd == "Quintette") {
+                parms$f.surv.capt <- 0.860
+                parms$f.surv.wild <- 0.810
+                parms$c.surv.capt <- 0.540
+                parms$c.surv.wild <- 0.294
+            }
+
+            # Maternity Pen:
+            # - AFS increases by 0.05 for each of the ranges.
+            # - Calf Survival always increases to 0.54.
+            if (pen.type == "mat.pen") {
+                parms$c.surv.capt <- 0.54
+                parms$f.surv.capt <- parms$f.surv.wild + 0.05
+            }
+            # Predator Exclosures:
+            # - AFS always increases to 0.95 and
+            # - Calf Survival always increases to 0.72.
+            if (pen.type == "pred.excl") {
+                parms$c.surv.capt <- 0.72
+                parms$f.surv.capt <- 0.95
+            }
         }
     }
     if (pen.type == "moose.red") {
@@ -79,7 +134,7 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red"), herd=NULL) {
 
 ## preset cost parameters
 .get_cost <-
-function(pen.type=c("mat.pen", "pred.excl", "moose.red")) {
+function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red")) {
     pen.type <- match.arg(pen.type)
     parms <- list()
     if (pen.type != "pred.excl") {
@@ -102,7 +157,7 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red")) {
 
 caribou_settings <-
 function(
-pen.type=c("mat.pen", "pred.excl", "moose.red"),
+pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red"),
 herd=NULL,
 ...) {
     if (inherits(pen.type, "caribou_settings")) {
