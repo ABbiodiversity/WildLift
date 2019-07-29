@@ -8,7 +8,12 @@ print.caribou_settings <- function(x, ...) {
 print.caribou_forecast <- function(x, ...) {
     cat("Caribou forecast - pen type:", attr(x$settings, "pen.type"),
         "\n\n")
-    str(x[c("tmax", "pop.start", "fpen.prop")],
+    WHAT <- if (is.null(x$fpen.prop)) {
+        c("tmax", "pop.start", "fpen.inds")
+    } else {
+        c("tmax", "pop.start", "fpen.prop")
+    }
+    str(x[WHAT],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     invisible(x)
 }
@@ -36,7 +41,12 @@ summary.caribou_forecast <- function(object, ...) {
 print.summary.caribou_forecast <- function(x, ...) {
     cat("Caribou forecast - pen type:", attr(x$settings, "pen.type"),
         "\n\n")
-    str(x[c("tmax", "pop.start", "fpen.prop")],
+    WHAT <- if (is.null(x$fpen.prop)) {
+        c("tmax", "pop.start", "fpen.inds")
+    } else {
+        c("tmax", "pop.start", "fpen.prop")
+    }
+    str(x[WHAT],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     cat("\n")
     str(x[c("npens", "lam.pen", "lam.nopen",

@@ -31,10 +31,11 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         if (any(fpen.inds < 0))
             stop("Argument fpen.inds must not be negative.")
         USE_PROP <- FALSE
+        fpen.inds <- as.integer(fpen.inds)
         # cannot be longer than tmax - silently truncated
         if (length(fpen.inds) > tmax)
             fpen.inds <- fpen.inds[seq_len(tmax)]
-        fpen.inds.vec[seq_along(fpen.inds)] <- as.integer(fpen.inds)
+        fpen.inds.vec[seq_along(fpen.inds)] <- fpen.inds
     }
     ## settings
     pen.type <- attr(settings, "type")
@@ -213,10 +214,13 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     Nend_diff <- Nend_pen - Nend_nopen
     Cost_total <- sum(Npop$pens.cost.t)
     Cost_percap <- if (Nend_diff <= 0) NA else Cost_total / Nend_diff
-    out <- list(Npop=Npop, settings=settings,
+    out <- list(
+        Npop=Npop,
+        settings=settings,
         tmax=tmax,
         pop.start=pop.start,
-        fpen.prop=fpen.prop,
+        fpen.prop=NULL,
+        fpen.inds=NULL,
         npens=Npop$pens.needed[tmax + 1L],
         lam.pen=Npop$lam.pen[tmax + 1L],
         lam.nopen=Npop$lam.nopen[tmax + 1L],
@@ -225,6 +229,11 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         Nend.diff = Nend_diff,
         Cost.total = Cost_total,
         Cost.percap = Cost_percap)
+    if (USE_PROP) {
+        out$fpen.prop <- fpen.prop
+    } else {
+        out$fpen.inds <- fpen.inds
+    }
     class(out) <- "caribou_forecast"
     out
 }
