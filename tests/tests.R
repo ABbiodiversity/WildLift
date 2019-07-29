@@ -1,8 +1,19 @@
 library(CaribouBC)
 
+## settings with different treatments, herds
 caribou_settings("mat.pen")
 caribou_settings("pred.excl")
+caribou_settings("moose.red")
+caribou_settings("wolf.red", "Quintette") # wolf reduction
+
+## fpen.prop
 caribou_forecast(caribou_settings("mat.pen"))
+## fpen.inds: single value
+caribou_forecast(caribou_settings("mat.pen"), fpen.inds = 5)
+## fpen.inds: vector of values
+caribou_forecast(caribou_settings("mat.pen"), fpen.inds = c(5, 4, 6))
+
+## compare scenarios
 x1 <- caribou_forecast(caribou_settings("mat.pen"), fpen.prop = 0.75)
 x2 <- caribou_forecast(caribou_settings("pred.excl"), fpen.prop = 0.75)
 b1 <- caribou_breakeven(x1)
