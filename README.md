@@ -26,6 +26,8 @@ Development version is available as this fork:
 devtools::install_github("psolymos/CaribouBC")
 ```
 
+See user visible changes in the [NEWS](NEWS.md) file.
+
 ## Usage
 
 ``` r
