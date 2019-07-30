@@ -92,18 +92,24 @@ herd=NULL) {
 
             # these are herds from wolf reduction study: NO wolf reduction
             if (herd == "KennedySiding") {
+                if (pen.type != "mat.pen")
+                    stop(sprintf("%s herd is not available for pen.type=%s.", herd, pen.type))
                 parms$f.surv.capt <- 0.894
                 parms$f.surv.wild <- 0.844
                 parms$c.surv.capt <- 0.540
                 parms$c.surv.wild <- 0.283
             }
             if (herd == "KlinsezaMoberly") {
+                if (pen.type != "mat.pen")
+                    stop(sprintf("%s herd is not available for pen.type=%s.", herd, pen.type))
                 parms$f.surv.capt <- 0.798
                 parms$f.surv.wild <- 0.748
                 parms$c.surv.capt <- 0.540
                 parms$c.surv.wild <- 0.308
             }
             if (herd == "Quintette") {
+                if (pen.type != "mat.pen")
+                    stop(sprintf("%s herd is not available for pen.type=%s.", herd, pen.type))
                 parms$f.surv.capt <- 0.860
                 parms$f.surv.wild <- 0.810
                 parms$c.surv.capt <- 0.540
