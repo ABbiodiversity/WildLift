@@ -24,7 +24,13 @@ inits <- list(
         caribou_settings("moose.red")),
     moose0 = c(
         fpen.prop = 0.25,
-        caribou_settings("mat.pen"))
+        caribou_settings("mat.pen")),
+    wolf = c(
+        fpen.prop = 0.25,
+        caribou_settings("wolf.red", herd="KennedySiding")),
+    wolf0 = c(
+        fpen.prop = 0.25,
+        caribou_settings("mat.pen", herd="KennedySiding"))
 )
 
 get_settings <- function(x) {
@@ -41,11 +47,8 @@ Herds <- c(
     "Wells Grey South" = "WellsGreySouth",
     "Groundhog" = "Groundhog",
     "Parsnip" = "Parsnip")
+HerdsWolf <- c(
+    "Kennedy Siding" = "KennedySiding",
+    "Klinse-za (Moberly)" = "KlinsezaMoberly",
+    "Quintette" = "Quintette")
 
-## TODO:
-## OK - add static settings sliders
-## OK - implement plot
-## OK - implement summary
-## OK - add download options
-## OK - remove pred cost slider where not relevant
-## - need some kind of help page / info popups?

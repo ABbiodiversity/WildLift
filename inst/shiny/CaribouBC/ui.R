@@ -2,7 +2,7 @@ dashboardPage(
   dashboardHeader(title = "Caribou BC"),
   dashboardSidebar(
     tags$script(src = "tips.js"),
-    selectInput("herd", "Herd", c("Default"="Default", Herds)),
+    selectInput("herd", "Herd", c("Default"="Default", Herds, HerdsWolf)),
     sliderInput("tmax", "Number of years to forecast",
       min = 1, max = 100, value = 20, step = 1
     ),
@@ -19,7 +19,8 @@ dashboardPage(
     sidebarMenu(
       menuItem("Maternity pen", tabName = "penning"),
       menuItem("Predator exclosure", tabName = "predator"),
-      menuItem("Moose reduction", tabName = "moose")
+      menuItem("Moose reduction", tabName = "moose"),
+      menuItem("Wolf reduction", tabName = "wolf")
     )
   ),
   dashboardBody(
@@ -201,7 +202,52 @@ dashboardPage(
             )
           )
         )
+      ),
+
+      tabItem("wolf",
+        fluidRow(
+          column(width=8,
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Population forecast: Wolf reduction",
+              plotlyOutput("wolf_Plot", width = "100%", height = 400),
+              bsTooltip("wolf_Plot",
+                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                placement="right")
+            ),
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Summary: Wolf reduction",
+              tableOutput("wolf_Table"),
+              downloadButton("wolf_download", "Download results as Excel file"),
+              bsTooltip("wolf_Table",
+                "Table summarizing reports. Click below to download the full summary.",
+                placement="right"),
+              bsTooltip("wolf_download",
+                "Click here to download results.",
+                placement="top")
+            )
+          ),
+          column(width=4,
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Penning",
+              sliderInput("wolf_FpenPerc", "Percent of females penned",
+                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
+                step = 1),
+              bsTooltip("wolf_FpenPerc",
+                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
+              uiOutput("wolf_button"),
+              bsTooltip("wolf_button",
+                "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
+            )
+          )
+        )
       )
+
     )
   )
 )

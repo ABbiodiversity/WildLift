@@ -13,7 +13,10 @@ server <- function(input, output, session) {
         predator_compare = FALSE,
         moose = inits$moose,
         moose0 = inits$moose0,
-        moose_compare = TRUE)
+        wolf_compare = TRUE,
+        wolf = inits$wolf,
+        wolf0 = inits$wolf0,
+        wolf_compare = TRUE)
 
     observeEvent(input$herd, {
         HERD <- input$herd
@@ -44,6 +47,27 @@ server <- function(input, output, session) {
         values$moose0 <- c(
             fpen.prop = values$moose0$fpen.prop,
             caribou_settings("mat.pen", HERD))
+
+    })
+
+    observeEvent(input$herd, {
+
+        HERD <- input$herd
+
+        if (!(HERD %in% HerdsWolf)) {
+            showNotification(
+                paste("Pick one of these herds for wolf reduction:",
+                paste0(names(HerdsWolf), collapse=", ")),
+                type = "error")
+            return(NULL)
+        }
+        values$wolf <- c(
+            fpen.prop = values$wolf$fpen.prop,
+            caribou_settings("wolf.red", HERD))
+        values$wolf0 <- c(
+            fpen.prop = values$wolf0$fpen.prop,
+            caribou_settings("mat.pen", HERD))
+
     })
 
 
@@ -720,5 +744,164 @@ server <- function(input, output, session) {
         contentType="application/octet-stream"
     )
 
+
+    ## >>> wolf tab <<<=====================================
+
+    ## observers
+    observeEvent(input$wolf_FpenPerc, {
+        values$wolf$fpen.prop <- input$wolf_FpenPerc / 100
+        values$wolf0$fpen.prop <- input$wolf_FpenPerc / 100
+    })
+    ## wolf reduction with penning
+    wolf_getF <- reactive({
+        caribou_forecast(values$wolf,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            fpen.prop = values$wolf$fpen.prop)
+    })
+    ## no wolf reduction with penning
+    wolf_getB <- reactive({
+        caribou_forecast(values$wolf0,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            fpen.prop = values$wolf0$fpen.prop)
+    })
+    ## wolf reduction without penning
+    wolf_getF0 <- reactive({
+        caribou_forecast(values$wolf,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            fpen.prop = 0)
+    })
+    ## no wolf reduction without penning
+    wolf_getB0 <- reactive({
+        caribou_forecast(values$wolf0,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            fpen.prop = 0)
+    })
+    ## making nice table of the results
+    wolf_getT <- reactive({
+        req(wolf_getF(),
+            wolf_getB(),
+            wolf_getF0(),
+            wolf_getB0())
+        tab <- cbind(
+            WolfNoPen=unlist(summary(wolf_getF0())),
+            WolfPen=unlist(summary(wolf_getF())),
+            NoWolfNoPen=unlist(summary(wolf_getB0())),
+            NoWolfPen=unlist(summary(wolf_getB()))
+        )
+        subs <- c("lam.pen", "Nend.pen")
+        df <- tab[subs,,drop=FALSE]
+        rownames(df) <- c("&lambda;", "N (end)")
+        colnames(df) <- c(
+            "Wolf reduction, no pen",
+            "Wolf reduction, penned",
+            "No wolf reduction, no pen",
+            "No wolf reduction, penned")
+        df
+    })
+    ## making nice table of the settings
+    wolf_getS <- reactive({
+        req(wolf_getF(),
+            wolf_getB(),
+            wolf_getF0(),
+            wolf_getB0())
+        tab <- cbind(
+            WolfNoPen=get_settings(wolf_getF0()),
+            WolfPen=get_settings(wolf_getF()),
+            NoWolfNoPen=get_settings(wolf_getB0()),
+            NoWolfPen=get_settings(wolf_getB())
+        )
+        SNAM <- c(
+            "tmax" = "T max",
+            "pop.start" = "N start",
+            "fpen.prop" = "% females penned",
+            "c.surv.wild" = "Calf survival, wild",
+            "c.surv.capt" = "Calf survival, captive",
+            "f.surv.wild" = "Adult female survival, wild",
+            "f.surv.capt" = "Adult female survival, captive",
+            "f.preg.wild" = "Pregnancy rate, wild",
+            "f.preg.capt" = "Pregnancy rate, captive",
+            "pen.cap" = "Max in a single pen")
+        df <- tab[names(SNAM),,drop=FALSE]
+        df["fpen.prop",] <- df["fpen.prop",]*100
+        rownames(df) <- SNAM
+        colnames(df) <- c(
+            "Wolf reduction, no pen",
+            "Wolf reduction, penned",
+            "No wolf reduction, no pen",
+            "No wolf reduction, penned")
+        df
+    })
+    ## plot
+    output$wolf_Plot <- renderPlotly({
+        req(wolf_getF())
+        dF0 <- plot(wolf_getF0(), plot=FALSE)
+        dF <- plot(wolf_getF(), plot=FALSE)
+        dB0 <- plot(wolf_getB0(), plot=FALSE)
+        dB <- plot(wolf_getB(), plot=FALSE)
+        colnames(dF0)[colnames(dF0) == "Npen"] <- "Individuals"
+        p <- plot_ly(dF0, x = ~Years, y = ~Individuals,
+            name = 'Wolf reduction, no pen', type = 'scatter', mode = 'lines',
+            color=I('red')) %>%
+            add_trace(y = ~Npen, name = 'Wolf reduction, penned', data = dF,
+                mode = 'lines', color=I('blue')) %>%
+            add_trace(y = ~Npen, name = 'No wolf reduction, no pen', data = dB0,
+                    line=list(dash = 'dash', color='red')) %>%
+            add_trace(y = ~Npen, name = 'No wolf reduction, penned', data = dB,
+                line=list(dash = 'dash', color='blue')) %>%
+            layout(legend = list(x = 100, y = 0))
+        p
+    })
+    ## table
+    output$wolf_Table <- renderTable({
+        req(wolf_getT())
+        wolf_getT()
+    }, rownames=TRUE, colnames=TRUE,
+    striped=TRUE, bordered=TRUE, na="n/a",
+    sanitize.text.function = function(x) x)
+    ## dowload
+    wolf_xlslist <- reactive({
+        req(wolf_getF(), wolf_getF0(), wolf_getB(), wolf_getB0())
+        req(wolf_getT())
+        TS <- cbind(
+            plot(wolf_getF0(), plot=FALSE)[,c("Years", "Npen")],
+            plot(wolf_getF(), plot=FALSE)[,"Npen"],
+            plot(wolf_getB0(), plot=FALSE)[,"Npen"],
+            plot(wolf_getB(), plot=FALSE)[,"Npen"])
+        colnames(TS) <- c("Years",
+            "N wolf reduction, no pen",
+            "N wolf reduction, penned",
+            "N no wolf reduction, no pen",
+            "N no wolf reduction, penned")
+        df <- wolf_getT()
+        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
+        ss <- wolf_getS()
+        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
+            fields="Version")
+        out <- list(
+            Info=data.frame(CaribouBC=paste0(
+                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
+            Settings=as.data.frame(ss),
+            TimeSeries=as.data.frame(TS),
+            Summary=as.data.frame(df))
+        out$Settings$Parameters <- rownames(ss)
+        out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
+        out$Summary$Variables <- rownames(df)
+        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
+        out
+    })
+    output$wolf_download <- downloadHandler(
+        filename = function() {
+            paste0("CaribouBC_wolf_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(wolf_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
 
 }
