@@ -10,7 +10,7 @@ Try the [Shiny app](https://psolymos.shinyapps.io/matpen/) or run
 locally as `shiny::runGitHub("bcgov/CaribouBC", subdir =
 "inst/shiny/matpen")`.
 
-[](caribou.gif)
+![](caribou.gif)
 
 ## Installation
 
