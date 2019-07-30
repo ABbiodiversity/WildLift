@@ -1,5 +1,4 @@
-CaribouBC
-=========
+# CaribouBC
 
 > Caribou Population Forecasting
 
@@ -8,11 +7,12 @@ status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://tra
 [![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
 Try the [Shiny app](https://psolymos.shinyapps.io/matpen/) or run
-locally as
-`shiny::runGitHub("bcgov/CaribouBC", subdir = "inst/shiny/matpen")`.
+locally as `shiny::runGitHub("bcgov/CaribouBC", subdir =
+"inst/shiny/matpen")`.
 
-Installation
-------------
+[](caribou.gif)
+
+## Installation
 
 Stable version:
 
@@ -26,8 +26,7 @@ Development version is available as this fork:
 devtools::install_github("psolymos/CaribouBC")
 ```
 
-Usage
------
+## Usage
 
 ``` r
 library(CaribouBC)
@@ -126,7 +125,7 @@ legend("topleft", col = c(1,1,2), lty = c(2,1,1),
     legend = c("No pen", "Mat pen", "Pred excl"))
 ```
 
-![](README-example-1.png)
+![](README-example-1.png)<!-- -->
 
 ``` r
 
@@ -143,7 +142,7 @@ plot(f3, main = "Mat pen")
 plot(f4, main = "Pred excl")
 ```
 
-![](README-example-2.png)
+![](README-example-2.png)<!-- -->
 
 ``` r
 par(op)
@@ -165,14 +164,12 @@ caribou_forecast(s2, fpen.inds = c(5, 0, 4, 6))
 #>  - fpen.inds:5 0 4 6
 ```
 
-Getting Help or Reporting an Issue
-----------------------------------
+## Getting Help or Reporting an Issue
 
 To report bugs/issues/feature requests, please file an
 [issue](https://github.com/bcgov/CaribouBC/issues/).
 
-How to Contribute
------------------
+## How to Contribute
 
 If you would like to contribute to the package, please see our
 [CONTRIBUTING](CONTRIBUTING.md) guidelines.
@@ -181,22 +178,21 @@ Please note that this project is released with a [Contributor Code of
 Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree
 to abide by its terms.
 
-License
--------
+## License
 
     Copyright 2018 Province of British Columbia
-
+    
     Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-
+    
     http://www.apache.org/licenses/LICENSE-2.0
-
+    
     Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and limitations under the License.
 
-------------------------------------------------------------------------
+-----
 
 *This project was created using the
 [bcgovr](https://github.com/bcgov/bcgovr) package.*
