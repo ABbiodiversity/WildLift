@@ -12,6 +12,8 @@ dashboardPage(
       "Number of years in which the caribou population is forecasted. Default set, but the user can change the value by slider."),
     bsTooltip("popstart",
       "Number of caribou in the starting population. Default set, but the user can change the value by slider."),
+#    radioButtons("use_perc", "How to provide females penned",
+#      list("Percent"="perc", "Number of individuals"="inds")),
     sidebarMenu(
       menuItem("Maternity pen", tabName = "penning"),
       menuItem("Predator exclosure", tabName = "predator"),
@@ -57,6 +59,7 @@ dashboardPage(
               bsTooltip("penning_herd",
                 "Select a herd for herd specific demography parameters.",
                 placement="top"),
+#              uiOutput("penning_perc_or_inds"),
               sliderInput("penning_FpenPerc", "Percent of females penned",
                 min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
                 step = 1),

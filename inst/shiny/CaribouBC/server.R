@@ -5,6 +5,7 @@ server <- function(input, output, session) {
 
     ## set values based inits
     values <- reactiveValues(
+        use_perc = TRUE,
         penning = inits$penning,
         penning0 = NULL,
         penning_compare = FALSE,
@@ -17,7 +18,10 @@ server <- function(input, output, session) {
         wolf = inits$wolf,
         wolf0 = inits$wolf0,
         wolf_compare = TRUE)
-
+    ## set perc/inds
+    observeEvent(input$use_perc, {
+        values$use_perc <- input$use_perc == "perc"
+    })
 
     ## >>> penning tab <<<=====================================
 
@@ -58,6 +62,28 @@ server <- function(input, output, session) {
             )
         )
     })
+
+    ## dynamically render perc slider or inds text input -- experimental
+    if (FALSE) {
+    output$penning_perc_or_inds <- renderUI({
+        if (values$use_perc) {
+            tagList(
+                sliderInput("penning_FpenPercXXX", "Percent of females penned",
+                    min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
+                    step = 1),
+                bsTooltip("penning_FpenPercXXX",
+                    "Change the percent of female population in maternity pens. Default set, but the user can toggle.")
+            )
+        } else {
+            tagList(
+                textInput("penning_FpenPercXXX", "Fpen #", value = "0"),
+                bsTooltip("penning_FpenPercXXX",
+                    "Type in the number of females in maternity pens. Seperate by commas if providing multiple values for subsequent years.")
+            )
+        }
+    })
+    }
+
     ## observers
     observeEvent(input$penning_herd, {
         values$penning <- c(
