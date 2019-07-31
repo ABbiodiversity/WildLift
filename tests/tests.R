@@ -30,9 +30,15 @@ lines(x1,col=2)
 x3 <- caribou_forecast(caribou_settings("mat.pen", c.surv.wild=0.64), fpen.prop = 0.5)
 
 ## breakeven with inds
-x4 <- caribou_forecast(caribou_settings("mat.pen"), fpen.inds = 50)
-b4 <- caribou_breakeven(x4, type="inds")
-
+s <- caribou_settings("mat.pen")
+x4 <- caribou_forecast(s, fpen.inds = 50)
+b4i <- caribou_breakeven(x4, type="inds")
+b4p <- caribou_breakeven(x4, type="prop")
+x5i <- caribou_forecast(s, fpen.inds = b4i)
+x5p <- caribou_forecast(s, fpen.prop = b4p)
+summary(x5i$Nend.pen)
+summary(x5p$Nend.pen)
+rbind(i=x5i$Npop[1,], p=x5p$Npop[1,]) # diff should be small
 
 ## imitate Shiny
 

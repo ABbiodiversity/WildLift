@@ -5,7 +5,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         stop("Argument tmax must be >= 1.")
     if (abs(round(tmax) - tmax) > 0.0001)
         warning("Argument tmax was rounded to nearest integer.")
-    tmax <- as.integer(round(tmax))
+    tmax <- as.integer(round(tmax)) # this must be integer
     if (pop.start < 1)
         stop("Argument pop.start must be >= 1.")
     if (abs(round(pop.start) - pop.start) > 0.0001)
@@ -35,7 +35,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         if (any(fpen.inds < 0))
             stop("Argument fpen.inds must not be negative.")
         USE_PROP <- FALSE
-        fpen.inds <- as.integer(fpen.inds)
+        # do not round
+        #fpen.inds <- as.integer(fpen.inds)
         # cannot be longer than tmax - silently truncated
         if (length(fpen.inds) > tmax)
             fpen.inds <- fpen.inds[seq_len(tmax)]
