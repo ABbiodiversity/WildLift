@@ -13,7 +13,7 @@ caribou_forecast(caribou_settings("mat.pen"), fpen.inds = 5)
 ## fpen.inds: vector of values
 caribou_forecast(caribou_settings("mat.pen"), fpen.inds = c(5, 4, 6))
 
-## compare scenarios
+## compare scenarios with props
 x1 <- caribou_forecast(caribou_settings("mat.pen"), fpen.prop = 0.75)
 x2 <- caribou_forecast(caribou_settings("pred.excl"), fpen.prop = 0.75)
 b1 <- caribou_breakeven(x1)
@@ -28,6 +28,11 @@ plot(x2)
 lines(x1,col=2)
 
 x3 <- caribou_forecast(caribou_settings("mat.pen", c.surv.wild=0.64), fpen.prop = 0.5)
+
+## breakeven with inds
+x4 <- caribou_forecast(caribou_settings("mat.pen"), fpen.inds = 50)
+b4 <- caribou_breakeven(x4, type="inds")
+
 
 ## imitate Shiny
 

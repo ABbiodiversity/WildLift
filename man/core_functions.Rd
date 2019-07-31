@@ -23,7 +23,8 @@ caribou_settings(pen.type = c("mat.pen",  "pred.excl",
 caribou_forecast(settings, tmax = 20, pop.start = 100,
     fpen.prop, fpen.inds)
 
-caribou_breakeven(forecast, lambda = 1, tol = 0.001)
+caribou_breakeven(forecast, lambda=1,
+    type=c("prop", "inds"), max=10^4, tol=0.01)
 
 \method{print}{caribou_settings}(x, ...)
 \method{print}{caribou_forecast}(x, ...)
@@ -74,6 +75,15 @@ a forecast object returned by \code{caribou_forecast}.
 }
   \item{lambda}{
 numeric, annual intrinsic growth rate, must be >0.
+}
+  \item{type}{
+what to provide as output: proportion (\code{"prop"})
+or numbers (\code{"inds"}) of females penned
+at breakeven point.
+}
+  \item{max}{
+numeric (>0), maximum value for breakeven optimization when
+\code{type = "inds"}.
 }
   \item{tol}{
 numeric, tolerance limit, i.e. the maximum acceptable deviation
