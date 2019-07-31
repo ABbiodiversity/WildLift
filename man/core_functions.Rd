@@ -65,7 +65,9 @@ for the proportion of females penned;
 \code{fpen.inds} is a nonnegative integer
 for the number of females penned, can be a vector giving
 number of females penned in each year to be accumulated.
-Only one of \code{fpen.prop} or \code{fpen.inds} can be provided.
+Only one of \code{fpen.prop} or \code{fpen.inds} can be provided at a time.
+Any of the two arguments can be \code{NULL} or missing, but
+not both at the same time.
 }
   \item{forecast}{
 a forecast object returned by \code{caribou_forecast}.

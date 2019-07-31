@@ -12,22 +12,26 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         warning("Argument pop.start was rounded to nearest integer.")
     pop.start <- as.integer(round(pop.start))
     ## penned prop or inds
-    if (!missing(fpen.prop) && !missing(fpen.inds)) {
+    if (missing(fpen.prop))
+        fpen.prop <- NULL
+    if (missing(fpen.inds))
+        fpen.inds <- NULL
+    if (!is.null(fpen.prop) && !is.null(fpen.inds)) {
         stop("Aprovide fpen.prop or fpen.inds but not both.")
     }
     fpen.inds.vec <- numeric(tmax) # default is 0
-    if (missing(fpen.prop) && missing(fpen.inds)) {
+    if (is.null(fpen.prop) && is.null(fpen.inds)) {
         USE_PROP <- TRUE
         fpen.prop <- 0
     }
-    if (!missing(fpen.prop) && missing(fpen.inds)) {
+    if (!is.null(fpen.prop) && is.null(fpen.inds)) {
         if (length(fpen.prop) > 1)
             stop("Penned proportion must be a single value.")
         if (fpen.prop > 1 || fpen.prop < 0)
             stop("Argument fpen.prop must be in the [0, 1] interval.")
         USE_PROP <- TRUE
     }
-    if (missing(fpen.prop) && !missing(fpen.inds)) {
+    if (is.null(fpen.prop) && !is.null(fpen.inds)) {
         if (any(fpen.inds < 0))
             stop("Argument fpen.inds must not be negative.")
         USE_PROP <- FALSE
