@@ -18,64 +18,12 @@ server <- function(input, output, session) {
         wolf0 = inits$wolf0,
         wolf_compare = TRUE)
 
-    observeEvent(input$herd, {
-        HERD <- input$herd
-        if (HERD == "Default")
-            HERD <- NULL
-
-        values$penning <- c(
-            fpen.prop = values$penning$fpen.prop,
-            caribou_settings("mat.pen", HERD))
-        if (values$penning_compare) {
-            values$penning0 <- values$penning
-        } else {
-            values$penning0 <- NULL
-        }
-
-        values$predator <- c(
-            fpen.prop = values$predator$fpen.prop,
-            caribou_settings("mat.pen", HERD))
-        if (values$predator_compare) {
-            values$predator0 <- values$predator
-        } else {
-            values$predator0 <- NULL
-        }
-
-        values$moose <- c(
-            fpen.prop = values$moose$fpen.prop,
-            caribou_settings("moose.red", HERD))
-        values$moose0 <- c(
-            fpen.prop = values$moose0$fpen.prop,
-            caribou_settings("mat.pen", HERD))
-
-    })
-
-    observeEvent(input$herd, {
-
-        HERD <- input$herd
-
-        if (!(HERD %in% HerdsWolf)) {
-            showNotification(
-                paste("Pick one of these herds for wolf reduction:",
-                paste0(names(HerdsWolf), collapse=", ")),
-                type = "error")
-            return(NULL)
-        }
-        values$wolf <- c(
-            fpen.prop = values$wolf$fpen.prop,
-            caribou_settings("wolf.red", HERD))
-        values$wolf0 <- c(
-            fpen.prop = values$wolf0$fpen.prop,
-            caribou_settings("mat.pen", HERD))
-
-    })
-
 
     ## >>> penning tab <<<=====================================
 
     ## dynamically render sliders
     output$penning_demogr_sliders <- renderUI({
-        if (input$herd != "Default")
+        if (input$penning_herd != "Default")
             return(p("Demography settings not available for specific herds."))
         tagList(
             sliderInput("penning_DemCsw", "Calf survival, wild",
@@ -102,7 +50,26 @@ server <- function(input, output, session) {
                     "stop-circle" else "arrows-alt-h"))
         )
     })
+    ## dynamically render herd selector
+    output$penning_herd <- renderUI({
+        tagList(
+            selectInput(
+                "penning_herd", "Herd", c("Default"="Default", Herds, HerdsWolf)
+            )
+        )
+    })
     ## observers
+    observeEvent(input$penning_herd, {
+        values$penning <- c(
+            fpen.prop = values$penning$fpen.prop,
+            caribou_settings("mat.pen",
+                herd = if (input$penning_herd == "Default") NULL else input$penning_herd))
+        if (values$penning_compare) {
+            values$penning0 <- values$penning
+        } else {
+            values$penning0 <- NULL
+        }
+    })
     observeEvent(input$penning_button, {
         values$penning_compare <- !values$penning_compare
         if (values$penning_compare) {
@@ -307,7 +274,7 @@ server <- function(input, output, session) {
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$penning_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
@@ -332,7 +299,7 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$predator_demogr_sliders <- renderUI({
-        if (input$herd != "Default")
+        if (input$predator_herd != "Default")
             return(p("Demography settings not available for specific herds."))
         tagList(
              sliderInput("predator_DemCsw", "Calf survival, wild",
@@ -359,7 +326,26 @@ server <- function(input, output, session) {
                     "stop-circle" else "arrows-alt-h"))
         )
     })
+    ## dynamically render herd selector
+    output$predator_herd <- renderUI({
+        tagList(
+            selectInput(
+                "predator_herd", "Herd", c("Default"="Default", Herds)
+            )
+        )
+    })
     ## observers
+    observeEvent(input$predator_herd, {
+        values$predator <- c(
+            fpen.prop = values$predator$fpen.prop,
+            caribou_settings("mat.pen",
+                herd = if (input$predator_herd == "Default") NULL else input$predator_herd))
+        if (values$predator_compare) {
+            values$predator0 <- values$predator
+        } else {
+            values$predator0 <- NULL
+        }
+    })
     observeEvent(input$predator_button, {
         values$predator_compare <- !values$predator_compare
         if (values$predator_compare) {
@@ -564,7 +550,7 @@ server <- function(input, output, session) {
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$predator_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
@@ -587,7 +573,25 @@ server <- function(input, output, session) {
 
     ## >>> moose tab <<<=====================================
 
+    ## dynamically render herd selector
+    output$moose_herd <- renderUI({
+        tagList(
+            selectInput(
+                "moose_herd", "Herd", c("Default"="Default", Herds)
+            )
+        )
+    })
     ## observers
+    observeEvent(input$moose_herd, {
+        values$moose <- c(
+            fpen.prop = values$moose$fpen.prop,
+            caribou_settings("moose.red",
+                herd = if (input$moose_herd == "Default") NULL else input$moose_herd))
+        values$moose0 <- c(
+            fpen.prop = values$moose0$fpen.prop,
+            caribou_settings("mat.pen",
+                herd = if (input$moose_herd == "Default") NULL else input$moose_herd))
+    })
     observeEvent(input$moose_FpenPerc, {
         values$moose$fpen.prop <- input$moose_FpenPerc / 100
         values$moose0$fpen.prop <- input$moose_FpenPerc / 100
@@ -724,7 +728,7 @@ server <- function(input, output, session) {
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$moose_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
@@ -747,7 +751,25 @@ server <- function(input, output, session) {
 
     ## >>> wolf tab <<<=====================================
 
+    ## dynamically render herd selector
+    output$wolf_herd <- renderUI({
+        tagList(
+            selectInput(
+                "wolf_herd", "Herd", HerdsWolf
+            )
+        )
+    })
     ## observers
+    observeEvent(input$wolf_herd, {
+        values$wolf <- c(
+            fpen.prop = values$wolf$fpen.prop,
+            caribou_settings("wolf.red",
+                herd = if (input$wolf_herd == "Default") NULL else input$wolf_herd))
+        values$wolf0 <- c(
+            fpen.prop = values$wolf0$fpen.prop,
+            caribou_settings("mat.pen",
+                herd = if (input$wolf_herd == "Default") NULL else input$wolf_herd))
+    })
     observeEvent(input$wolf_FpenPerc, {
         values$wolf$fpen.prop <- input$wolf_FpenPerc / 100
         values$wolf0$fpen.prop <- input$wolf_FpenPerc / 100
@@ -884,7 +906,7 @@ server <- function(input, output, session) {
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$herd))),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$wolf_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
