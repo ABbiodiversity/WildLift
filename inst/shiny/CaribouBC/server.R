@@ -14,10 +14,8 @@ server <- function(input, output, session) {
         predator_compare = FALSE,
         moose = inits$moose,
         moose0 = inits$moose0,
-        wolf_compare = TRUE,
         wolf = inits$wolf,
-        wolf0 = inits$wolf0,
-        wolf_compare = TRUE)
+        wolf0 = inits$wolf0)
     ## set perc/inds
     observeEvent(input$use_perc, {
         values$use_perc <- input$use_perc == "perc"
@@ -62,32 +60,31 @@ server <- function(input, output, session) {
             )
         )
     })
-
-    ## dynamically render perc slider or inds text input -- experimental
-    if (FALSE) {
+    ## dynamically render perc or inds slider
     output$penning_perc_or_inds <- renderUI({
         if (values$use_perc) {
             tagList(
-                sliderInput("penning_FpenPercXXX", "Percent of females penned",
+                sliderInput("penning_Fpen", "Percent of females penned",
                     min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
                     step = 1),
-                bsTooltip("penning_FpenPercXXX",
+                bsTooltip("penning_Fpen",
                     "Change the percent of female population in maternity pens. Default set, but the user can toggle.")
             )
         } else {
             tagList(
-                textInput("penning_FpenPercXXX", "Fpen #", value = "0"),
-                bsTooltip("penning_FpenPercXXX",
-                    "Type in the number of females in maternity pens. Seperate by commas if providing multiple values for subsequent years.")
+                sliderInput("penning_Fpen", "Number of females penned",
+                    min = 0, max = input$popstart, value = inits$penning$fpen.inds,
+                    step = 1),
+                bsTooltip("penning_Fpen",
+                    "Change the number of females in maternity pens. Default set, but the user can toggle.")
             )
         }
     })
-    }
-
     ## observers
     observeEvent(input$penning_herd, {
         values$penning <- c(
             fpen.prop = values$penning$fpen.prop,
+            fpen.inds = values$penning$fpen.inds,
             caribou_settings("mat.pen",
                 herd = if (input$penning_herd == "Default") NULL else input$penning_herd))
         if (values$penning_compare) {
@@ -104,8 +101,15 @@ server <- function(input, output, session) {
             values$penning0 <- NULL
         }
     })
-    observeEvent(input$penning_FpenPerc, {
-        values$penning$fpen.prop <- input$penning_FpenPerc / 100
+#    observeEvent(input$penning_FpenPerc, {
+#        values$penning$fpen.prop <- input$penning_FpenPerc / 100
+#    })
+    observeEvent(input$penning_Fpen, {
+        if (values$use_perc) {
+            values$penning$fpen.prop <- input$penning_Fpen / 100
+        } else {
+            values$penning$fpen.inds <- input$penning_Fpen
+        }
     })
     observeEvent(input$penning_DemCsw, {
         values$penning$c.surv.wild <- input$penning_DemCsw
@@ -148,18 +152,23 @@ server <- function(input, output, session) {
         caribou_forecast(values$penning,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = values$penning$fpen.prop)
+            fpen.prop = if (values$use_perc) values$penning$fpen.prop else NULL,
+            fpen.inds = if (values$use_perc) NULL else values$penning$fpen.inds)
     })
     ## try to find breakeven point
     penning_getB <- reactive({
         req(penning_getF())
-        p <- suppressWarnings(caribou_breakeven(penning_getF()))
+        p <- suppressWarnings(
+            caribou_breakeven(penning_getF(),
+                type = if (values$use_perc) "prop" else "inds")
+        )
         if (is.na(p))
             return(NULL)
         caribou_forecast(penning_getF()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = p)
+            fpen.prop = if (values$use_perc) p else NULL,
+            fpen.inds = if (values$use_perc) NULL else p)
     })
     ## these are similar functions to the bechmark scenario
     penning_getF0 <- reactive({
@@ -168,43 +177,54 @@ server <- function(input, output, session) {
         caribou_forecast(values$penning0,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = values$penning0$fpen.prop)
+            fpen.prop = if (values$use_perc) values$penning0$fpen.prop else NULL,
+            fpen.inds = if (values$use_perc) NULL else values$penning0$fpen.inds)
     })
     penning_getB0 <- reactive({
         req(penning_getF0())
-        p <- suppressWarnings(caribou_breakeven(penning_getF0()))
+        p <- suppressWarnings(
+            caribou_breakeven(penning_getF0(),
+                type = if (values$use_perc) "perc" else "inds")
+        )
         if (is.na(p))
             return(NULL)
         caribou_forecast(penning_getF0()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = p)
+            fpen.prop = if (values$use_perc) p else NULL,
+            fpen.inds = if (values$use_perc) NULL else p)
     })
     ## making nice table of the results
     penning_getT <- reactive({
         req(penning_getF())
         bev <- if (is.null(penning_getB()))
-            NA else unlist(summary(penning_getB()))
+            #NA else unlist(summary(penning_getB()))
+            NA else get_summary(penning_getB(), values$use_perc)
         tab <- cbind(
-            Results=unlist(summary(penning_getF())),
+            #Results=unlist(summary(penning_getF())),
+            Results=get_summary(penning_getF(), values$use_perc),
             Breakeven=bev)
-        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
+        subs <- c("fpen", "npens", "lam.pen", "lam.nopen",
             "Nend.pen", "Nend.nopen", "Nend.diff",
             "Cost.total", "Cost.percap")
         df <- tab[subs,,drop=FALSE]
-        df[1L,] <- df[1L,]*100
-        rownames(df) <- c("% penned",
+        if (values$use_perc)
+            df[1L,] <- df[1L,]*100
+        rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (maternity pen)", "&lambda; (no maternity pen)",
             "N (end, maternity pen)", "N (end, no maternity pen)", "N (end, difference)",
             "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
-                NA else unlist(summary(penning_getB0()))
+                #NA else unlist(summary(penning_getB0()))
+                NA else get_summary(penning_getB0(), values$use_perc)
             tab0 <- cbind(
-                Results=unlist(summary(penning_getF0())),
+                #Results=unlist(summary(penning_getF0())),
+                Results=get_summary(penning_getF0(), values$use_perc),
                 Breakeven=bev0)
             df0 <- tab0[subs,,drop=FALSE]
-            df0[1L,] <- df0[1L,]*100
+            if (values$use_perc)
+                df0[1L,] <- df0[1L,]*100
             rownames(df0) <- rownames(df)
             df <- cbind(df0, df)
             colnames(df) <- c("Results, reference", "Breakeven, reference",
@@ -216,14 +236,16 @@ server <- function(input, output, session) {
     penning_getS <- reactive({
         req(penning_getF())
         bev <- if (is.null(penning_getB()))
-            NA else get_settings(penning_getB())
+            NA else get_settings(penning_getB(), values$use_perc)
         tab <- cbind(
-            Results=get_settings(penning_getF()),
+            Results=get_settings(penning_getF(), values$use_perc),
             Breakeven=bev)
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
-            "fpen.prop" = "% females penned",
+            #"fpen.prop" = "% females penned",
+            "fpen" = if (values$use_perc)
+                "% females penned" else "# females penned",
             "c.surv.wild" = "Calf survival, wild",
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
@@ -237,16 +259,18 @@ server <- function(input, output, session) {
             "pen.cost.capt" = "Capture/monitor (x $1000)",
             "pen.cost.pred" = "Removing predators (x $1000)")
         df <- tab[names(SNAM),,drop=FALSE]
-        df["fpen.prop",] <- df["fpen.prop",]*100
+        if (values$use_perc)
+            df["fpen",] <- df["fpen",]*100
         rownames(df) <- SNAM
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
-                NA else get_settings(penning_getB0())
+                NA else get_settings(penning_getB0(), values$use_perc)
             tab0 <- cbind(
-                Results=get_settings(penning_getF0()),
+                Results=get_settings(penning_getF0(), values$use_perc),
                 Breakeven=bev0)
             df0 <- tab0[names(SNAM),,drop=FALSE]
-            df0["fpen.prop",] <- df0["fpen.prop",]*100
+            if (values$use_perc)
+                df0["fpen",] <- df0["fpen",]*100
             rownames(df0) <- SNAM
             df <- cbind(df0, df)
             colnames(df) <- c("Results, reference", "Breakeven, reference",
@@ -295,8 +319,6 @@ server <- function(input, output, session) {
         df <- penning_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- penning_getS()
-        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
-            fields="Version")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
@@ -360,10 +382,31 @@ server <- function(input, output, session) {
             )
         )
     })
+    ## dynamically render perc or inds slider
+    output$predator_perc_or_inds <- renderUI({
+        if (values$use_perc) {
+            tagList(
+                sliderInput("predator_Fpen", "Percent of females penned",
+                    min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
+                    step = 1),
+                bsTooltip("predator_Fpen",
+                    "Change the percent of female population in maternity pens. Default set, but the user can toggle.")
+            )
+        } else {
+            tagList(
+                sliderInput("predator_Fpen", "Number of females penned",
+                    min = 0, max = input$popstart, value = inits$predator$fpen.inds,
+                    step = 1),
+                bsTooltip("predator_Fpen",
+                    "Change the number of females in maternity pens. Default set, but the user can toggle.")
+            )
+        }
+    })
     ## observers
     observeEvent(input$predator_herd, {
         values$predator <- c(
             fpen.prop = values$predator$fpen.prop,
+            fpen.inds = values$predator$fpen.inds,
             caribou_settings("mat.pen",
                 herd = if (input$predator_herd == "Default") NULL else input$predator_herd))
         if (values$predator_compare) {
@@ -380,8 +423,15 @@ server <- function(input, output, session) {
             values$predator0 <- NULL
         }
     })
-    observeEvent(input$predator_FpenPerc, {
-        values$predator$fpen.prop <- input$predator_FpenPerc / 100
+#    observeEvent(input$predator_FpenPerc, {
+#        values$predator$fpen.prop <- input$predator_FpenPerc / 100
+#    })
+    observeEvent(input$predator_Fpen, {
+        if (values$use_perc) {
+            values$predator$fpen.prop <- input$predator_Fpen / 100
+        } else {
+            values$predator$fpen.inds <- input$predator_Fpen
+        }
     })
     observeEvent(input$predator_DemCsw, {
         values$predator$c.surv.wild <- input$predator_DemCsw
@@ -424,18 +474,23 @@ server <- function(input, output, session) {
         caribou_forecast(values$predator,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = values$predator$fpen.prop)
+            fpen.prop = if (values$use_perc) values$predator$fpen.prop else NULL,
+            fpen.inds = if (values$use_perc) NULL else values$predator$fpen.inds)
     })
     ## try to find breakeven point
     predator_getB <- reactive({
         req(predator_getF())
-        p <- suppressWarnings(caribou_breakeven(predator_getF()))
+        p <- suppressWarnings(
+            caribou_breakeven(predator_getF(),
+                type = if (values$use_perc) "prop" else "inds")
+        )
         if (is.na(p))
             return(NULL)
         caribou_forecast(predator_getF()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = p)
+            fpen.prop = if (values$use_perc) p else NULL,
+            fpen.inds = if (values$use_perc) NULL else p)
     })
     ## these are similar functions to the bechmark scenario
     predator_getF0 <- reactive({
@@ -444,43 +499,54 @@ server <- function(input, output, session) {
         caribou_forecast(values$predator0,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = values$predator0$fpen.prop)
+            fpen.prop = if (values$use_perc) values$predator0$fpen.prop else NULL,
+            fpen.inds = if (values$use_perc) NULL else values$predator0$fpen.inds)
     })
     predator_getB0 <- reactive({
         req(predator_getF0())
-        p <- suppressWarnings(caribou_breakeven(predator_getF0()))
+        p <- suppressWarnings(
+            caribou_breakeven(predator_getF0(),
+                type = if (values$use_perc) "perc" else "inds")
+        )
         if (is.na(p))
             return(NULL)
         caribou_forecast(predator_getF0()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = p)
+            fpen.prop = if (values$use_perc) p else NULL,
+            fpen.inds = if (values$use_perc) NULL else p)
     })
     ## making nice table of the results
     predator_getT <- reactive({
         req(predator_getF())
         bev <- if (is.null(predator_getB()))
-            NA else unlist(summary(predator_getB()))
+            #NA else unlist(summary(predator_getB()))
+            NA else get_summary(predator_getB(), values$use_perc)
         tab <- cbind(
-            Results=unlist(summary(predator_getF())),
+            #Results=unlist(summary(predator_getF())),
+            Results=get_summary(predator_getF(), values$use_perc),
             Breakeven=bev)
-        subs <- c("fpen.prop", "npens", "lam.pen", "lam.nopen",
+        subs <- c("fpen", "npens", "lam.pen", "lam.nopen",
             "Nend.pen", "Nend.nopen", "Nend.diff",
             "Cost.total", "Cost.percap")
         df <- tab[subs,,drop=FALSE]
-        df[1L,] <- df[1L,]*100
-        rownames(df) <- c("% penned",
+        if (values$use_perc)
+            df[1L,] <- df[1L,]*100
+        rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (predator exclosure)", "&lambda; (no predator exclosure)",
             "N (end, predator exclosure)", "N (end, no predator exclosure)", "N (end, difference)",
             "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
-                NA else unlist(summary(predator_getB0()))
+                #NA else unlist(summary(predator_getB0()))
+                NA else get_summary(predator_getB0(), values$use_perc)
             tab0 <- cbind(
-                Results=unlist(summary(predator_getF0())),
+                #Results=unlist(summary(predator_getF0())),
+                Results=get_summary(predator_getF0(), values$use_perc),
                 Breakeven=bev0)
             df0 <- tab0[subs,,drop=FALSE]
-            df0[1L,] <- df0[1L,]*100
+            if (values$use_perc)
+                df0[1L,] <- df0[1L,]*100
             rownames(df0) <- rownames(df)
             df <- cbind(df0, df)
             colnames(df) <- c("Results, reference", "Breakeven, reference",
@@ -492,14 +558,16 @@ server <- function(input, output, session) {
     predator_getS <- reactive({
         req(predator_getF())
         bev <- if (is.null(predator_getB()))
-            NA else get_settings(predator_getB())
+            NA else get_settings(predator_getB(), values$use_perc)
         tab <- cbind(
-            Results=get_settings(predator_getF()),
+            Results=get_settings(predator_getF(), values$use_perc),
             Breakeven=bev)
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
-            "fpen.prop" = "% females penned",
+            #"fpen.prop" = "% females penned",
+            "fpen" = if (values$use_perc)
+                "% females penned" else "# females penned",
             "c.surv.wild" = "Calf survival, wild",
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
@@ -513,16 +581,18 @@ server <- function(input, output, session) {
             "pen.cost.capt" = "Capture/monitor (x $1000)",
             "pen.cost.pred" = "Removing predators (x $1000)")
         df <- tab[names(SNAM),,drop=FALSE]
-        df["fpen.prop",] <- df["fpen.prop",]*100
+        if (values$use_perc)
+            df["fpen",] <- df["fpen",]*100
         rownames(df) <- SNAM
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
-                NA else get_settings(predator_getB0())
+                NA else get_settings(predator_getB0(), values$use_perc)
             tab0 <- cbind(
-                Results=get_settings(predator_getF0()),
+                Results=get_settings(predator_getF0(), values$use_perc),
                 Breakeven=bev0)
             df0 <- tab0[names(SNAM),,drop=FALSE]
-            df0["fpen.prop",] <- df0["fpen.prop",]*100
+            if (values$use_perc)
+                df0["fpen",] <- df0["fpen",]*100
             rownames(df0) <- SNAM
             df <- cbind(df0, df)
             colnames(df) <- c("Results, reference", "Breakeven, reference",
@@ -571,8 +641,6 @@ server <- function(input, output, session) {
         df <- predator_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- predator_getS()
-        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
-            fields="Version")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
@@ -607,34 +675,67 @@ server <- function(input, output, session) {
             )
         )
     })
+    ## dynamically render perc or inds slider
+    output$moose_perc_or_inds <- renderUI({
+        if (values$use_perc) {
+            tagList(
+                sliderInput("moose_Fpen", "Percent of females penned",
+                    min = 0, max = 100, value = round(100*inits$moose$fpen.prop),
+                    step = 1),
+                bsTooltip("moose_Fpen",
+                    "Change the percent of female population in maternity pens. Default set, but the user can toggle.")
+            )
+        } else {
+            tagList(
+                sliderInput("moose_Fpen", "Number of females penned",
+                    min = 0, max = input$popstart, value = inits$moose$fpen.inds,
+                    step = 1),
+                bsTooltip("moose_Fpen",
+                    "Change the number of females in maternity pens. Default set, but the user can toggle.")
+            )
+        }
+    })
     ## observers
     observeEvent(input$moose_herd, {
         values$moose <- c(
             fpen.prop = values$moose$fpen.prop,
+            fpen.inds = values$moose$fpen.inds,
             caribou_settings("moose.red",
                 herd = if (input$moose_herd == "Default") NULL else input$moose_herd))
         values$moose0 <- c(
             fpen.prop = values$moose0$fpen.prop,
+            fpen.inds = values$moose0$fpen.inds,
             caribou_settings("mat.pen",
                 herd = if (input$moose_herd == "Default") NULL else input$moose_herd))
     })
-    observeEvent(input$moose_FpenPerc, {
-        values$moose$fpen.prop <- input$moose_FpenPerc / 100
-        values$moose0$fpen.prop <- input$moose_FpenPerc / 100
+#    observeEvent(input$moose_FpenPerc, {
+#        values$moose$fpen.prop <- input$moose_FpenPerc / 100
+#        values$moose0$fpen.prop <- input$moose_FpenPerc / 100
+#    })
+    observeEvent(input$moose_Fpen, {
+        if (values$use_perc) {
+            values$moose$fpen.prop <- input$moose_Fpen / 100
+            values$moose0$fpen.prop <- input$moose_Fpen / 100
+        } else {
+            values$moose$fpen.inds <- input$moose_Fpen
+            values$moose0$fpen.inds <- input$moose_Fpen
+        }
     })
     ## moose reduction with penning
     moose_getF <- reactive({
         caribou_forecast(values$moose,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = values$moose$fpen.prop)
+            fpen.prop = if (values$use_perc) values$moose$fpen.prop else NULL,
+            fpen.inds = if (values$use_perc) NULL else values$moose$fpen.inds)
     })
     ## no moose reduction with penning
     moose_getB <- reactive({
         caribou_forecast(values$moose0,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = values$moose0$fpen.prop)
+            fpen.prop = if (values$use_perc) values$moose0$fpen.prop else NULL,
+            fpen.inds = if (values$use_perc) NULL else values$moose0$fpen.inds)
     })
     ## moose reduction without penning
     moose_getF0 <- reactive({
@@ -656,14 +757,15 @@ server <- function(input, output, session) {
             moose_getB(),
             moose_getF0(),
             moose_getB0())
-        tab <- cbind(
-            MooseNoPen=unlist(summary(moose_getF0())),
-            MoosePen=unlist(summary(moose_getF())),
-            NoMooseNoPen=unlist(summary(moose_getB0())),
-            NoMoosePen=unlist(summary(moose_getB()))
-        )
         subs <- c("lam.pen", "Nend.pen")
-        df <- tab[subs,,drop=FALSE]
+        df <- cbind(
+            MooseNoPen=get_summary(moose_getF0(), values$use_perc)[subs],
+            MoosePen=get_summary(moose_getF(), values$use_perc)[subs],
+            NoMooseNoPen=get_summary(moose_getB0(), values$use_perc)[subs],
+            NoMoosePen=get_summary(moose_getB(), values$use_perc)[subs]
+        )
+        #print(str(df))
+        #df <- tab[subs,,drop=FALSE]
         rownames(df) <- c("&lambda;", "N (end)")
         colnames(df) <- c(
             "Moose reduction, no pen",
@@ -679,15 +781,17 @@ server <- function(input, output, session) {
             moose_getF0(),
             moose_getB0())
         tab <- cbind(
-            MooseNoPen=get_settings(moose_getF0()),
-            MoosePen=get_settings(moose_getF()),
-            NoMooseNoPen=get_settings(moose_getB0()),
-            NoMoosePen=get_settings(moose_getB())
+            MooseNoPen=get_settings(moose_getF0(), values$use_perc),
+            MoosePen=get_settings(moose_getF(), values$use_perc),
+            NoMooseNoPen=get_settings(moose_getB0(), values$use_perc),
+            NoMoosePen=get_settings(moose_getB(), values$use_perc)
         )
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
-            "fpen.prop" = "% females penned",
+            #"fpen.prop" = "% females penned",
+            "fpen" = if (values$use_perc)
+                "% females penned" else "# females penned",
             "c.surv.wild" = "Calf survival, wild",
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
@@ -696,7 +800,8 @@ server <- function(input, output, session) {
             "f.preg.capt" = "Pregnancy rate, captive",
             "pen.cap" = "Max in a single pen")
         df <- tab[names(SNAM),,drop=FALSE]
-        df["fpen.prop",] <- df["fpen.prop",]*100
+        if (values$use_perc)
+            df["fpen",] <- df["fpen",]*100
         rownames(df) <- SNAM
         colnames(df) <- c(
             "Moose reduction, no pen",
@@ -749,8 +854,6 @@ server <- function(input, output, session) {
         df <- moose_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- moose_getS()
-        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
-            fields="Version")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
@@ -785,34 +888,65 @@ server <- function(input, output, session) {
             )
         )
     })
+    ## dynamically render perc or inds slider
+    output$wolf_perc_or_inds <- renderUI({
+        if (values$use_perc) {
+            tagList(
+                sliderInput("wolf_Fpen", "Percent of females penned",
+                    min = 0, max = 100, value = round(100*inits$wolf$fpen.prop),
+                    step = 1),
+                bsTooltip("wolf_Fpen",
+                    "Change the percent of female population in maternity pens. Default set, but the user can toggle.")
+            )
+        } else {
+            tagList(
+                sliderInput("wolf_Fpen", "Number of females penned",
+                    min = 0, max = input$popstart, value = inits$wolf$fpen.inds,
+                    step = 1),
+                bsTooltip("wolf_Fpen",
+                    "Change the number of females in maternity pens. Default set, but the user can toggle.")
+            )
+        }
+    })
     ## observers
     observeEvent(input$wolf_herd, {
         values$wolf <- c(
             fpen.prop = values$wolf$fpen.prop,
-            caribou_settings("wolf.red",
-                herd = if (input$wolf_herd == "Default") NULL else input$wolf_herd))
+            fpen.inds = values$wolf$fpen.inds,
+            caribou_settings("wolf.red", herd = input$wolf_herd))
         values$wolf0 <- c(
             fpen.prop = values$wolf0$fpen.prop,
-            caribou_settings("mat.pen",
-                herd = if (input$wolf_herd == "Default") NULL else input$wolf_herd))
+            fpen.inds = values$wolf0$fpen.inds,
+            caribou_settings("mat.pen", herd = input$wolf_herd))
     })
-    observeEvent(input$wolf_FpenPerc, {
-        values$wolf$fpen.prop <- input$wolf_FpenPerc / 100
-        values$wolf0$fpen.prop <- input$wolf_FpenPerc / 100
+#    observeEvent(input$wolf_FpenPerc, {
+#        values$wolf$fpen.prop <- input$wolf_FpenPerc / 100
+#        values$wolf0$fpen.prop <- input$wolf_FpenPerc / 100
+#    })
+    observeEvent(input$wolf_Fpen, {
+        if (values$use_perc) {
+            values$wolf$fpen.prop <- input$wolf_Fpen / 100
+            values$wolf0$fpen.prop <- input$wolf_Fpen / 100
+        } else {
+            values$wolf$fpen.inds <- input$wolf_Fpen
+            values$wolf0$fpen.inds <- input$wolf_Fpen
+        }
     })
     ## wolf reduction with penning
     wolf_getF <- reactive({
         caribou_forecast(values$wolf,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = values$wolf$fpen.prop)
+            fpen.prop = if (values$use_perc) values$wolf$fpen.prop else NULL,
+            fpen.inds = if (values$use_perc) NULL else values$wolf$fpen.inds)
     })
     ## no wolf reduction with penning
     wolf_getB <- reactive({
         caribou_forecast(values$wolf0,
             tmax = input$tmax,
             pop.start = input$popstart,
-            fpen.prop = values$wolf0$fpen.prop)
+            fpen.prop = if (values$use_perc) values$wolf0$fpen.prop else NULL,
+            fpen.inds = if (values$use_perc) NULL else values$wolf0$fpen.inds)
     })
     ## wolf reduction without penning
     wolf_getF0 <- reactive({
@@ -834,14 +968,14 @@ server <- function(input, output, session) {
             wolf_getB(),
             wolf_getF0(),
             wolf_getB0())
-        tab <- cbind(
-            WolfNoPen=unlist(summary(wolf_getF0())),
-            WolfPen=unlist(summary(wolf_getF())),
-            NoWolfNoPen=unlist(summary(wolf_getB0())),
-            NoWolfPen=unlist(summary(wolf_getB()))
-        )
         subs <- c("lam.pen", "Nend.pen")
-        df <- tab[subs,,drop=FALSE]
+        df <- cbind(
+            WolfNoPen=get_summary(wolf_getF0(), values$use_perc)[subs],
+            WolfPen=get_summary(wolf_getF(), values$use_perc)[subs],
+            NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs],
+            NoWolfPen=get_summary(wolf_getB(), values$use_perc)[subs]
+        )
+        #df <- tab[subs,,drop=FALSE]
         rownames(df) <- c("&lambda;", "N (end)")
         colnames(df) <- c(
             "Wolf reduction, no pen",
@@ -857,15 +991,17 @@ server <- function(input, output, session) {
             wolf_getF0(),
             wolf_getB0())
         tab <- cbind(
-            WolfNoPen=get_settings(wolf_getF0()),
-            WolfPen=get_settings(wolf_getF()),
-            NoWolfNoPen=get_settings(wolf_getB0()),
-            NoWolfPen=get_settings(wolf_getB())
+            WolfNoPen=get_settings(wolf_getF0(), values$use_perc),
+            WolfPen=get_settings(wolf_getF(), values$use_perc),
+            NoWolfNoPen=get_settings(wolf_getB0(), values$use_perc),
+            NoWolfPen=get_settings(wolf_getB(), values$use_perc)
         )
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
-            "fpen.prop" = "% females penned",
+            #"fpen.prop" = "% females penned",
+            "fpen" = if (values$use_perc)
+                "% females penned" else "# females penned",
             "c.surv.wild" = "Calf survival, wild",
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
@@ -874,7 +1010,8 @@ server <- function(input, output, session) {
             "f.preg.capt" = "Pregnancy rate, captive",
             "pen.cap" = "Max in a single pen")
         df <- tab[names(SNAM),,drop=FALSE]
-        df["fpen.prop",] <- df["fpen.prop",]*100
+        if (values$use_perc)
+            df["fpen",] <- df["fpen",]*100
         rownames(df) <- SNAM
         colnames(df) <- c(
             "Wolf reduction, no pen",
@@ -927,8 +1064,6 @@ server <- function(input, output, session) {
         df <- wolf_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- wolf_getS()
-        ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
-            fields="Version")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),

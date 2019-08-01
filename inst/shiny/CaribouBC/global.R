@@ -11,33 +11,56 @@ library(plotly)
 library(openxlsx)
 library(CaribouBC)
 
+ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"), fields="Version")
+
 ## initialize sliders for the different pen types
 inits <- list(
     penning = c(
         fpen.prop = 0.25,
+        fpen.inds = 10,
         caribou_settings("mat.pen")),
     predator = c(
         fpen.prop = 0.25,
+        fpen.inds = 10,
         caribou_settings("pred.excl")),
     moose = c(
         fpen.prop = 0.25,
+        fpen.inds = 10,
         caribou_settings("moose.red")),
     moose0 = c(
         fpen.prop = 0.25,
+        fpen.inds = 10,
         caribou_settings("mat.pen")),
     wolf = c(
         fpen.prop = 0.25,
+        fpen.inds = 10,
         caribou_settings("wolf.red", herd="KennedySiding")),
     wolf0 = c(
         fpen.prop = 0.25,
+        fpen.inds = 10,
         caribou_settings("mat.pen", herd="KennedySiding"))
 )
 
-get_settings <- function(x) {
-    c(tmax = x$tmax,
+get_settings <- function(x, use_perc=TRUE) {
+    out <- c(tmax = x$tmax,
         pop.start = x$pop.start,
-        fpen.prop = x$fpen.prop,
+        fpen=if (use_perc)
+            paste0(100*x$fpen.prop, "%") else paste0(x$fpen.inds, collapse=", "),
         unlist(x$settings))
+    attr(out, "fpen.prop") <- x$fpen.prop
+    attr(out, "fpen.inds") <- x$fpen.inds
+    out
+}
+
+#get_inds <- function(x) eval(parse(text=paste("c(", x, ")")))
+
+get_summary <- function(x, use_perc=TRUE) {
+    xx <- summary(x)
+    xx$fpen <- if (use_perc)
+        x$fpen.prop else x$fpen.inds
+    xx$fpen.prop <- NULL
+    xx$fpen.inds <- NULL
+    unlist(xx)
 }
 
 Herds <- c(
@@ -52,3 +75,4 @@ HerdsWolf <- c(
     "Klinse-za (Moberly)" = "KlinsezaMoberly",
     "Quintette" = "Quintette")
 
+FooterText <- "<p>Shiny app made by the <a href='https://github.com/bcgov/CaribouBC'>CaribouBC</a> R package.</p>"

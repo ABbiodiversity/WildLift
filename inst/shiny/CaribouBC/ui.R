@@ -1,5 +1,5 @@
 dashboardPage(
-  dashboardHeader(title = "Caribou BC"),
+  dashboardHeader(title = paste("Caribou BC", ver[1])),
   dashboardSidebar(
     tags$script(src = "tips.js"),
     sliderInput("tmax", "Number of years to forecast",
@@ -12,8 +12,8 @@ dashboardPage(
       "Number of years in which the caribou population is forecasted. Default set, but the user can change the value by slider."),
     bsTooltip("popstart",
       "Number of caribou in the starting population. Default set, but the user can change the value by slider."),
-#    radioButtons("use_perc", "How to provide females penned",
-#      list("Percent"="perc", "Number of individuals"="inds")),
+    radioButtons("use_perc", "How to provide females penned",
+      list("Percent"="perc", "Number of individuals"="inds")),
     sidebarMenu(
       menuItem("Maternity pen", tabName = "penning"),
       menuItem("Predator exclosure", tabName = "predator"),
@@ -48,7 +48,8 @@ dashboardPage(
               bsTooltip("penning_download",
                 "Click here to download results.",
                 placement="top")
-            )
+            ),
+            HTML(FooterText)
           ),
           column(width=4,
             box(
@@ -59,12 +60,12 @@ dashboardPage(
               bsTooltip("penning_herd",
                 "Select a herd for herd specific demography parameters.",
                 placement="top"),
-#              uiOutput("penning_perc_or_inds"),
-              sliderInput("penning_FpenPerc", "Percent of females penned",
-                min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
-                step = 1),
-              bsTooltip("penning_FpenPerc",
-                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
+              uiOutput("penning_perc_or_inds"),
+#              sliderInput("penning_FpenPerc", "Percent of females penned",
+#                min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
+#                step = 1),
+#              bsTooltip("penning_FpenPerc",
+#                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
               uiOutput("penning_button"),
               bsTooltip("penning_button",
                 "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
@@ -119,7 +120,8 @@ dashboardPage(
               bsTooltip("predator_download",
                 "Click here to download results.",
                 placement="top")
-            )
+            ),
+            HTML(FooterText)
           ),
           column(width=4,
             box(
@@ -130,11 +132,12 @@ dashboardPage(
               bsTooltip("predator_herd",
                 "Select a herd for herd specific demography parameters.",
                 placement="top"),
-              sliderInput("predator_FpenPerc", "Percent of females penned",
-                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
-                step = 1),
-              bsTooltip("predator_FpenPerc",
-                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
+              uiOutput("predator_perc_or_inds"),
+#              sliderInput("predator_FpenPerc", "Percent of females penned",
+#                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
+#                step = 1),
+#              bsTooltip("predator_FpenPerc",
+#                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
               uiOutput("predator_button"),
               bsTooltip("predator_button",
                 "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
@@ -191,7 +194,8 @@ dashboardPage(
               bsTooltip("moose_download",
                 "Click here to download results.",
                 placement="top")
-            )
+            ),
+            HTML(FooterText)
           ),
           column(width=4,
             box(
@@ -202,11 +206,12 @@ dashboardPage(
               bsTooltip("moose_herd",
                 "Select a herd for herd specific demography parameters.",
                 placement="top"),
-              sliderInput("moose_FpenPerc", "Percent of females penned",
-                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
-                step = 1),
-              bsTooltip("moose_FpenPerc",
-                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
+              uiOutput("moose_perc_or_inds"),
+#              sliderInput("moose_FpenPerc", "Percent of females penned",
+#                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
+#                step = 1),
+#              bsTooltip("moose_FpenPerc",
+#                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
               uiOutput("moose_button"),
               bsTooltip("moose_button",
                 "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
@@ -239,7 +244,8 @@ dashboardPage(
               bsTooltip("wolf_download",
                 "Click here to download results.",
                 placement="top")
-            )
+            ),
+            HTML(FooterText)
           ),
           column(width=4,
             box(
@@ -250,11 +256,12 @@ dashboardPage(
               bsTooltip("wolf_herd",
                 "Select a herd for herd specific demography parameters.",
                 placement="top"),
-              sliderInput("wolf_FpenPerc", "Percent of females penned",
-                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
-                step = 1),
-              bsTooltip("wolf_FpenPerc",
-                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
+              uiOutput("wolf_perc_or_inds"),
+#              sliderInput("wolf_FpenPerc", "Percent of females penned",
+#                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
+#                step = 1),
+#              bsTooltip("wolf_FpenPerc",
+#                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
               uiOutput("wolf_button"),
               bsTooltip("wolf_button",
                 "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
