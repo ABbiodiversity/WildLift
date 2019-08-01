@@ -8,7 +8,10 @@ type=c("prop", "inds"), max=10^4, tol=0.01) {
     if (type == "prop") {
         fun <- function(x) {
             f <- caribou_forecast(forecast$settings,
-                tmax=forecast$tmax, pop.start=forecast$pop.start, fpen.prop=x)
+                #tmax=forecast$tmax,
+                tmax=1L,
+                pop.start=forecast$pop.start,
+                fpen.prop=x)
             abs(f$Npop$lam.pen[1L] - lambda)
         }
         o <- optimize(fun, c(0, 1))
@@ -17,7 +20,10 @@ type=c("prop", "inds"), max=10^4, tol=0.01) {
             stop("Argument max must be > 0.")
         fun <- function(x) {
             f <- caribou_forecast(forecast$settings,
-                tmax=forecast$tmax, pop.start=forecast$pop.start, fpen.inds=x)
+                #tmax=forecast$tmax,
+                tmax=1L,
+                pop.start=forecast$pop.start,
+                fpen.inds=x)
             abs(f$Npop$lam.pen[1L] - lambda)
         }
         o <- optimize(fun, c(0, max))
