@@ -55,7 +55,7 @@ dashboardPage(
             box(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Penning",
+              title = "Settings",
               uiOutput("penning_herd"),
               bsTooltip("penning_herd",
                 "Select a herd for herd specific demography parameters.",
@@ -127,7 +127,7 @@ dashboardPage(
             box(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Penning",
+              title = "Settings",
               uiOutput("predator_herd"),
               bsTooltip("predator_herd",
                 "Select a herd for herd specific demography parameters.",
@@ -201,7 +201,7 @@ dashboardPage(
             box(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Penning",
+              title = "Settings",
               uiOutput("moose_herd"),
               bsTooltip("moose_herd",
                 "Select a herd for herd specific demography parameters.",
@@ -251,20 +251,11 @@ dashboardPage(
             box(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Penning",
+              title = "Settings",
               uiOutput("wolf_herd"),
               bsTooltip("wolf_herd",
                 "Select a herd for herd specific demography parameters.",
-                placement="top"),
-#              uiOutput("wolf_perc_or_inds"),
-#              sliderInput("wolf_FpenPerc", "Percent of females penned",
-#                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
-#                step = 1),
-#              bsTooltip("wolf_FpenPerc",
-#                "Change the percent of female population in maternity pens. Default set, but the user can toggle."),
-              uiOutput("wolf_button"),
-              bsTooltip("wolf_button",
-                "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
+                placement="top")
             )
           )
         )

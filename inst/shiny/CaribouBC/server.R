@@ -938,14 +938,15 @@ server <- function(input, output, session) {
         req(wolf_getF0(),
             wolf_getB0())
         subs <- c("lam.pen", "Nend.pen")
-        df <- cbind(
+        df <- rbind(
             WolfNoPen=get_summary(wolf_getF0(), values$use_perc)[subs],
             NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs])
-        #df <- tab[subs,,drop=FALSE]
-        rownames(df) <- c("&lambda;", "N (end)")
-        colnames(df) <- c(
+        df <- rbind(df, c(NA, df[1, "Nend.pen"]-df[2, "Nend.pen"]))
+        colnames(df) <- c("&lambda;", "N (end)")
+        rownames(df) <- c(
             "Wolf reduction",
-            "No wolf reduction")
+            "No wolf reduction",
+            "Difference")
         df
     })
     ## making nice table of the settings
@@ -1001,7 +1002,7 @@ server <- function(input, output, session) {
     sanitize.text.function = function(x) x)
     ## dowload
     wolf_xlslist <- reactive({
-        req(wolf_getF(), wolf_getF0(), wolf_getB(), wolf_getB0())
+        req(wolf_getF0(), wolf_getB0())
         req(wolf_getT())
         TS <- cbind(
             plot(wolf_getF0(), plot=FALSE)[,c("Years", "Npen")],
