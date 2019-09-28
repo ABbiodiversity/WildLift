@@ -256,7 +256,7 @@ dashboardPage(
               bsTooltip("wolf_herd",
                 "Select a herd for herd specific demography parameters.",
                 placement="top"),
-              uiOutput("wolf_perc_or_inds"),
+#              uiOutput("wolf_perc_or_inds"),
 #              sliderInput("wolf_FpenPerc", "Percent of females penned",
 #                min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
 #                step = 1),

@@ -919,35 +919,6 @@ server <- function(input, output, session) {
             fpen.inds = values$wolf0$fpen.inds,
             caribou_settings("mat.pen", herd = input$wolf_herd))
     })
-#    observeEvent(input$wolf_FpenPerc, {
-#        values$wolf$fpen.prop <- input$wolf_FpenPerc / 100
-#        values$wolf0$fpen.prop <- input$wolf_FpenPerc / 100
-#    })
-    observeEvent(input$wolf_Fpen, {
-        if (values$use_perc) {
-            values$wolf$fpen.prop <- input$wolf_Fpen / 100
-            values$wolf0$fpen.prop <- input$wolf_Fpen / 100
-        } else {
-            values$wolf$fpen.inds <- input$wolf_Fpen
-            values$wolf0$fpen.inds <- input$wolf_Fpen
-        }
-    })
-    ## wolf reduction with penning
-    wolf_getF <- reactive({
-        caribou_forecast(values$wolf,
-            tmax = input$tmax,
-            pop.start = input$popstart,
-            fpen.prop = if (values$use_perc) values$wolf$fpen.prop else NULL,
-            fpen.inds = if (values$use_perc) NULL else values$wolf$fpen.inds)
-    })
-    ## no wolf reduction with penning
-    wolf_getB <- reactive({
-        caribou_forecast(values$wolf0,
-            tmax = input$tmax,
-            pop.start = input$popstart,
-            fpen.prop = if (values$use_perc) values$wolf0$fpen.prop else NULL,
-            fpen.inds = if (values$use_perc) NULL else values$wolf0$fpen.inds)
-    })
     ## wolf reduction without penning
     wolf_getF0 <- reactive({
         caribou_forecast(values$wolf,
@@ -964,38 +935,26 @@ server <- function(input, output, session) {
     })
     ## making nice table of the results
     wolf_getT <- reactive({
-        req(wolf_getF(),
-            wolf_getB(),
-            wolf_getF0(),
+        req(wolf_getF0(),
             wolf_getB0())
         subs <- c("lam.pen", "Nend.pen")
         df <- cbind(
             WolfNoPen=get_summary(wolf_getF0(), values$use_perc)[subs],
-            WolfPen=get_summary(wolf_getF(), values$use_perc)[subs],
-            NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs],
-            NoWolfPen=get_summary(wolf_getB(), values$use_perc)[subs]
-        )
+            NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs])
         #df <- tab[subs,,drop=FALSE]
         rownames(df) <- c("&lambda;", "N (end)")
         colnames(df) <- c(
-            "Wolf reduction, no pen",
-            "Wolf reduction, penned",
-            "No wolf reduction, no pen",
-            "No wolf reduction, penned")
+            "Wolf reduction",
+            "No wolf reduction")
         df
     })
     ## making nice table of the settings
     wolf_getS <- reactive({
-        req(wolf_getF(),
-            wolf_getB(),
-            wolf_getF0(),
+        req(wolf_getF0(),
             wolf_getB0())
         tab <- cbind(
             WolfNoPen=get_settings(wolf_getF0(), values$use_perc),
-            WolfPen=get_settings(wolf_getF(), values$use_perc),
-            NoWolfNoPen=get_settings(wolf_getB0(), values$use_perc),
-            NoWolfPen=get_settings(wolf_getB(), values$use_perc)
-        )
+            NoWolfNoPen=get_settings(wolf_getB0(), values$use_perc))
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
@@ -1014,29 +973,22 @@ server <- function(input, output, session) {
             df["fpen",] <- df["fpen",]*100
         rownames(df) <- SNAM
         colnames(df) <- c(
-            "Wolf reduction, no pen",
-            "Wolf reduction, penned",
-            "No wolf reduction, no pen",
-            "No wolf reduction, penned")
+            "Wolf reduction",
+            "No wolf reduction")
         df
     })
     ## plot
     output$wolf_Plot <- renderPlotly({
-        req(wolf_getF())
+        req(wolf_getF0(),
+            wolf_getB0())
         dF0 <- plot(wolf_getF0(), plot=FALSE)
-        dF <- plot(wolf_getF(), plot=FALSE)
         dB0 <- plot(wolf_getB0(), plot=FALSE)
-        dB <- plot(wolf_getB(), plot=FALSE)
         colnames(dF0)[colnames(dF0) == "Npen"] <- "Individuals"
         p <- plot_ly(dF0, x = ~Years, y = ~Individuals,
-            name = 'Wolf reduction, no pen', type = 'scatter', mode = 'lines',
+            name = 'Wolf reduction', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Npen, name = 'Wolf reduction, penned', data = dF,
-                mode = 'lines', color=I('blue')) %>%
-            add_trace(y = ~Npen, name = 'No wolf reduction, no pen', data = dB0,
-                    line=list(dash = 'dash', color='red')) %>%
-            add_trace(y = ~Npen, name = 'No wolf reduction, penned', data = dB,
-                line=list(dash = 'dash', color='blue')) %>%
+            add_trace(y = ~Npen, name = 'No wolf reduction', data = dB0,
+                    mode = 'lines', color=I('blue')) %>%
             layout(legend = list(x = 100, y = 0))
         p
     })
@@ -1053,14 +1005,10 @@ server <- function(input, output, session) {
         req(wolf_getT())
         TS <- cbind(
             plot(wolf_getF0(), plot=FALSE)[,c("Years", "Npen")],
-            plot(wolf_getF(), plot=FALSE)[,"Npen"],
-            plot(wolf_getB0(), plot=FALSE)[,"Npen"],
-            plot(wolf_getB(), plot=FALSE)[,"Npen"])
+            plot(wolf_getB0(), plot=FALSE)[,"Npen"])
         colnames(TS) <- c("Years",
             "N wolf reduction, no pen",
-            "N wolf reduction, penned",
-            "N no wolf reduction, no pen",
-            "N no wolf reduction, penned")
+            "N no wolf reduction, no pen")
         df <- wolf_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- wolf_getS()

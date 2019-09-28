@@ -2,7 +2,7 @@
 
 ## install/update CaribouBC package as needed
 ## need to install from github for rsconnect to work properly
-#devtools::install_github("psolymos/CaribouBC")
+#remotes::install_github("psolymos/CaribouBC")
 
 library(shiny)
 library(shinydashboard)
@@ -32,12 +32,12 @@ inits <- list(
         fpen.inds = 10,
         caribou_settings("mat.pen")),
     wolf = c(
-        fpen.prop = 0.25,
-        fpen.inds = 10,
+        fpen.prop = 0, # not considering penning
+        fpen.inds = 0, # not considering penning
         caribou_settings("wolf.red", herd="KennedySiding")),
     wolf0 = c(
-        fpen.prop = 0.25,
-        fpen.inds = 10,
+        fpen.prop = 0, # not considering penning
+        fpen.inds = 0, # not considering penning
         caribou_settings("mat.pen", herd="KennedySiding"))
 )
 
