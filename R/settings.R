@@ -34,24 +34,24 @@ herd=NULL) {
                 "Quintette")
             herd <- match.arg(herd, Herds)
             # these are herds from wolf reduction study: WITH wolf reduction
-            # no penning (captive) option is considered
+            # no penning (captive=wild) option is considered
             if (herd == "KennedySiding") {
-                #parms$f.surv.capt <- 0.894
                 parms$f.surv.wild <- 0.962
-                #parms$c.surv.capt <- 0.540
                 parms$c.surv.wild <- 0.554
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
             }
             if (herd == "KlinsezaMoberly") {
-                #parms$f.surv.capt <- 0.798
                 parms$f.surv.wild <- 0.860
-                #parms$c.surv.capt <- 0.540
                 parms$c.surv.wild <- 0.506
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
             }
             if (herd == "Quintette") {
-                #parms$f.surv.capt <- 0.860
                 parms$f.surv.wild <- 0.917
-                #parms$c.surv.capt <- 0.540
                 parms$c.surv.wild <- 0.489
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
             }
         } else {
             Herds <- c(
@@ -92,30 +92,33 @@ herd=NULL) {
             }
 
             # these are herds from wolf reduction study: NO wolf reduction
-            # no penning (captive) option is considered
+            # no penning (captive=wild) option is considered
             if (herd == "KennedySiding") {
                 if (pen.type != "mat.pen")
-                    stop(sprintf("%s herd is not available for pen.type=%s.", herd, pen.type))
-                #parms$f.surv.capt <- 0.894
+                    stop(sprintf("%s herd is not available for pen.type=%s.",
+                                 herd, pen.type))
                 parms$f.surv.wild <- 0.844
-                #parms$c.surv.capt <- 0.540
                 parms$c.surv.wild <- 0.283
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
             }
             if (herd == "KlinsezaMoberly") {
                 if (pen.type != "mat.pen")
-                    stop(sprintf("%s herd is not available for pen.type=%s.", herd, pen.type))
-                #parms$f.surv.capt <- 0.798
+                    stop(sprintf("%s herd is not available for pen.type=%s.",
+                                 herd, pen.type))
                 parms$f.surv.wild <- 0.748
-                #parms$c.surv.capt <- 0.540
                 parms$c.surv.wild <- 0.308
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
             }
             if (herd == "Quintette") {
                 if (pen.type != "mat.pen")
-                    stop(sprintf("%s herd is not available for pen.type=%s.", herd, pen.type))
-                #parms$f.surv.capt <- 0.860
+                    stop(sprintf("%s herd is not available for pen.type=%s.",
+                                 herd, pen.type))
                 parms$f.surv.wild <- 0.810
-                #parms$c.surv.capt <- 0.540
                 parms$c.surv.wild <- 0.294
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
             }
 
             # Maternity Pen:
