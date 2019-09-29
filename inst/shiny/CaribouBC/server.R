@@ -1,6 +1,5 @@
 server <- function(input, output, session) {
 
-
     ## >>> common part for all 3 tabs <<<====================
 
     ## set values based inits
@@ -101,9 +100,6 @@ server <- function(input, output, session) {
             values$penning0 <- NULL
         }
     })
-#    observeEvent(input$penning_FpenPerc, {
-#        values$penning$fpen.prop <- input$penning_FpenPerc / 100
-#    })
     observeEvent(input$penning_Fpen, {
         if (values$use_perc) {
             values$penning$fpen.prop <- input$penning_Fpen / 100
@@ -259,8 +255,6 @@ server <- function(input, output, session) {
             "pen.cost.capt" = "Capture/monitor (x $1000)",
             "pen.cost.pred" = "Removing predators (x $1000)")
         df <- tab[names(SNAM),,drop=FALSE]
-        if (values$use_perc)
-            df["fpen",] <- df["fpen",]*100
         rownames(df) <- SNAM
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
@@ -287,7 +281,8 @@ server <- function(input, output, session) {
             name = 'Maternity pen', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'No maternity pen',
-                mode = 'lines', color=I('blue'))
+                mode = 'lines', color=I('blue')) %>%
+            config(displayModeBar = FALSE)
         if (values$penning_compare) {
             df0 <- plot(penning_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Maternity pen, reference', data = df0,
@@ -423,9 +418,6 @@ server <- function(input, output, session) {
             values$predator0 <- NULL
         }
     })
-#    observeEvent(input$predator_FpenPerc, {
-#        values$predator$fpen.prop <- input$predator_FpenPerc / 100
-#    })
     observeEvent(input$predator_Fpen, {
         if (values$use_perc) {
             values$predator$fpen.prop <- input$predator_Fpen / 100
@@ -581,8 +573,6 @@ server <- function(input, output, session) {
             "pen.cost.capt" = "Capture/monitor (x $1000)",
             "pen.cost.pred" = "Removing predators (x $1000)")
         df <- tab[names(SNAM),,drop=FALSE]
-        if (values$use_perc)
-            df["fpen",] <- df["fpen",]*100
         rownames(df) <- SNAM
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
@@ -609,7 +599,8 @@ server <- function(input, output, session) {
             name = 'Predator exclosure', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'No predator exclosure',
-                mode = 'lines', color=I('blue'))
+                mode = 'lines', color=I('blue')) %>%
+            config(displayModeBar = FALSE)
         if (values$predator_compare) {
             df0 <- plot(predator_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Predator exclosure, reference', data = df0,
@@ -708,10 +699,6 @@ server <- function(input, output, session) {
             caribou_settings("mat.pen",
                 herd = if (input$moose_herd == "Default") NULL else input$moose_herd))
     })
-#    observeEvent(input$moose_FpenPerc, {
-#        values$moose$fpen.prop <- input$moose_FpenPerc / 100
-#        values$moose0$fpen.prop <- input$moose_FpenPerc / 100
-#    })
     observeEvent(input$moose_Fpen, {
         if (values$use_perc) {
             values$moose$fpen.prop <- input$moose_Fpen / 100
@@ -800,8 +787,6 @@ server <- function(input, output, session) {
             "f.preg.capt" = "Pregnancy rate, captive",
             "pen.cap" = "Max in a single pen")
         df <- tab[names(SNAM),,drop=FALSE]
-        if (values$use_perc)
-            df["fpen",] <- df["fpen",]*100
         rownames(df) <- SNAM
         colnames(df) <- c(
             "Moose reduction, no pen",
@@ -827,7 +812,8 @@ server <- function(input, output, session) {
                     line=list(dash = 'dash', color='red')) %>%
             add_trace(y = ~Npen, name = 'No moose reduction, penned', data = dB,
                 line=list(dash = 'dash', color='blue')) %>%
-            layout(legend = list(x = 100, y = 0))
+            layout(legend = list(x = 100, y = 0)) %>%
+            config(displayModeBar = FALSE)
         p
     })
     ## table
@@ -969,9 +955,8 @@ server <- function(input, output, session) {
             "f.preg.wild" = "Pregnancy rate, wild",
             "f.preg.capt" = "Pregnancy rate, captive",
             "pen.cap" = "Max in a single pen")
+        print("wolf_getS 3")
         df <- tab[names(SNAM),,drop=FALSE]
-        if (values$use_perc)
-            df["fpen",] <- df["fpen",]*100
         rownames(df) <- SNAM
         colnames(df) <- c(
             "Wolf reduction",
@@ -990,7 +975,8 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Npen, name = 'No wolf reduction', data = dB0,
                     mode = 'lines', color=I('blue')) %>%
-            layout(legend = list(x = 100, y = 0))
+            layout(legend = list(x = 100, y = 0)) %>%
+            config(displayModeBar = FALSE)
         p
     })
     ## table
@@ -1003,16 +989,21 @@ server <- function(input, output, session) {
     ## dowload
     wolf_xlslist <- reactive({
         req(wolf_getF0(), wolf_getB0())
+        print("req")
         req(wolf_getT())
+        print("req getT")
         TS <- cbind(
             plot(wolf_getF0(), plot=FALSE)[,c("Years", "Npen")],
             plot(wolf_getB0(), plot=FALSE)[,"Npen"])
+        print("TS")
         colnames(TS) <- c("Years",
-            "N wolf reduction, no pen",
-            "N no wolf reduction, no pen")
+            "N wolf reduction",
+            "N no wolf reduction")
         df <- wolf_getT()
+        print("getT")
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- wolf_getS()
+        print("getS")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
@@ -1024,6 +1015,7 @@ server <- function(input, output, session) {
         out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
         out$Summary$Variables <- rownames(df)
         out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
+        print("out")
         out
     })
     output$wolf_download <- downloadHandler(

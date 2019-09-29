@@ -11,7 +11,8 @@ library(plotly)
 library(openxlsx)
 library(CaribouBC)
 
-ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"), fields="Version")
+ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
+                fields="Version")
 
 ## initialize sliders for the different pen types
 inits <- list(
