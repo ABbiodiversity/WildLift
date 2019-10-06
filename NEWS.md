@@ -1,3 +1,7 @@
+# Version 0.2.1
+
+* Added captive breeding component (#5).
+
 # Version 0.2.0
 
 * User interface for wolf reduction is finalized.
