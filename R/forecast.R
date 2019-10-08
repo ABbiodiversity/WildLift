@@ -240,5 +240,6 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         out$fpen.inds <- fpen.inds
     }
     class(out) <- "caribou_forecast"
+    out$call <- match.call()
     out
 }

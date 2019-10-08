@@ -1,7 +1,7 @@
 print.caribou_settings <- function(x, ...) {
     cat("Caribou settings - pen type:", attr(x, "pen.type"),
         "\n\n")
-    str(x,
+    str(x[names(x) != "call"],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     invisible(x)
 }

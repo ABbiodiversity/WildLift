@@ -193,5 +193,6 @@ herd=NULL,
             stop(sprintf("Unexpected parameter: %s.", i))
         }
     }
+    parms$call <- match.call()
     parms
 }
