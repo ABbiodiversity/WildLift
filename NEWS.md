@@ -1,6 +1,7 @@
 # Version 0.2.1
 
 * Added captive breeding component (#5).
+* Objects now store call for easier updating.
 
 # Version 0.2.0
 
