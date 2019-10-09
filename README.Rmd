@@ -29,13 +29,13 @@ Try the [Shiny app](https://psolymos.shinyapps.io/matpen/) or run locally as
 Stable version:
 
 ```{r install,eval=FALSE}
-devtools::install_github("bcgov/CaribouBC")
+remotes::install_github("bcgov/CaribouBC")
 ```
 
 Development version is available as this fork:
 
 ```{r install_dev,eval=FALSE}
-devtools::install_github("psolymos/CaribouBC")
+remotes::install_github("psolymos/CaribouBC")
 ```
 
 See user visible changes in the [NEWS](NEWS.md) file.
