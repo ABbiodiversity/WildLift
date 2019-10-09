@@ -148,20 +148,29 @@ herd=NULL) {
 function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red")) {
     pen.type <- match.arg(pen.type)
     parms <- list()
-    if (pen.type != "pred.excl") {
+    if (pen.type == "mat.pen") {
         parms$pen.cap <- 35       # how many individual caribou can live in mat pen?
         parms$pen.cost.setup <- 500 # cost in thousands to set up pen
         parms$pen.cost.proj <- 80 # costs of project manager
         parms$pen.cost.maint <- 300 # cost in thousands for patrolling and repairing fence + shepherd + contingencies
         parms$pen.cost.capt <- 250 # cost in thousands to capture cows, monitor, survey, calf collar
         parms$pen.cost.pred <- 0 # cost in thousands for removing predators annually
-    } else {
+    }
+    if (pen.type == "pred.excl") {
         parms$pen.cap <- 35        # how many individual caribou can live in big pen?
         parms$pen.cost.setup <- (77*24) + 20 # cost in thousands to set up pen
         parms$pen.cost.proj <- 80 # costs of project manager
         parms$pen.cost.maint <- 600 # cost in thousands for patrolling and repairing fence + contingencies
         parms$pen.cost.capt <- 200 # cost in thousands to capture cows, monitor, survey, calf collar
         parms$pen.cost.pred <- 80 # cost in thousands for removing predators annually
+    }
+    if (!(pen.type %in% c("mat.pen", "pred.excl"))) {
+        parms$pen.cap <- 0
+        parms$pen.cost.setup <- 0
+        parms$pen.cost.proj <- 0
+        parms$pen.cost.maint <- 0
+        parms$pen.cost.capt <- 0
+        parms$pen.cost.pred <- 0
     }
     parms
 }
