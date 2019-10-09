@@ -40,3 +40,39 @@ summary(x5i$Nend.pen)
 summary(x5p$Nend.pen)
 rbind(i=x5i$Npop[1,], p=x5p$Npop[1,]) # diff should be small
 
+## imitate Shiny
+
+
+input <- list(
+    tmax = 20,
+    pop.start = 100,
+    fpen.perc = 25) # note! this is percent, NOT proportion
+
+f <- caribou_forecast(caribou_settings(),
+    tmax = input$tmax,
+    pop.start = input$pop.start,
+    fpen.prop = input$fpen.perc / 100)
+getF <- function() f
+b <- caribou_forecast(getF()$settings,
+    tmax = input$tmax,
+    pop.start = input$pop.start,
+    fpen.prop = caribou_breakeven(getF()))
+getB <- function() b
+
+tab <- cbind(
+    Results=unlist(summary(getF())),
+    Breakeven=unlist(summary(getB())))
+df <- data.frame(tab[c(
+    "fpen.prop", "npens", "lam.pen", "lam.nopen",
+    "Nend.nopen", "Nend.pen", "Nend.diff",
+    "Cost.total", "Cost.percap"),])
+rownames(df)[1L] <- "Percent.penned"
+df[1L,] <- df[1L,]*100
+#DT::datatable(df)
+
+
+#library(plotly)
+#df <- plot(getF(), plot=FALSE)
+#p <- plot_ly(df, x = ~Years, y = ~Npen, name = 'Penned', type = 'scatter', mode = 'lines') %>%
+#  add_trace(y = ~Nnopen, name = 'Baseline (no pen)', mode = 'lines')
+#p

@@ -35,6 +35,8 @@ lines.caribou_forecast <- function(x, pen=TRUE, plot=TRUE, ...) {
 }
 summary.caribou_forecast <- function(object, ...) {
     object$Npop <- NULL
+    object$call <- NULL
+    object$settings$call <- NULL
     class(object) <- "summary.caribou_forecast"
     object
 }
