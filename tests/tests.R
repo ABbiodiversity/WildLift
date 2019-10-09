@@ -1,3 +1,5 @@
+#remotes::install_github("psolymos/CaribouBC")
+
 library(CaribouBC)
 
 ## settings with different treatments, herds
