@@ -3,7 +3,7 @@ dashboardPage(
   dashboardSidebar(
     tags$script(src = "tips.js"),
     sliderInput("tmax", "Number of years to forecast",
-      min = 1, max = 100, value = 20, step = 1
+      min = 1, max = 50, value = 20, step = 1
     ),
     sliderInput("popstart", "Initial population size",
       min = 1, max = 200, value = 100, step = 1
