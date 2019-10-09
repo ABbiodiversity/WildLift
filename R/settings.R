@@ -24,8 +24,13 @@ herd=NULL) {
         parms$f.preg.wild <- 0.92         # pregnancy rate, same for captive and wild
         parms$f.preg.capt <- parms$f.preg.wild       # pregnancy rate, same for captive and wild
     }
-    if (pen.type == "wolf.red" && is.null(herd))
-        stop("Must specify a herd for wolf reduction.")
+    if (pen.type == "wolf.red" && is.null(herd)) {
+        #stop("Must specify a herd for wolf reduction.")
+        parms$f.surv.wild <- 0.900 # 0.801 when no wolf reduction
+        parms$c.surv.wild <- 0.517 # 0.295 when no wolf reduction
+        parms$f.surv.capt <- parms$f.surv.wild
+        parms$c.surv.capt <- parms$c.surv.wild
+    }
     if (!is.null(herd)) {
         if (pen.type == "wolf.red") {
             Herds <- c(
