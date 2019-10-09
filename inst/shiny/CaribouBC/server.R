@@ -1029,3 +1029,9 @@ server <- function(input, output, session) {
     )
 
 }
+
+# TODO
+# - add vital sliders for generic pop in Moose tab
+# - add vital sliders for generic pop in Wolf tab
+# - set AFS=0.801 CS=0.295 under no wolf option
+#
