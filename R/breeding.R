@@ -37,7 +37,7 @@ wild=TRUE, age.1st.litter=3, age.calf.max=1) {
 caribou_breeding <- function(settings, age.cens=3,
 in.age=3, # ages of females added in each year, matching in.inds
 in.inds=10, # number of females added each year
-in.max=50, # capacity of captive breeding facility, excess goes into recipient pop
+in.max=35, # capacity of captive breeding facility, excess goes into recipient pop
 out.age=1, # age of inds pumped out
 out.prop=1, # 0=excess only, 1=as many as there, 0-1=proportionally between
 tmax=20,
