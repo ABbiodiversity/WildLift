@@ -17,13 +17,13 @@ locally as `shiny::runGitHub("bcgov/CaribouBC", subdir =
 Stable version:
 
 ``` r
-devtools::install_github("bcgov/CaribouBC")
+remotes::install_github("bcgov/CaribouBC")
 ```
 
 Development version is available as this fork:
 
 ``` r
-devtools::install_github("psolymos/CaribouBC")
+remotes::install_github("psolymos/CaribouBC")
 ```
 
 See user visible changes in the [NEWS](NEWS.md) file.
@@ -33,7 +33,7 @@ See user visible changes in the [NEWS](NEWS.md) file.
 ``` r
 library(CaribouBC)
 #> Loading required package: popbio
-#> CaribouBC 0.1.1   2019-07-28
+#> CaribouBC 0.2.1   2019-10-05
 
 ## Predefined settings
 (s1 <- caribou_settings("mat.pen"))
