@@ -6,7 +6,7 @@ if (FALSE) {
 library(CaribouBC)
 
 ## create projection matrix
-make_age_mat <- function(settings, age.cens=3,
+caribou_matrix <- function(settings, age.cens=3,
 wild=TRUE, age.1st.litter=3, age.calf.max=1) {
     if (wild) {
         surv.c <- settings$c.surv.wild
@@ -31,6 +31,9 @@ wild=TRUE, age.1st.litter=3, age.calf.max=1) {
     }
     A[age.cens+1L, age.cens+1L] <- if (age.cens+1L > age.calf.max)
         surv.f else surv.c
+    l <- seq_len(age.cens+1)
+    l <- paste0(l-1L, "-", l, "yr")
+    dimnames(A) <- list(l, l)
     A
 }
 
@@ -43,11 +46,11 @@ out.prop=1, # 0=excess only, 1=as many as there, 0-1=proportionally between
 tmax=20,
 pop.start=100, # wild / recipient population
 age.1st.litter=3, age.calf.max=1) {
-    Aw <- make_age_mat(settings,
+    Aw <- caribou_matrix(settings,
         age.cens=age.cens, wild=TRUE,
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max)
-    Ac <- make_age_mat(settings,
+    Ac <- caribou_matrix(settings,
         age.cens=age.cens, wild=FALSE,
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max)
@@ -150,10 +153,14 @@ age.1st.litter=3, age.calf.max=1) {
         pop.start=pop.start,
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max,
-        Nin=Nin, Nout=Nout, Nc=Nc, Nw=Nw, Nw0=Nw0)
+        Nin=Nin, Nout=Nout, Ncapt=Nc, Nrecip=Nw, Nwild=Nw0)
+    out$population <- data.frame(Year=c(0, seq_len(tmax)),
+        sapply(out[c("Nin", "Nout", "Ncapt", "Nrecip", "Nwild")], colSums))
     class(out) <- "caribou_breeding"
     out
 }
+
+A <- caribou_matrix(caribou_settings())
 
 x <- caribou_breeding(caribou_settings(), # this has captive/wild vitals
     age.cens=18, # proj matrix censored at this age
@@ -165,18 +172,39 @@ x <- caribou_breeding(caribou_settings(), # this has captive/wild vitals
     out.prop = 0) # 0=move only N[t]-in.max youngs
                   # 1=move all youngs and replace with females
 
-N <- data.frame(year=c(0, seq_len(x$tmax)),
-    sapply(x[c("Nin", "Nout", "Nc", "Nw", "Nw0")], colSums))
-N
+x
+summary(x)
+plot(x)
 
-plot(N$year, N$Nc, ylim=c(0, max(N[,-1])), type="l",
-    ylab="Individuals", xlab="Years", main="out.prop=0")
-lines(N$year, N$Nw, col=2)
-lines(N$year, N$Nw0, col=4)
-lines(N$year, N$Nc-N$Nout, col=1, lty=2)
-lines(N$year, N$Nin, col=1, lty=3)
-legend("topright", bty="n", lty=1, col=c(1,2,4),
-    legend=c("Captive", "Recipient", "Wild"))
+print.caribou_breeding <- function(x, ...) {
+    cat("Caribou captive breeding:\n\n")
+    WHAT <- c("tmax", "pop.start", "in.max")
+    str(x[WHAT],
+        give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
+    cat("\n")
+    print(format(drop(as.matrix(x$population[x$tmax+1L,
+        c("Ncapt", "Nrecip", "Nwild")])), digits=getOption("digits")-3L),
+        quote=FALSE)
+    invisible(x)
+}
+summary.caribou_breeding <- function(object, ...) {
+    object$population
+}
+plot.caribou_breeding <- function(x, plot=TRUE, ...) {
+    N <- x$population
+    if (plot) {
+        plot(N$Year, N$Ncapt, ylim=c(0, max(N[,-1])), type="l",
+            ylab="Individuals", xlab="Years", ...)
+        lines(N$Year, N$Nrecip, col=2)
+        lines(N$Year, N$Nwild, col=4)
+        lines(N$Year, N$Ncapt-N$Nout, col=1, lty=2)
+        lines(N$Year, N$Nin, col=1, lty=3)
+        legend("topright", bty="n", lty=1, col=c(1,2,4),
+            legend=c("Captive", "Recipient", "Wild"))
+    }
+    invisible(N)
+}
+
 
 }
 
