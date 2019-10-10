@@ -48,8 +48,11 @@ It can also be a settings object.
 \code{"KennedySiding"}, \code{"KlinsezaMoberly"}, \code{"Quintette"}.
 Note: only \code{"KennedySiding"}, \code{"KlinsezaMoberly"},
 or \code{"Quintette"} can be selected when \code{pen.type = "wolf.red"},
-i.e. user must pick a herd for that treatment
-and \code{herd} cannot be \code{NULL}.
+beside a generic herd setting when herd is \code{NULL} that is
+specific to the 'wolf removal' tretment type (wild, i.e. 'no wolf removal'
+settings for these herds are available under the default
+\code{pen.type = "mat.pen"} treatment but no separate generic herd
+settings are provided for the 'no wolf removal' treatment).
 }
   \item{settings}{
 a settings object returned by \code{caribou_settings}.
