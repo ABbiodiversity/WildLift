@@ -49,7 +49,7 @@ It can also be a settings object.
 Note: only \code{"KennedySiding"}, \code{"KlinsezaMoberly"},
 or \code{"Quintette"} can be selected when \code{pen.type = "wolf.red"},
 beside a generic herd setting when herd is \code{NULL} that is
-specific to the 'wolf removal' tretment type (wild, i.e. 'no wolf removal'
+specific to the 'wolf removal' treatment type (wild, i.e. 'no wolf removal'
 settings for these herds are available under the default
 \code{pen.type = "mat.pen"} treatment but no separate generic herd
 settings are provided for the 'no wolf removal' treatment).
@@ -66,7 +66,7 @@ positive integer, initial population size in year 0.
   \item{fpen.prop, fpen.inds}{
 \code{fpen.prop} is a single numeric value between 0 and 1
 for the proportion of females penned;
-\code{fpen.inds} is a nonnegative integer
+\code{fpen.inds} is a non-negative integer
 for the number of females penned, can be a vector giving
 number of females penned in each year to be accumulated.
 Only one of \code{fpen.prop} or \code{fpen.inds} can be provided at a time.
@@ -146,7 +146,7 @@ The following demographic parameters can be set by \code{caribou_settings}:
 \code{caribou_breakeven} returns a numeric value representing the
 'breakeven' proportion of females penned where \code{lambda}
 is within \code{tol}erance. It returns \code{NA} when
-proportion satisfying the \code{lambda} critrion cannot be found,
+proportion satisfying the \code{lambda} criterion cannot be found,
 alongside a warning.
 
 The \code{print} method returns the input object \code{x} invisibly.
@@ -158,6 +158,9 @@ The \code{plot} and \code{lines} methods return the plotted data invisibly
 (years, pen and no-pen population size for \code{plot};
 years, pen or no-pen population size for \code{lines}).
 Both methods produce plots as a side effect.
+}
+\seealso{
+\code{\link{caribou_matrix}}, \code{\link{caribou_breeding}}
 }
 \examples{
 ## Predefined settings
