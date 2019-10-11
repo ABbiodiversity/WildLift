@@ -33,7 +33,7 @@ See user visible changes in the [NEWS](NEWS.md) file.
 ``` r
 library(CaribouBC)
 #> Loading required package: popbio
-#> CaribouBC 0.2.1   2019-10-05
+#> CaribouBC 0.2.1   2019-10-10
 
 ## Predefined settings
 (s1 <- caribou_settings("mat.pen"))
@@ -164,6 +164,79 @@ caribou_forecast(s2, fpen.inds = c(5, 0, 4, 6))
 #>  - tmax     :20
 #>  - pop.start:100
 #>  - fpen.inds:5 0 4 6
+
+## Create projection matrices
+s <- caribou_settings()
+caribou_matrix(s, wild=TRUE)  # wild
+#>         [0,1) [1,2) [2,3) [3,Inf]
+#> [0,1)   0.000 0.000 0.000 0.39238
+#> [1,2)   0.163 0.000 0.000 0.00000
+#> [2,3)   0.000 0.853 0.000 0.00000
+#> [3,Inf] 0.000 0.000 0.853 0.85300
+caribou_matrix(s, wild=FALSE) # captive
+#>         [0,1) [1,2) [2,3) [3,Inf]
+#> [0,1)    0.00 0.000 0.000 0.41538
+#> [1,2)    0.54 0.000 0.000 0.00000
+#> [2,3)    0.00 0.903 0.000 0.00000
+#> [3,Inf]  0.00 0.000 0.903 0.90300
+
+## Compare scenarios for captive breeding
+## out.prop = 0: move only N[t]-in.max youngs
+x0 <- caribou_breeding(s,
+    age.cens = 18,    # proj matrix censored at this age
+    tmax = 20,        # projection horizon
+    in.age = c(3, 4), # 5x 3yr + 5x 4yr female --> captive
+    in.inds = c(5, 5),
+    in.max = 60,      # capacity of breeding facility
+    out.age = c(1, 2),# 1 and 2yr calves --> recipient
+    out.prop = 0)
+x0
+#> Caribou captive breeding:
+#> 
+#>  - tmax     :20
+#>  - pop.start:100
+#>  - in.max   :60
+#>  - out.prop :0
+#> 
+#>  Ncapt Nrecip  Nwild 
+#>  59.56  54.76  16.54
+summary(x0)
+#>    Year Nin Nout    Ncapt    Nrecip     Nwild
+#> 1     0  10    0 10.00000 100.00000 100.00000
+#> 2     1  10    0 23.18380  91.39560  91.39560
+#> 3     2  10    0 37.33182  83.53156  83.53156
+#> 4     3  10    0 52.13296  76.34417  76.34417
+#> 5     4   8    5 60.32740  74.77522  69.77522
+#> 6     5   0    5 61.30754  73.03648  63.77148
+#> 7     6   0    5 60.25846  71.85677  58.28433
+#> 8     7   0    3 60.39753  69.48162  53.26931
+#> 9     8   0    3 60.40149  67.38260  48.68581
+#> 10    9   0    4 59.95943  66.17652  44.49669
+#> 11   10   0    4 59.90962  64.75278  40.66802
+#> 12   11   0    4 59.51499  63.76250  37.16878
+#> 13   12   0    3 59.95682  61.87466  33.97063
+#> 14   13   0    3 60.27493  60.20821  31.04766
+#> 15   14   0    4 59.92817  59.38578  28.37620
+#> 16   15   0    4 59.74541  58.58360  25.93460
+#> 17   16   0    3 60.28610  57.14619  23.70308
+#> 18   17   0    4 59.62999  56.89708  21.66357
+#> 19   18   0    3 60.34917  55.31162  19.79955
+#> 20   19   0    4 59.79264  55.20203  18.09592
+#> 21   20   0    4 59.56152  54.76152  16.53888
+
+## out.prop = 1: move all youngs and replace with females
+x1 <- update(x0, out.prop = 1)
+
+## Vicualize the 2 scenarios
+op <- par(mfrow=c(1, 2))
+plot(x0, main="out.prop = 0")
+plot(x1, main="out.prop = 1")
+```
+
+![](README-example-3.png)<!-- -->
+
+``` r
+par(op)
 ```
 
 ## Getting Help or Reporting an Issue
