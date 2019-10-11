@@ -140,10 +140,10 @@ caribou_matrix(s, wild=FALSE) # captive
 x0 <- caribou_breeding(s,
     age.cens = 18,    # proj matrix censored at this age
     tmax = 20,        # projection horizon
-    in.age = c(3, 4), # 5x 3yr old + 5x 4-yr old female --> captive
+    in.age = c(3, 4), # 5x 3yr + 5x 4yr female --> captive
     in.inds = c(5, 5),
     in.max = 60,      # capacity of breeding facility
-    out.age = c(1, 2),# 1 and 2-yr old calves --> recipient
+    out.age = c(1, 2),# 1 and 2yr calves --> recipient
     out.prop = 0)
 x0
 summary(x0)
