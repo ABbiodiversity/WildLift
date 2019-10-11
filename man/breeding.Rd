@@ -65,7 +65,9 @@ transferred from the captive to the recipient herd.
 The amount varies between the excess number
 (\code{out.prop=0}, min of total transferable calves and
 individuals above facility capacity) and the total number of
-transferable calves (\code{out.prop=0}).
+transferable calves (\code{out.prop=0}, the difference
+between the remaining population and \code{in.max} is replaced
+by incomong females).
 }
   \item{tmax}{
 positive integer, number of years to forecast after initial year 0.
@@ -128,22 +130,31 @@ and produces a plot as a side effect.
 \code{\link{caribou_settings}}, \code{\link{caribou_forecast}}
 }
 \examples{
+## projection matrix
 s <- caribou_settings()
-A <- caribou_matrix(s)
 
-x <- caribou_breeding(s, # this has captive/wild vitals
-    age.cens=18, # proj matrix censored at this age
-    tmax=20, # projection horizon
-    in.age=c(3, 4), # 5x 3yr old + 5x 4-yr old female --> captive
-    in.inds=c(5, 5),
-    in.max=60,      # breeding capacity
-    out.age=c(1, 2),# we 1 and 2-yr old calves --> recipient
-    out.prop = 0) # 0=move only N[t]-in.max youngs
-                  # 1=move all youngs and replace with females
+caribou_matrix(s, wild=TRUE)  # wild
+caribou_matrix(s, wild=FALSE) # captive
 
-x
-summary(x)
-plot(x)
+## out.prop = 0: move only N[t]-in.max youngs
+x0 <- caribou_breeding(s,
+    age.cens = 18,    # proj matrix censored at this age
+    tmax = 20,        # projection horizon
+    in.age = c(3, 4), # 5x 3yr old + 5x 4-yr old female --> captive
+    in.inds = c(5, 5),
+    in.max = 60,      # capacity of breeding facility
+    out.age = c(1, 2),# 1 and 2-yr old calves --> recipient
+    out.prop = 0)
+x0
+summary(x0)
+
+## out.prop = 1: move all youngs and replace with females
+x1 <- update(x0, out.prop = 1)
+
+op <- par(mfrow=c(1, 2))
+plot(x0, main="out.prop = 0")
+plot(x1, main="out.prop = 1")
+par(op)
 }
 \keyword{ ts }
 \keyword{ methods }
