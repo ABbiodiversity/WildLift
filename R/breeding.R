@@ -152,24 +152,3 @@ age.1st.litter=3, age.calf.max=1) {
     class(out) <- "caribou_breeding"
     out
 }
-
-
-if (FALSE) {
-A <- caribou_matrix(caribou_settings())
-
-x <- caribou_breeding(caribou_settings(), # this has captive/wild vitals
-    age.cens=18, # proj matrix censored at this age
-    tmax=20, # projection horizon
-    in.age=c(3, 4), # 5x 3yr old + 5x 4-yr old female --> captive
-    in.inds=c(5, 5),
-    in.max=60,      # breeding capacity
-    out.age=c(1, 2),# we 1 and 2-yr old calves --> recipient
-    out.prop = 0) # 0=move only N[t]-in.max youngs
-                  # 1=move all youngs and replace with females
-
-x
-summary(x)
-plot(x)
-
-}
-
