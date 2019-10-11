@@ -66,7 +66,7 @@ print.summary.caribou_forecast <- function(x, ...) {
 
 print.caribou_breeding <- function(x, ...) {
     cat("Caribou captive breeding:\n\n")
-    WHAT <- c("tmax", "pop.start", "in.max")
+    WHAT <- c("tmax", "pop.start", "in.max", "out.prop")
     str(x[WHAT],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     cat("\n")

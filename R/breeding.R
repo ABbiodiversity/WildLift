@@ -143,6 +143,7 @@ age.1st.litter=3, age.calf.max=1) {
         in.inds=in.inds,
         in.max=in.max,
         out.age=out.age,
+        out.prop=out.prop,
         tmax=tmax,
         pop.start=pop.start,
         age.1st.litter=age.1st.litter,
