@@ -25,7 +25,8 @@ wild=TRUE, age.1st.litter=3, age.calf.max=1) {
     A[age.cens+1L, age.cens+1L] <- if (age.cens+1L > age.calf.max)
         surv.f else surv.c
     l <- seq_len(age.cens+1)
-    l <- paste0(l-1L, "-", l, "yr")
+    l <- paste0("[", l-1L, ",", l, ")")
+    l[length(l)] <- paste0("[", age.cens, ",", Inf, "]")
     dimnames(A) <- list(l, l)
     A
 }
