@@ -186,6 +186,7 @@ function(
 pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red"),
 herd=NULL,
 ...) {
+    pen.type <- match.arg(pen.type)
     if (inherits(pen.type, "caribou_settings")) {
         parms <- pen.type
     } else {
