@@ -1157,17 +1157,10 @@ server <- function(input, output, session) {
             out.prop = input$breeding_outprop)
     })
     ## plot
-    #output$breeding_Plot <- renderPlot({
-    #    req(breeding_getF())
-    #    plot(breeding_getF())
-    #})
-    ## plot
     output$breeding_Plot <- renderPlotly({
         req(breeding_getF())
         dF <- summary(breeding_getF())
-        #dF$Nout <- dF$Ncapt - dF$Nout
         colnames(dF)[colnames(dF) == "Nrecip"] <- "Individuals"
-        colnames(dF)[colnames(dF) == "Year"] <- "Years"
         p <- plot_ly(dF, x = ~Years, y = ~Individuals,
             name = 'Recipient', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
@@ -1183,6 +1176,71 @@ server <- function(input, output, session) {
             config(displayModeBar = FALSE)
         p
     })
+    ## making nice table of the settings
+    breeding_getS <- reactive({
+        req(breeding_getF())
+        x <- breeding_getF()
+        s <- x$settings
+        s$call <- NULL
+        tab <- cbind(c(tmax = x$tmax,
+            pop.start = x$pop.start,
+            in.inds=sum(x$in.inds),
+            in.max=x$in.max,
+            out.prop=x$out.prop,
+            unlist(s)))
+        SNAM <- c(
+            "tmax" = "T max",
+            "pop.start" = "N start",
+            "c.surv.wild" = "Calf survival, wild",
+            "c.surv.capt" = "Calf survival, captive",
+            "f.surv.wild" = "Adult female survival, wild",
+            "f.surv.capt" = "Adult female survival, captive",
+            "f.preg.wild" = "Pregnancy rate, wild",
+            "f.preg.capt" = "Pregnancy rate, captive",
+            "in.inds"="Number of females (max)",
+            "in.max"="Max in a single pen",
+            "out.prop"="Transferred calf tuning value")
+        df <- tab[names(SNAM),,drop=FALSE]
+        rownames(df) <- SNAM
+        colnames(df) <- "Breeding"
+        df
+    })
+    ## table
+    output$breeding_Table <- renderTable({
+        req(breeding_getF())
+        print(breeding_getS())
+        dF <- summary(breeding_getF())[,-(2:3)]
+        colnames(dF)[-1] <- c("Captive", "Recipient", "Wild")
+        dF[nrow(dF),,drop=FALSE]
+    }, rownames=FALSE, colnames=TRUE,
+    striped=TRUE, bordered=TRUE, na="n/a",
+    sanitize.text.function = function(x) x)
+
+    ## dowload
+    breeding_xlslist <- reactive({
+        req(breeding_getF())
+        dF <- summary(breeding_getF())
+        ss <- breeding_getS()
+        print(ss)
+        out <- list(
+            Info=data.frame(CaribouBC=paste0(
+                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
+            Settings=as.data.frame(ss),
+            TimeSeries=as.data.frame(dF))
+        out$Settings$Parameters <- rownames(ss)
+        out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
+        out
+    })
+    output$breeding_download <- downloadHandler(
+        filename = function() {
+            paste0("CaribouBC_breeding_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(breeding_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
 
 
 }
