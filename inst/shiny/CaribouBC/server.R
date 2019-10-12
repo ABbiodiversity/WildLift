@@ -85,7 +85,8 @@ server <- function(input, output, session) {
             fpen.prop = values$penning$fpen.prop,
             fpen.inds = values$penning$fpen.inds,
             caribou_settings("mat.pen",
-                herd = if (input$penning_herd == "Default") NULL else input$penning_herd))
+                herd = if (input$penning_herd == "Default")
+                    NULL else input$penning_herd))
         if (values$penning_compare) {
             values$penning0 <- values$penning
         } else {
@@ -658,7 +659,25 @@ server <- function(input, output, session) {
 
     ## >>> moose tab <<<=====================================
 
-    ## dynamically render herd selector
+    ## dynamically render sliders
+    output$moose_demogr_sliders <- renderUI({
+        if (input$moose_herd != "Default")
+            return(p("Demography settings not available for specific herds."))
+        tagList(
+            sliderInput("moose_DemCsw", "Calf survival, moose reduction",
+                min = 0, max = 1, value = inits$moose$c.surv.wild, step = 0.01),
+            sliderInput("moose_DemCsc", "Calf survival, no moose reduction",
+                min = 0, max = 1, value = inits$moose0$c.surv.wild, step = 0.01),
+            sliderInput("moose_DemFsw", "Adult female survival, moose reduction",
+                min = 0, max = 1, value = inits$moose$f.surv.wild, step = 0.01),
+            sliderInput("moose_DemFsc", "Adult female survival, no moose reduction",
+                min = 0, max = 1, value = inits$moose0$f.surv.wild, step = 0.01),
+            sliderInput("moose_DemFpw", "Pregnancy rate, moose reduction",
+                min = 0, max = 1, value = inits$moose$f.preg.wild, step = 0.01),
+            sliderInput("moose_DemFpc", "Pregnancy rate, no moose reduction",
+                min = 0, max = 1, value = inits$moose0$f.preg.wild, step = 0.01)
+        )
+    })    ## dynamically render herd selector
     output$moose_herd <- renderUI({
         tagList(
             selectInput(
@@ -692,12 +711,32 @@ server <- function(input, output, session) {
             fpen.prop = values$moose$fpen.prop,
             fpen.inds = values$moose$fpen.inds,
             caribou_settings("moose.red",
-                herd = if (input$moose_herd == "Default") NULL else input$moose_herd))
+                herd = if (input$moose_herd == "Default")
+                    NULL else input$moose_herd))
         values$moose0 <- c(
             fpen.prop = values$moose0$fpen.prop,
             fpen.inds = values$moose0$fpen.inds,
             caribou_settings("mat.pen",
-                herd = if (input$moose_herd == "Default") NULL else input$moose_herd))
+                herd = if (input$moose_herd == "Default")
+                    NULL else input$moose_herd))
+    })
+    observeEvent(input$moose_DemCsw, {
+        values$moose$c.surv.wild <- input$moose_DemCsw
+    })
+    observeEvent(input$moose_DemCsc, {
+        values$moose0$c.surv.wild <- input$moose_DemCsc
+    })
+    observeEvent(input$moose_DemFsw, {
+        values$moose$f.surv.wild <- input$moose_DemFsw
+    })
+    observeEvent(input$moose_DemFsc, {
+        values$moose0$f.surv.wild <- input$moose_DemFsc
+    })
+    observeEvent(input$moose_DemFpw, {
+        values$moose$f.preg.wild <- input$moose_DemFpw
+    })
+    observeEvent(input$moose_DemFpc, {
+        values$moose0$f.preg.wild <- input$moose_DemFpc
     })
     observeEvent(input$moose_Fpen, {
         if (values$use_perc) {
@@ -866,11 +905,30 @@ server <- function(input, output, session) {
 
     ## >>> wolf tab <<<=====================================
 
+    ## dynamically render sliders
+    output$wolf_demogr_sliders <- renderUI({
+        if (input$wolf_herd != "Default")
+            return(p("Demography settings not available for specific herds."))
+        tagList(
+            sliderInput("wolf_DemCsw", "Calf survival, wolf reduction",
+                min = 0, max = 1, value = inits$wolf$c.surv.wild, step = 0.01),
+            sliderInput("wolf_DemCsc", "Calf survival, no wolf reduction",
+                min = 0, max = 1, value = inits$wolf0$c.surv.wild, step = 0.01),
+            sliderInput("wolf_DemFsw", "Adult female survival, wolf reduction",
+                min = 0, max = 1, value = inits$wolf$f.surv.wild, step = 0.01),
+            sliderInput("wolf_DemFsc", "Adult female survival, no wolf reduction",
+                min = 0, max = 1, value = inits$wolf0$f.surv.wild, step = 0.01),
+            sliderInput("wolf_DemFpw", "Pregnancy rate, wolf reduction",
+                min = 0, max = 1, value = inits$wolf$f.preg.wild, step = 0.01),
+            sliderInput("wolf_DemFpc", "Pregnancy rate, no wolf reduction",
+                min = 0, max = 1, value = inits$wolf0$f.preg.wild, step = 0.01)
+        )
+    })
     ## dynamically render herd selector
     output$wolf_herd <- renderUI({
         tagList(
             selectInput(
-                "wolf_herd", "Herd", HerdsWolf
+                "wolf_herd", "Herd", c("Default"="Default", HerdsWolf)
             )
         )
     })
@@ -899,11 +957,33 @@ server <- function(input, output, session) {
         values$wolf <- c(
             fpen.prop = values$wolf$fpen.prop,
             fpen.inds = values$wolf$fpen.inds,
-            caribou_settings("wolf.red", herd = input$wolf_herd))
+            caribou_settings("wolf.red",
+                herd = if (input$wolf_herd == "Default")
+                    NULL else input$wolf_herd))
         values$wolf0 <- c(
             fpen.prop = values$wolf0$fpen.prop,
             fpen.inds = values$wolf0$fpen.inds,
-            caribou_settings("mat.pen", herd = input$wolf_herd))
+            caribou_settings("mat.pen",
+                herd = if (input$wolf_herd == "Default")
+                    NULL else input$wolf_herd))
+    })
+    observeEvent(input$wolf_DemCsw, {
+        values$wolf$c.surv.wild <- input$wolf_DemCsw
+    })
+    observeEvent(input$wolf_DemCsc, {
+        values$wolf0$c.surv.wild <- input$wolf_DemCsc
+    })
+    observeEvent(input$wolf_DemFsw, {
+        values$wolf$f.surv.wild <- input$wolf_DemFsw
+    })
+    observeEvent(input$wolf_DemFsc, {
+        values$wolf0$f.surv.wild <- input$wolf_DemFsc
+    })
+    observeEvent(input$wolf_DemFpw, {
+        values$wolf$f.preg.wild <- input$wolf_DemFpw
+    })
+    observeEvent(input$wolf_DemFpc, {
+        values$wolf0$f.preg.wild <- input$wolf_DemFpc
     })
     ## wolf reduction without penning
     wolf_getF0 <- reactive({

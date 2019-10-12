@@ -35,11 +35,11 @@ inits <- list(
     wolf = c(
         fpen.prop = 0, # not considering penning
         fpen.inds = 0, # not considering penning
-        caribou_settings("wolf.red", herd="KennedySiding")),
+        caribou_settings("wolf.red")),
     wolf0 = c(
         fpen.prop = 0, # not considering penning
         fpen.inds = 0, # not considering penning
-        caribou_settings("mat.pen", herd="KennedySiding"))
+        caribou_settings("mat.pen"))
 )
 
 get_settings <- function(x, use_perc=TRUE) {

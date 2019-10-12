@@ -215,6 +215,12 @@ dashboardPage(
               uiOutput("moose_button"),
               bsTooltip("moose_button",
                 "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
+            ),
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = TRUE,
+              title = "Demography",
+              uiOutput("moose_demogr_sliders")
             )
           )
         )
@@ -256,6 +262,12 @@ dashboardPage(
               bsTooltip("wolf_herd",
                 "Select a herd for herd specific demography parameters.",
                 placement="top")
+            ),
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = TRUE,
+              title = "Demography",
+              uiOutput("wolf_demogr_sliders")
             )
           )
         )
