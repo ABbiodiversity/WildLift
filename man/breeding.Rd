@@ -65,7 +65,7 @@ transferred from the captive to the recipient herd.
 The amount varies between the excess number
 (\code{out.prop=0}, min of total transferable calves and
 individuals above facility capacity) and the total number of
-transferable calves (\code{out.prop=0}, the difference
+transferable calves (\code{out.prop=1}, the difference
 between the remaining population and \code{in.max} is replaced
 by incomong females).
 }
