@@ -149,7 +149,7 @@ age.1st.litter=3, age.calf.max=1) {
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max,
         Nin=Nin, Nout=Nout, Ncapt=Nc, Nrecip=Nw, Nwild=Nw0)
-    out$population <- data.frame(Year=c(0, seq_len(tmax)),
+    out$population <- data.frame(Years=c(0, seq_len(tmax)),
         sapply(out[c("Nin", "Nout", "Ncapt", "Nrecip", "Nwild")], colSums))
     class(out) <- "caribou_breeding"
     out
