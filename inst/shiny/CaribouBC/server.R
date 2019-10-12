@@ -14,7 +14,8 @@ server <- function(input, output, session) {
         moose = inits$moose,
         moose0 = inits$moose0,
         wolf = inits$wolf,
-        wolf0 = inits$wolf0)
+        wolf0 = inits$wolf0,
+        breeding = inits$breeding)
     ## set perc/inds
     observeEvent(input$use_perc, {
         values$use_perc <- input$use_perc == "perc"
@@ -932,40 +933,19 @@ server <- function(input, output, session) {
             )
         )
     })
-    ## dynamically render perc or inds slider
-    output$wolf_perc_or_inds <- renderUI({
-        if (values$use_perc) {
-            tagList(
-                sliderInput("wolf_Fpen", "Percent of females penned",
-                    min = 0, max = 100, value = round(100*inits$wolf$fpen.prop),
-                    step = 1),
-                bsTooltip("wolf_Fpen",
-                    "Change the percent of female population in maternity pens. Default set, but the user can toggle.")
-            )
-        } else {
-            tagList(
-                sliderInput("wolf_Fpen", "Number of females penned",
-                    min = 0, max = input$popstart, value = inits$wolf$fpen.inds,
-                    step = 1),
-                bsTooltip("wolf_Fpen",
-                    "Change the number of females in maternity pens. Default set, but the user can toggle.")
-            )
-        }
-    })
     ## observers
     observeEvent(input$wolf_herd, {
-        values$wolf <- c(
-            fpen.prop = values$wolf$fpen.prop,
-            fpen.inds = values$wolf$fpen.inds,
-            caribou_settings("wolf.red",
+        values$wolf <- caribou_settings("wolf.red",
                 herd = if (input$wolf_herd == "Default")
-                    NULL else input$wolf_herd))
-        values$wolf0 <- c(
-            fpen.prop = values$wolf0$fpen.prop,
-            fpen.inds = values$wolf0$fpen.inds,
-            caribou_settings("mat.pen",
+                    NULL else input$wolf_herd)
+        ## set AFS=0.801 CS=0.295 under no wolf option
+        values$wolf0 <- caribou_settings("mat.pen",
                 herd = if (input$wolf_herd == "Default")
-                    NULL else input$wolf_herd))
+                    NULL else input$wolf_herd,
+                f.surv.capt=0.801,
+                f.surv.wild=0.801,
+                c.surv.capt=0.295,
+                c.surv.wild=0.295)
     })
     observeEvent(input$wolf_DemCsw, {
         values$wolf$c.surv.wild <- input$wolf_DemCsw
@@ -1108,10 +1088,102 @@ server <- function(input, output, session) {
         contentType="application/octet-stream"
     )
 
+
+    ## >>> breeding tab <<<=====================================
+
+    ## dynamically render sliders
+    output$breeding_demogr_sliders <- renderUI({
+        if (input$breeding_herd != "Default")
+            return(p("Demography settings not available for specific herds."))
+        tagList(
+            sliderInput("breeding_DemCsc", "Calf survival, captive",
+                min = 0, max = 1, value = inits$breeding$c.surv.capt, step = 0.01),
+            sliderInput("breeding_DemCsw", "Calf survival, recipient & wild",
+                min = 0, max = 1, value = inits$breeding$c.surv.wild, step = 0.01),
+            sliderInput("breeding_DemFsc", "Adult female survival, captive",
+                min = 0, max = 1, value = inits$breeding$f.surv.capt, step = 0.01),
+            sliderInput("breeding_DemFsw", "Adult female survival, recipient & wild",
+                min = 0, max = 1, value = inits$breeding$f.surv.wild, step = 0.01),
+            sliderInput("breeding_DemFpc", "Pregnancy rate, captive",
+                min = 0, max = 1, value = inits$breeding$f.preg.capt, step = 0.01),
+            sliderInput("breeding_DemFpw", "Pregnancy rate, recipient & wild",
+                min = 0, max = 1, value = inits$breeding$f.preg.wild, step = 0.01)
+        )
+    })
+    ## dynamically render herd selector
+    output$breeding_herd <- renderUI({
+        tagList(
+            selectInput(
+                "breeding_herd", "Herd", c("Default"="Default", Herds)
+            )
+        )
+    })
+    ## observers
+    observeEvent(input$breeding_herd, {
+        values$breeding <- caribou_settings("mat.pen",
+                herd = if (input$breeding_herd == "Default")
+                    NULL else input$breeding_herd)
+    })
+    observeEvent(input$breeding_DemCsw, {
+        values$breeding$c.surv.wild <- input$breeding_DemCsw
+    })
+    observeEvent(input$breeding_DemCsc, {
+        values$breeding$c.surv.capt <- input$breeding_DemCsc
+    })
+    observeEvent(input$breeding_DemFsw, {
+        values$breeding$f.surv.wild <- input$breeding_DemFsw
+    })
+    observeEvent(input$breeding_DemFsc, {
+        values$breeding$f.surv.capt <- input$breeding_DemFsc
+    })
+    observeEvent(input$breeding_DemFpw, {
+        values$breeding$f.preg.wild <- input$breeding_DemFpw
+    })
+    observeEvent(input$breeding_DemFpc, {
+        values$breeding$f.preg.capt <- input$breeding_DemFpc
+    })
+    ## breeding reduction without penning
+    breeding_getF <- reactive({
+        n <- input$breeding_ininds
+        nn <- c(ceiling(n)/2, input$breeding_ininds - ceiling(n)/2)
+        caribou_breeding(values$breeding,
+            age.cens = 18,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            in.age = c(3, 4),
+            in.inds = nn,
+            in.max = input$breeding_inmax,
+            out.age = c(1, 2),
+            out.prop = input$breeding_outprop)
+    })
+    ## plot
+    #output$breeding_Plot <- renderPlot({
+    #    req(breeding_getF())
+    #    plot(breeding_getF())
+    #})
+    ## plot
+    output$breeding_Plot <- renderPlotly({
+        req(breeding_getF())
+        dF <- summary(breeding_getF())
+        #dF$Nout <- dF$Ncapt - dF$Nout
+        colnames(dF)[colnames(dF) == "Nrecip"] <- "Individuals"
+        colnames(dF)[colnames(dF) == "Year"] <- "Years"
+        p <- plot_ly(dF, x = ~Years, y = ~Individuals,
+            name = 'Recipient', type = 'scatter', mode = 'lines',
+            color=I('red')) %>%
+            add_trace(y = ~Nwild, name = 'Wild', data = dF,
+                    mode = 'lines', color=I('blue')) %>%
+            add_trace(y = ~Ncapt, name = 'Captive', data = dF,
+                    mode = 'lines', color=I('black')) %>%
+            add_trace(y = ~Nout, name = 'Calves out', data = dF,
+                    mode = 'lines', color=I('orange')) %>%
+            add_trace(y = ~Nin, name = 'Females in', data = dF,
+                line=list(color='grey')) %>%
+            layout(legend = list(x = 100, y = 0)) %>%
+            config(displayModeBar = FALSE)
+        p
+    })
+
+
 }
 
-# TODO
-# - add vital sliders for generic pop in Moose tab
-# - add vital sliders for generic pop in Wolf tab
-# - set AFS=0.801 CS=0.295 under no wolf option
-#

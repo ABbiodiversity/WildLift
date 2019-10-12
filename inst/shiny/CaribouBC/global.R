@@ -32,14 +32,14 @@ inits <- list(
         fpen.prop = 0.25,
         fpen.inds = 10,
         caribou_settings("mat.pen")),
-    wolf = c(
-        fpen.prop = 0, # not considering penning
-        fpen.inds = 0, # not considering penning
-        caribou_settings("wolf.red")),
-    wolf0 = c(
-        fpen.prop = 0, # not considering penning
-        fpen.inds = 0, # not considering penning
-        caribou_settings("mat.pen"))
+    wolf = caribou_settings("wolf.red"),
+    ## set AFS=0.801 CS=0.295 under no wolf option
+    wolf0 = caribou_settings("mat.pen",
+        f.surv.capt=0.801,
+        f.surv.wild=0.801,
+        c.surv.capt=0.295,
+        c.surv.wild=0.295),
+    breeding = caribou_settings("mat.pen")
 )
 
 get_settings <- function(x, use_perc=TRUE) {

@@ -18,7 +18,8 @@ dashboardPage(
       menuItem("Maternity pen", tabName = "penning"),
       menuItem("Predator exclosure", tabName = "predator"),
       menuItem("Moose reduction", tabName = "moose"),
-      menuItem("Wolf reduction", tabName = "wolf")
+      menuItem("Wolf reduction", tabName = "wolf"),
+      menuItem("Captive breeding", tabName = "breeding")
     )
   ),
   dashboardBody(
@@ -268,6 +269,61 @@ dashboardPage(
               collapsible = TRUE, collapsed = TRUE,
               title = "Demography",
               uiOutput("wolf_demogr_sliders")
+            )
+          )
+        )
+      ),
+
+      tabItem("breeding",
+        fluidRow(
+          column(width=8,
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Population forecast: captive breeding",
+              plotlyOutput("breeding_Plot", width = "100%", height = 400),
+              bsTooltip("breeding_Plot",
+                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                placement="right")
+            ),
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Summary: captive breeding",
+              tableOutput("breeding_Table"),
+              downloadButton("breeding_download", "Download results as Excel file"),
+              bsTooltip("breeding_Table",
+                "Table summarizing reports. Click below to download the full summary.",
+                placement="right"),
+              bsTooltip("breeding_download",
+                "Click here to download results.",
+                placement="top")
+            ),
+            HTML(FooterText)
+          ),
+          column(width=4,
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Settings",
+              uiOutput("breeding_herd"),
+              bsTooltip("breeding_herd",
+                "Select a herd for herd specific demography parameters.",
+                placement="top"),
+              sliderInput("breeding_outprop", "Transferred calves tuning",
+                min = 0, max = 1, value = 0, step = 0.01),
+              bsTooltip("breeding_outprop",
+                "The amount varies between the excess number (0: min of total transferable calves and individuals above facility capacity) and the total number of transferable calves (1: the difference between the remaining population and in.max is replaced by incomong females)."),
+              sliderInput("breeding_ininds", "Number of females put into captivity in each year (max)",
+                min = 0, max = 20, value = 10, step = 1),
+              sliderInput("breeding_inmax", "Capacity of breeding facility (max number of individuals)",
+                min = 0, max = 100, value = 35, step = 1)
+            ),
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = TRUE,
+              title = "Demography",
+              uiOutput("breeding_demogr_sliders")
             )
           )
         )
