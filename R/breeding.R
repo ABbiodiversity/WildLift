@@ -1,6 +1,6 @@
 ## create projection matrix
-caribou_matrix <- function(settings, age.cens=3,
-wild=TRUE, age.1st.litter=3, age.calf.max=1) {
+caribou_matrix <- function(settings, wild=TRUE,
+age.cens=3, age.1st.litter=3, age.calf.max=1) {
     if (wild) {
         surv.c <- settings$c.surv.wild
         surv.f <- settings$f.surv.wild
@@ -31,7 +31,8 @@ wild=TRUE, age.1st.litter=3, age.calf.max=1) {
     A
 }
 
-caribou_breeding <- function(settings, age.cens=3,
+## initial function
+.caribou_breeding <- function(settings, age.cens=3,
 in.age=3, # ages of females added in each year, matching in.inds
 in.inds=10, # number of females added each year
 in.max=35, # capacity of captive breeding facility, excess goes into recipient pop
@@ -40,12 +41,12 @@ out.prop=1, # 0=excess only, 1=as many as there, 0-1=proportionally between
 tmax=20,
 pop.start=100, # wild / recipient population
 age.1st.litter=3, age.calf.max=1) {
-    Aw <- caribou_matrix(settings,
-        age.cens=age.cens, wild=TRUE,
+    Aw <- caribou_matrix(settings, wild=TRUE,
+        age.cens=age.cens,
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max)
-    Ac <- caribou_matrix(settings,
-        age.cens=age.cens, wild=FALSE,
+    Ac <- caribou_matrix(settings, wild=FALSE,
+        age.cens=age.cens,
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max)
     out.age <- as.integer(out.age)
@@ -142,6 +143,121 @@ age.1st.litter=3, age.calf.max=1) {
         in.age=in.age,
         in.inds=in.inds,
         in.max=in.max,
+        out.age=out.age,
+        out.prop=out.prop,
+        tmax=tmax,
+        pop.start=pop.start,
+        age.1st.litter=age.1st.litter,
+        age.calf.max=age.calf.max,
+        Nin=Nin, Nout=Nout, Ncapt=Nc, Nrecip=Nw, Nwild=Nw0)
+    out$population <- data.frame(Years=c(0, seq_len(tmax)),
+        sapply(out[c("Nin", "Nout", "Ncapt", "Nrecip", "Nwild")], colSums))
+    class(out) <- "caribou_breeding"
+    out
+}
+
+## revised function
+caribou_breeding <- function(settings,
+in.inds=10, # number of females added each year
+out.prop=1, # remove all (1) or none (0), recycled
+tmax=20,
+pop.start=100) { # wild / recipient population
+
+    age.1st.litter <- 3
+    age.calf.max <- 1
+    age.cens <- 18
+    in.age <- 3:4 # ages of females added in each year, matching in.inds
+    out.age <- 1:2 # age of inds pumped out
+
+    Aw <- caribou_matrix(settings, wild=TRUE,
+        age.cens=age.cens,
+        age.1st.litter=age.1st.litter,
+        age.calf.max=age.calf.max)
+    Ac <- caribou_matrix(settings, wild=FALSE,
+        age.cens=age.cens,
+        age.1st.litter=age.1st.litter,
+        age.calf.max=age.calf.max)
+    if (length(out.prop) > 1L)
+        stop("out.prop must be of length 1")
+    if (out.prop < 0 || out.prop > 1)
+        stop("out.prop must be a value between 0 and 1")
+    tmax <- as.integer(round(tmax))
+    if (tmax < 1)
+        stop("tmax must be > 0")
+    Nc <- matrix(0, age.cens+1, tmax+1)
+    Nin <- Nout <- Nw <- Nw0 <- Nc
+
+    if (length(in.inds) < tmax)
+        in.inds <- c(in.inds, rep(0, tmax - length(in.inds)))
+    if (length(in.inds) > tmax)
+        in.inds <- in.inds[seq_len(tmax)]
+    in.inds <- as.integer(in.inds)
+    if (any(in.inds < 0))
+        stop("in.inds values must not be negative")
+
+    ## input in yr 0
+    N0c <- numeric(age.cens+1)
+    n0 <- in.inds[1L]
+    while (n0 > 0) {
+        for (j in sort(in.age)) {
+            N0c[j+1] <- N0c[j+1] + 1
+            n0 <- n0 - 1
+            if (n0 <= 0)
+                break
+        }
+    }
+    Nin[,1] <- N0c
+    ## captive
+    Nc[,1] <- N0c # year 0 pop in captive
+    ## recipient (w) and wild (w0 - no influx)
+    Nw[,1] <- pop.start * eigen.analysis(Aw)$stable.stage # stable age dist
+    ## wild (without receiving inds)
+    Nw0 <- pop.projection(Aw, Nw[,1], tmax+1)$stage.vectors
+    dimnames(Nw0) <- NULL
+    for (i in seq_len(tmax)) {
+        ## projecting to next year: reproduction from last year
+        Nc[,i+1L] <- Ac %*% Nc[,i]
+        Nw[,i+1L] <- Aw %*% Nw[,i]
+
+        ## add new females
+        room <- in.inds[i]
+        ## add inds one-by-one starting with younger ages
+        while(room > 0) {
+            for (j in sort(in.age)) {
+                Nin[j+1,i+1L] <- Nin[j+1,i+1L] + 1
+                room <- room - 1
+                if (room <= 0)
+                    break
+            }
+        }
+        ## adjust captive pop
+        Nc[,i+1L] <- Nc[,i+1L] + Nin[,i+1L]
+
+        ## remove youngs
+        tomove <- floor(out.prop * sum(Nc[out.age+1L,i+1L]))
+        ## remove inds one-by-one starting with younger ages
+        while(tomove > 0) {
+            for (j in sort(out.age)) {
+                Nout[j+1,i+1L] <- Nout[j+1,i+1L] + 1
+                tomove <- tomove - 1
+                if (tomove <= 0)
+                    break
+            }
+        }
+        ## new Nc must be >= 0
+        Nout[,i+1L] <- pmin(Nout[,i+1L], floor(Nc[,i+1L]))
+        ## adjust captive pop
+        Nc[,i+1L] <- Nc[,i+1L] - Nout[,i+1L]
+        ## adjust recipient pop
+        Nw[,i+1L] <- Nw[,i+1L] + Nout[,i+1L]
+
+    }
+    out <- list(
+        call=match.call(),
+        settings=settings,
+        age.cens=age.cens,
+        in.age=in.age,
+        in.inds=in.inds,
         out.age=out.age,
         out.prop=out.prop,
         tmax=tmax,
