@@ -70,9 +70,10 @@ print.caribou_breeding <- function(x, ...) {
     str(x[WHAT],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     cat("\n")
-    print(format(drop(as.matrix(x$population[x$tmax+1L,
-        c("Ncapt", "Nrecip", "Nwild")])), digits=getOption("digits")-3L),
-        quote=FALSE)
+    N <- x$population[x$tmax:(x$tmax+1L), c("Ncapt", "Nrecip", "Nwild")]
+    m <- rbind(N=N[2L,], lambda=N[2L,]/N[1L,])
+    colnames(m) <- c("capt", "recip", "wild")
+    print(format(m, digits=getOption("digits")-3L))
     invisible(x)
 }
 
