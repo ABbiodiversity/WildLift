@@ -296,13 +296,12 @@ dashboardPage(
                 "Select a herd for herd specific demography parameters.",
                 placement="top"),
               sliderInput("breeding_outprop", "Transferred calves tuning",
-                min = 0, max = 1, value = 0, step = 0.01),
+                min = 0, max = 1, value = 0.5, step = 0.01),
               bsTooltip("breeding_outprop",
-                "The amount varies between the excess number (0: min of total transferable calves and individuals above facility capacity) and the total number of transferable calves (1: the difference between the remaining population and in.max is replaced by incomong females)."),
-              sliderInput("breeding_ininds", "Number of females put into captivity in each year (max)",
+                "The proportion of calves transferred from the captive to the recipient herd."),
+              sliderInput("breeding_ininds", "Number of females put into captivity each year (max)",
                 min = 0, max = 20, value = 10, step = 1),
-              sliderInput("breeding_inmax", "Capacity of breeding facility (max number of individuals)",
-                min = 0, max = 100, value = 35, step = 1)
+              uiOutput("breeding_years")
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,

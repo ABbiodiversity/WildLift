@@ -1092,6 +1092,13 @@ server <- function(input, output, session) {
     ## >>> breeding tab <<<=====================================
 
     ## dynamically render sliders
+    output$breeding_years <- renderUI({
+        tagList(
+            sliderInput("breeding_yrs",
+                "Number of years to put females in captivity",
+                min = 0, max = input$tmax, value = 1, step = 1)
+        )
+    })
     output$breeding_demogr_sliders <- renderUI({
         if (input$breeding_herd != "Default")
             return(p("Demography settings not available for specific herds."))
@@ -1144,16 +1151,14 @@ server <- function(input, output, session) {
     })
     ## breeding reduction without penning
     breeding_getF <- reactive({
-        n <- input$breeding_ininds
-        nn <- c(ceiling(n)/2, input$breeding_ininds - ceiling(n)/2)
+        req(input$breeding_yrs, input$breeding_ininds)
+        print(input$breeding_yrs)
+        nn <- rep(input$breeding_ininds, input$breeding_yrs)
+        print(nn)
         caribou_breeding(values$breeding,
-            age.cens = 18,
             tmax = input$tmax,
             pop.start = input$popstart,
-            in.age = c(3, 4),
             in.inds = nn,
-            in.max = input$breeding_inmax,
-            out.age = c(1, 2),
             out.prop = input$breeding_outprop)
     })
     ## plot
@@ -1184,8 +1189,6 @@ server <- function(input, output, session) {
         s$call <- NULL
         tab <- cbind(c(tmax = x$tmax,
             pop.start = x$pop.start,
-            in.inds=sum(x$in.inds),
-            in.max=x$in.max,
             out.prop=x$out.prop,
             unlist(s)))
         SNAM <- c(
@@ -1197,9 +1200,7 @@ server <- function(input, output, session) {
             "f.surv.capt" = "Adult female survival, captive",
             "f.preg.wild" = "Pregnancy rate, wild",
             "f.preg.capt" = "Pregnancy rate, captive",
-            "in.inds"="Number of females (max)",
-            "in.max"="Max in a single pen",
-            "out.prop"="Transferred calf tuning value")
+            "out.prop"="Proportion of calves transferred")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- "Breeding"
@@ -1208,11 +1209,12 @@ server <- function(input, output, session) {
     ## table
     output$breeding_Table <- renderTable({
         req(breeding_getF())
-        print(breeding_getS())
-        dF <- summary(breeding_getF())[,-(2:3)]
-        colnames(dF)[-1] <- c("Captive", "Recipient", "Wild")
-        dF[nrow(dF),,drop=FALSE]
-    }, rownames=FALSE, colnames=TRUE,
+        dF <- summary(breeding_getF())[,-(1:3)]
+        colnames(dF) <- c("Captive", "Recipient", "Wild")
+        N0 <- dF[nrow(dF)-1L,,drop=FALSE]
+        N1 <- dF[nrow(dF),,drop=FALSE]
+        df <- rbind('N'=N1, '&lambda;'=round(N1/N0, 3))
+    }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
     sanitize.text.function = function(x) x)
 
@@ -1221,7 +1223,6 @@ server <- function(input, output, session) {
         req(breeding_getF())
         dF <- summary(breeding_getF())
         ss <- breeding_getS()
-        print(ss)
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
