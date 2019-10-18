@@ -34,6 +34,8 @@ age.cens=3, age.1st.litter=3, age.calf.max=1) {
 caribou_breeding <- function(settings,
 in.inds=10, # number of females added each year
 out.prop=1, # remove all (1) or none (0), recycled
+f.surv.trans=1, # female survival during transportation into captive
+c.surv.trans=1, # calf survival during transportation into recipient
 tmax=20,
 pop.start=100) { # wild / recipient population
 
@@ -55,6 +57,10 @@ pop.start=100) { # wild / recipient population
         stop("out.prop must be of length 1")
     if (out.prop < 0 || out.prop > 1)
         stop("out.prop must be a value between 0 and 1")
+    if (f.surv.trans < 0 || f.surv.trans > 1)
+        stop("f.surv.trans must be a value between 0 and 1")
+    if (c.surv.trans < 0 || c.surv.trans > 1)
+        stop("c.surv.trans must be a value between 0 and 1")
     tmax <- as.integer(round(tmax))
     if (tmax < 1)
         stop("tmax must be > 0")
@@ -81,8 +87,8 @@ pop.start=100) { # wild / recipient population
         }
     }
     Nin[,1] <- N0c
-    ## captive
-    Nc[,1] <- N0c # year 0 pop in captive
+    ## captive, adjust by transport mortality
+    Nc[,1] <- f.surv.trans * N0c # year 0 pop in captive
     ## recipient (w) and wild (w0 - no influx)
     Nw[,1] <- pop.start * eigen.analysis(Aw)$stable.stage # stable age dist
     ## wild (without receiving inds)
@@ -106,8 +112,8 @@ pop.start=100) { # wild / recipient population
                     break
             }
         }
-        ## adjust captive pop
-        Nc[,i+1L] <- Nc[,i+1L] + Nin[,i+1L]
+        ## adjust captive pop, adjust by transport mortality
+        Nc[,i+1L] <- Nc[,i+1L] + f.surv.trans * Nin[,i+1L]
 
         ## remove youngs
         tomove <- floor(out.prop * sum(Nc[out.age+1L,i+1L]))
@@ -125,8 +131,8 @@ pop.start=100) { # wild / recipient population
         #Nout[,i+1L] <- pmin(Nout[,i+1L], floor(Nc[,i+1L]))
         ## adjust captive pop
         Nc[,i+1L] <- Nc[,i+1L] - Nout[,i+1L]
-        ## adjust recipient pop
-        Nw[,i+1L] <- Nw[,i+1L] + Nout[,i+1L]
+        ## adjust recipient pop, adjust by transport mortality
+        Nw[,i+1L] <- Nw[,i+1L] + c.surv.trans * Nout[,i+1L]
 
     }
     out <- list(

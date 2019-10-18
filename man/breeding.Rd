@@ -15,7 +15,8 @@ caribou_matrix(settings, wild=TRUE,
     age.cens=3, age.1st.litter=3, age.calf.max=1)
 
 caribou_breeding(settings,
-    in.inds=10, out.prop=1, tmax=20, pop.start=100)
+    in.inds=10, f.surv.trans=1, c.surv.trans=1,
+    out.prop=1, tmax=20, pop.start=100)
 
 \method{print}{caribou_breeding}(x, ...)
 \method{summary}{caribou_breeding}(object, ...)
@@ -48,6 +49,14 @@ are added after the last value (up until year \code{tmax}).
   \item{out.prop}{
 numeric between 0 and 1, the proportion of calves
 transferred from the captive to the recipient herd.
+}
+  \item{f.surv.trans}{
+numeric between 0 and 1, female survival during transportation
+into the captive population.
+}
+  \item{c.surv.trans}{
+numeric between 0 and 1, calf survival during transportation
+from captive to recipient herd.
 }
   \item{tmax}{
 positive integer, number of years to forecast after initial year 0.
