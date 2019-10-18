@@ -15,8 +15,8 @@ caribou_matrix(settings, wild=TRUE,
     age.cens=3, age.1st.litter=3, age.calf.max=1)
 
 caribou_breeding(settings,
-    in.inds=10, f.surv.trans=1, c.surv.trans=1,
-    out.prop=1, tmax=20, pop.start=100)
+    in.inds=10, out.prop=1, f.surv.trans=1, c.surv.trans=1,
+    tmax=20, pop.start=100)
 
 \method{print}{caribou_breeding}(x, ...)
 \method{summary}{caribou_breeding}(object, ...)
