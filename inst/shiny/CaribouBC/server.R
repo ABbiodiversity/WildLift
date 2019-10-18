@@ -1152,12 +1152,12 @@ server <- function(input, output, session) {
     ## breeding reduction without penning
     breeding_getF <- reactive({
         req(input$breeding_yrs, input$breeding_ininds)
-        print(input$breeding_yrs)
         nn <- rep(input$breeding_ininds, input$breeding_yrs)
-        print(nn)
         caribou_breeding(values$breeding,
             tmax = input$tmax,
             pop.start = input$popstart,
+            f.surv.trans = input$breeding_ftrans,
+            c.surv.trans = input$breeding_ctrans,
             in.inds = nn,
             out.prop = input$breeding_outprop)
     })
