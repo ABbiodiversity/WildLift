@@ -295,17 +295,19 @@ dashboardPage(
               bsTooltip("breeding_herd",
                 "Select a herd for herd specific demography parameters.",
                 placement="top"),
-              sliderInput("breeding_outprop", "Transferred calves tuning",
+              sliderInput("breeding_outprop", "Proportion of juveniles transferred",
                 min = 0, max = 1, value = 0.5, step = 0.01),
               bsTooltip("breeding_outprop",
-                "The proportion of calves transferred from the captive to the recipient herd."),
+                "The proportion of juveniles transferred from the captive to the recipient herd."),
               sliderInput("breeding_ininds", "Number of females put into captivity each year (max)",
                 min = 0, max = 20, value = 10, step = 1),
               uiOutput("breeding_years"),
               sliderInput("breeding_ftrans", "Female survival during transport",
                 min = 0, max = 1, value = 1, step = 0.01),
-              sliderInput("breeding_ctrans", "Calf survival during transport",
-                min = 0, max = 1, value = 1, step = 0.01)
+              sliderInput("breeding_jtrans", "Juvenile survival during transport",
+                min = 0, max = 1, value = 1, step = 0.01),
+              sliderInput("breeding_jw", "Juvenile survival weight after transport for 1 year",
+                min = 0, max = 1, value = 0.5, step = 0.01)
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,

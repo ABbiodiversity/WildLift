@@ -35,7 +35,8 @@ caribou_breeding <- function(settings,
 in.inds=10, # number of females added each year
 out.prop=1, # remove all (1) or none (0), recycled
 f.surv.trans=1, # female survival during transportation into captive
-c.surv.trans=1, # calf survival during transportation into recipient
+j.surv.trans=1, # juv survival during transportation into recipient
+j.weight=0.5, # transported juv survival is (1-w)*capt+w*wild for 1 yr
 tmax=20,
 pop.start=100) { # wild / recipient population
 
@@ -59,8 +60,10 @@ pop.start=100) { # wild / recipient population
         stop("out.prop must be a value between 0 and 1")
     if (f.surv.trans < 0 || f.surv.trans > 1)
         stop("f.surv.trans must be a value between 0 and 1")
-    if (c.surv.trans < 0 || c.surv.trans > 1)
-        stop("c.surv.trans must be a value between 0 and 1")
+    if (j.surv.trans < 0 || j.surv.trans > 1)
+        stop("j.surv.trans must be a value between 0 and 1")
+    if (j.weight < 0 || j.weight > 1)
+        stop("j.weight must be a value between 0 and 1")
     tmax <- as.integer(round(tmax))
     if (tmax < 1)
         stop("tmax must be > 0")
@@ -95,9 +98,25 @@ pop.start=100) { # wild / recipient population
     Nw0 <- pop.projection(Aw, Nw[,1], tmax+1)$stage.vectors
     dimnames(Nw0) <- NULL
     for (i in seq_len(tmax)) {
+        ## adjusting transported juv survival
+        Aw2 <- Aw
+        ## proportion of wild (not transported) juvs
+        pjw <- (Nw[out.age+1L,i] - j.surv.trans * Nout[out.age+1L,i]) /
+            Nw[out.age+1L,i]
+        #cat(i, ": pjw =", pjw)
+        for (j in seq_len(out.age)) {
+            a <- sort(out.age)[j]+1L
+            ## recently transported juv survival
+            sjt <- j.weight * Aw[a+1L, a] + (1-j.weight) * Ac[a+1L, a]
+            ## wild juv survival
+            sjw <- Aw[a+1L, a]
+            Aw2[a+1L, a] <- pjw * sjw + (1-pjw) * sjt
+            #cat(" / sjw =", sjw, "/ sjt =", sjt, "/ Aw2 =", Aw2[a+1L, a], "\n")
+        }
+
         ## projecting to next year: reproduction from last year
         Nc[,i+1L] <- Ac %*% Nc[,i]
-        Nw[,i+1L] <- Aw %*% Nw[,i]
+        Nw[,i+1L] <- Aw2 %*% Nw[,i]
 
         ## add new females
         room <- if (i == tmax)
@@ -132,7 +151,7 @@ pop.start=100) { # wild / recipient population
         ## adjust captive pop
         Nc[,i+1L] <- Nc[,i+1L] - Nout[,i+1L]
         ## adjust recipient pop, adjust by transport mortality
-        Nw[,i+1L] <- Nw[,i+1L] + c.surv.trans * Nout[,i+1L]
+        Nw[,i+1L] <- Nw[,i+1L] + j.surv.trans * Nout[,i+1L]
 
     }
     out <- list(
@@ -143,6 +162,9 @@ pop.start=100) { # wild / recipient population
         in.inds=in.inds,
         out.age=out.age,
         out.prop=out.prop,
+        f.surv.trans=f.surv.trans,
+        j.surv.trans=j.surv.trans,
+        j.weight=j.weight,
         tmax=tmax,
         pop.start=pop.start,
         age.1st.litter=age.1st.litter,

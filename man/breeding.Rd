@@ -15,7 +15,8 @@ caribou_matrix(settings, wild=TRUE,
     age.cens=3, age.1st.litter=3, age.calf.max=1)
 
 caribou_breeding(settings,
-    in.inds=10, out.prop=1, f.surv.trans=1, c.surv.trans=1,
+    in.inds=10, out.prop=1, f.surv.trans=1,
+    j.surv.trans=1, j.weight=0.5,
     tmax=20, pop.start=100)
 
 \method{print}{caribou_breeding}(x, ...)
@@ -47,16 +48,21 @@ integer vector, number of females put into captivity each year.
 are added after the last value (up until year \code{tmax}).
 }
   \item{out.prop}{
-numeric between 0 and 1, the proportion of calves
+numeric between 0 and 1, the proportion of juveniles
 transferred from the captive to the recipient herd.
 }
   \item{f.surv.trans}{
 numeric between 0 and 1, female survival during transportation
 into the captive population.
 }
-  \item{c.surv.trans}{
-numeric between 0 and 1, calf survival during transportation
+  \item{j.surv.trans}{
+numeric between 0 and 1, juvenile survival during transportation
 from captive to recipient herd.
+}
+  \item{j.weight}{
+numeric weight between 0 and 1,
+transported juv survival is (1-weight)*captive+weight*wild survival
+for 1 year following traportation.
 }
   \item{tmax}{
 positive integer, number of years to forecast after initial year 0.
