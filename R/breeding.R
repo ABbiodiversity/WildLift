@@ -42,7 +42,7 @@ pop.start=100) { # wild / recipient population
 
     age.1st.litter <- 3
     age.calf.max <- 1
-    age.cens <- 18
+    age.cens <- 4
     in.age <- 3:4 # ages of females added in each year, matching in.inds
     out.age <- 1 # age of inds pumped out
 
@@ -105,11 +105,15 @@ pop.start=100) { # wild / recipient population
             Nw[out.age+1L,i]
         for (j in seq_len(out.age)) {
             a <- sort(out.age)[j]+1L
-            ## recently transported juv survival reduction
-            sjt <- j.surv.red * Aw[a+1L, a]
             ## wild juv survival
             sjw <- Aw[a+1L, a]
+            ## recently transported juv survival reduction
+            sjt <- j.surv.red * sjw
             Aw2[a+1L, a] <- pjw * sjw + (1-pjw) * sjt
+
+            ## wild and recip should be identical when reduction is 0
+            #tmp <- c(i=i, sjw=sjw, sjt=sjt, pjw=pjw, js2=Aw2[a+1L, a])
+            #cat(paste(names(tmp), round(tmp, 2), sep="=", collapse="\t"), "\n")
         }
 
         ## projecting to next year: reproduction from last year
