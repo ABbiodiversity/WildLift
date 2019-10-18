@@ -1158,7 +1158,7 @@ server <- function(input, output, session) {
             pop.start = input$popstart,
             f.surv.trans = input$breeding_ftrans,
             j.surv.trans = input$breeding_jtrans,
-            j.weight = input$breeding_jw,
+            j.surv.red = input$breeding_jsred,
             in.inds = nn,
             out.prop = input$breeding_outprop)
     })

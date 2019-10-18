@@ -16,7 +16,7 @@ caribou_matrix(settings, wild=TRUE,
 
 caribou_breeding(settings,
     in.inds=10, out.prop=1, f.surv.trans=1,
-    j.surv.trans=1, j.weight=0.5,
+    j.surv.trans=1, j.surv.red=1,
     tmax=20, pop.start=100)
 
 \method{print}{caribou_breeding}(x, ...)
@@ -59,10 +59,9 @@ into the captive population.
 numeric between 0 and 1, juvenile survival during transportation
 from captive to recipient herd.
 }
-  \item{j.weight}{
-numeric weight between 0 and 1,
-transported juv survival is (1-weight)*captive+weight*wild survival
-for 1 year following traportation.
+  \item{j.surv.red}{
+numeric between 0 and 1,
+transported juv survival reduction factor for 1 year following traportation.
 }
   \item{tmax}{
 positive integer, number of years to forecast after initial year 0.

@@ -36,7 +36,7 @@ in.inds=10, # number of females added each year
 out.prop=1, # remove all (1) or none (0), recycled
 f.surv.trans=1, # female survival during transportation into captive
 j.surv.trans=1, # juv survival during transportation into recipient
-j.weight=0.5, # transported juv survival is (1-w)*capt+w*wild for 1 yr
+j.surv.red=1, # transported juv survival reduction for 1 yr
 tmax=20,
 pop.start=100) { # wild / recipient population
 
@@ -62,8 +62,8 @@ pop.start=100) { # wild / recipient population
         stop("f.surv.trans must be a value between 0 and 1")
     if (j.surv.trans < 0 || j.surv.trans > 1)
         stop("j.surv.trans must be a value between 0 and 1")
-    if (j.weight < 0 || j.weight > 1)
-        stop("j.weight must be a value between 0 and 1")
+    if (j.surv.red < 0 || j.surv.red > 1)
+        stop("j.surv.red must be a value between 0 and 1")
     tmax <- as.integer(round(tmax))
     if (tmax < 1)
         stop("tmax must be > 0")
@@ -103,15 +103,13 @@ pop.start=100) { # wild / recipient population
         ## proportion of wild (not transported) juvs
         pjw <- (Nw[out.age+1L,i] - j.surv.trans * Nout[out.age+1L,i]) /
             Nw[out.age+1L,i]
-        #cat(i, ": pjw =", pjw)
         for (j in seq_len(out.age)) {
             a <- sort(out.age)[j]+1L
-            ## recently transported juv survival
-            sjt <- j.weight * Aw[a+1L, a] + (1-j.weight) * Ac[a+1L, a]
+            ## recently transported juv survival reduction
+            sjt <- j.surv.red * Aw[a+1L, a]
             ## wild juv survival
             sjw <- Aw[a+1L, a]
             Aw2[a+1L, a] <- pjw * sjw + (1-pjw) * sjt
-            #cat(" / sjw =", sjw, "/ sjt =", sjt, "/ Aw2 =", Aw2[a+1L, a], "\n")
         }
 
         ## projecting to next year: reproduction from last year

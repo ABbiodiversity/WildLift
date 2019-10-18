@@ -306,8 +306,8 @@ dashboardPage(
                 min = 0, max = 1, value = 1, step = 0.01),
               sliderInput("breeding_jtrans", "Juvenile survival during transport",
                 min = 0, max = 1, value = 1, step = 0.01),
-              sliderInput("breeding_jw", "Juvenile survival weight after transport for 1 year",
-                min = 0, max = 1, value = 0.5, step = 0.01)
+              sliderInput("breeding_jsred", "Transported juvenile survival reduction for 1 year",
+                min = 0, max = 1, value = 1, step = 0.01)
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,
