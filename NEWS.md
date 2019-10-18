@@ -1,3 +1,7 @@
+# Version 0.2.2
+
+* Added transportation related mortality to captive breeding.
+
 # Version 0.2.1
 
 * Added captive breeding component (#5).
