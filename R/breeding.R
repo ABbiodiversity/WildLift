@@ -68,6 +68,7 @@ pop.start=100) { # wild / recipient population
     if (tmax < 1)
         stop("tmax must be > 0")
     Nc <- matrix(0, age.cens+1, tmax+1)
+    dimnames(Nc) <- list(rownames(Aw), 0:tmax)
     Nin <- Nout <- Nw <- Nw0 <- Nc
 
     if (length(in.inds) < tmax)
@@ -96,7 +97,7 @@ pop.start=100) { # wild / recipient population
     Nw[,1] <- pop.start * eigen.analysis(Aw)$stable.stage # stable age dist
     ## wild (without receiving inds)
     Nw0 <- pop.projection(Aw, Nw[,1], tmax+1)$stage.vectors
-    dimnames(Nw0) <- NULL
+    dimnames(Nw0) <- dimnames(Nw)
     for (i in seq_len(tmax)) {
         ## adjusting transported juv survival
         Aw2 <- Aw
@@ -122,7 +123,6 @@ pop.start=100) { # wild / recipient population
         ## add new females
         room <- if (i == tmax)
             0 else in.inds[i+1L]
-        #cat("year", i, "| adding", room)
         ## add inds one-by-one starting with younger ages
         while(room > 0) {
             for (j in sort(in.age)) {
@@ -137,7 +137,6 @@ pop.start=100) { # wild / recipient population
 
         ## remove youngs
         tomove <- floor(out.prop * sum(Nc[out.age+1L,i+1L]))
-        #cat("| removing", tomove, "\n")
         ## remove inds one-by-one starting with younger ages
         while(tomove > 0) {
             for (j in sort(out.age)) {
@@ -147,7 +146,6 @@ pop.start=100) { # wild / recipient population
                     break
             }
         }
-        cat(Nout[2,i+1L], "\n")
         ## new Nc must be >= 0
         #Nout[,i+1L] <- pmin(Nout[,i+1L], floor(Nc[,i+1L]))
         ## adjust captive pop
