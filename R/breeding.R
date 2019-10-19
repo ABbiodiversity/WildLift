@@ -103,17 +103,16 @@ pop.start=100) { # wild / recipient population
         ## proportion of wild (not transported) juvs
         pjw <- (Nw[out.age+1L,i] - j.surv.trans * Nout[out.age+1L,i]) /
             Nw[out.age+1L,i]
+        ## this adjustment shows up in Nw[out.age+2,i+1]
+        ## but Nout[out.age+1,i] is not removed
+        ## thus wild != recipient
         for (j in seq_len(out.age)) {
             a <- sort(out.age)[j]+1L
             ## wild juv survival
             sjw <- Aw[a+1L, a]
             ## recently transported juv survival reduction
             sjt <- j.surv.red * sjw
-            Aw2[a+1L, a] <- pjw * sjw + (1-pjw) * sjt
-
-            ## wild and recip should be identical when reduction is 0
-            #tmp <- c(i=i, sjw=sjw, sjt=sjt, pjw=pjw, js2=Aw2[a+1L, a])
-            #cat(paste(names(tmp), round(tmp, 2), sep="=", collapse="\t"), "\n")
+            Aw2[a+1L, a] <- pjw[j] * sjw + (1-pjw[j]) * sjt
         }
 
         ## projecting to next year: reproduction from last year
@@ -148,6 +147,7 @@ pop.start=100) { # wild / recipient population
                     break
             }
         }
+        cat(Nout[2,i+1L], "\n")
         ## new Nc must be >= 0
         #Nout[,i+1L] <- pmin(Nout[,i+1L], floor(Nc[,i+1L]))
         ## adjust captive pop
@@ -177,4 +177,3 @@ pop.start=100) { # wild / recipient population
     class(out) <- "caribou_breeding"
     out
 }
-
