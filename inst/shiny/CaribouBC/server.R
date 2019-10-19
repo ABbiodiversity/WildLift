@@ -1165,19 +1165,26 @@ server <- function(input, output, session) {
     ## plot
     output$breeding_Plot <- renderPlotly({
         req(breeding_getF())
-        dF <- summary(breeding_getF())
+        bb <- breeding_getF()
+        dF <- summary(bb)
         colnames(dF)[colnames(dF) == "Nrecip"] <- "Individuals"
         p <- plot_ly(dF, x = ~Years, y = ~Individuals,
             name = 'Recipient', type = 'scatter', mode = 'lines',
+            text = hover(t(bb$Nrecip)),
+            hoverinfo = 'text',
             color=I('red')) %>%
             add_trace(y = ~Nwild, name = 'Wild', data = dF,
-                    mode = 'lines', color=I('blue')) %>%
+                    mode = 'lines', color=I('blue'),
+                    text = hover(t(bb$Nwild))) %>%
             add_trace(y = ~Ncapt, name = 'Captive', data = dF,
-                    mode = 'lines', color=I('black')) %>%
+                    mode = 'lines', color=I('black'),
+                    text = hover(t(bb$Ncapt))) %>%
             add_trace(y = ~Nout, name = 'Calves out', data = dF,
-                    mode = 'lines', color=I('orange')) %>%
+                    mode = 'lines', color=I('orange'),
+                    text = hover(t(bb$Nout))) %>%
             add_trace(y = ~Nin, name = 'Females in', data = dF,
-                line=list(color='grey')) %>%
+                line=list(color='grey'),
+                text = hover(t(bb$Nin))) %>%
             layout(legend = list(x = 100, y = 0)) %>%
             config(displayModeBar = FALSE)
         p

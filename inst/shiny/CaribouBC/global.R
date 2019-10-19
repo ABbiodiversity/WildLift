@@ -78,3 +78,15 @@ HerdsWolf <- c(
     "Quintette" = "Quintette")
 
 FooterText <- "<p>Shiny app made by the <a href='https://github.com/bcgov/CaribouBC'>CaribouBC</a> R package.</p>"
+
+hover <- function(x, d=1) {
+    tot <- round(rowSums(x), d)
+    x <- round(x, d)
+    sapply(seq_along(tot), function(i) {
+        paste0(
+            tot[i], "=[",
+            paste0(x[i,], collapse=","),
+            "]"
+        )
+    })
+}
