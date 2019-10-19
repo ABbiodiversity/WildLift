@@ -90,3 +90,16 @@ hover <- function(x, d=1) {
         )
     })
 }
+
+stack_breeding <- function(x) {
+    tt <- 0:x$tmax
+    rr <- rownames(x$Nin)
+    N <- rbind(
+        data.frame(What="Nin", Year=tt, t(x$Nin)),
+        data.frame(What="Nout", Year=tt, t(x$Nout)),
+        data.frame(What="Ncapt", Year=tt, t(x$Ncapt)),
+        data.frame(What="Nrecip", Year=tt, t(x$Nrecip)),
+        data.frame(What="Nwild", Year=tt, t(x$Nwild)))
+    colnames(N) <- c("Part", "Year", rr)
+    N
+}

@@ -1198,6 +1198,9 @@ server <- function(input, output, session) {
         tab <- cbind(c(tmax = x$tmax,
             pop.start = x$pop.start,
             out.prop=x$out.prop,
+            f.surv.trans=x$f.surv.trans,
+            j.surv.trans=x$j.surv.trans,
+            j.surv.red=x$j.surv.red,
             unlist(s)))
         SNAM <- c(
             "tmax" = "T max",
@@ -1208,7 +1211,10 @@ server <- function(input, output, session) {
             "f.surv.capt" = "Adult female survival, captive",
             "f.preg.wild" = "Pregnancy rate, wild",
             "f.preg.capt" = "Pregnancy rate, captive",
-            "out.prop"="Proportion of calves transferred")
+            "out.prop"="Proportion of calves transferred",
+            "f.surv.trans"="Female survival during transport",
+            "j.surv.trans"="Juvenile survival during transport",
+            "j.surv.red"="Juvenile survival reduction in year 1")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- "Breeding"
@@ -1229,14 +1235,16 @@ server <- function(input, output, session) {
     ## dowload
     breeding_xlslist <- reactive({
         req(breeding_getF())
-        dF <- summary(breeding_getF())
+        bb <- breeding_getF()
+        dF <- summary(bb)
         ss <- breeding_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
             Settings=as.data.frame(ss),
-            TimeSeries=as.data.frame(dF))
+            TimeSeries=as.data.frame(dF),
+            AgeClasses=stack_breeding(bb))
         out$Settings$Parameters <- rownames(ss)
         out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
         out
