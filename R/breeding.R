@@ -54,10 +54,6 @@ pop.start=100) { # wild / recipient population
         age.cens=age.cens,
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max)
-    if (length(out.prop) > 1L)
-        stop("out.prop must be of length 1")
-    if (out.prop < 0 || out.prop > 1)
-        stop("out.prop must be a value between 0 and 1")
     if (f.surv.trans < 0 || f.surv.trans > 1)
         stop("f.surv.trans must be a value between 0 and 1")
     if (j.surv.trans < 0 || j.surv.trans > 1)
@@ -78,6 +74,14 @@ pop.start=100) { # wild / recipient population
     in.inds <- as.integer(in.inds)
     if (any(in.inds < 0))
         stop("in.inds values must not be negative")
+
+    if (length(out.prop) < tmax)
+        out.prop <- c(out.prop,
+            rep(out.prop[length(out.prop)], tmax - length(out.prop)))
+    if (length(out.prop) > tmax)
+        out.prop <- out.prop[seq_len(tmax)]
+    if (any(out.prop < 0) || any(out.prop > 1))
+        stop("out.prop must be a values between 0 and 1")
 
     ## input in yr 0
     N0c <- numeric(age.cens+1)
@@ -136,7 +140,7 @@ pop.start=100) { # wild / recipient population
         Nc[,i+1L] <- Nc[,i+1L] + f.surv.trans * Nin[,i+1L]
 
         ## remove youngs
-        tomove <- floor(out.prop * sum(Nc[out.age+1L,i+1L]))
+        tomove <- floor(out.prop[i] * sum(Nc[out.age+1L,i+1L]))
         ## remove inds one-by-one starting with younger ages
         while(tomove > 0) {
             for (j in sort(out.age)) {

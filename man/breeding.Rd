@@ -48,8 +48,11 @@ integer vector, number of females put into captivity each year.
 are added after the last value (up until year \code{tmax}).
 }
   \item{out.prop}{
-numeric between 0 and 1, the proportion of juveniles
+numeric vector between 0 and 1, the proportion of juveniles
 transferred from the captive to the recipient herd.
+The last value is repeated when length is less than \code{tmax}.
+Can be useful if juvenile transfer should be delayed
+to build up stock first.
 }
   \item{f.surv.trans}{
 numeric between 0 and 1, female survival during transportation
