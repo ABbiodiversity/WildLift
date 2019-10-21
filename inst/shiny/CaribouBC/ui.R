@@ -304,6 +304,7 @@ dashboardPage(
               uiOutput("breeding_years"),
               sliderInput("breeding_ftrans", "Female survival during transport",
                 min = 0, max = 1, value = 1, step = 0.01),
+              uiOutput("breeding_jyears"),
               sliderInput("breeding_jtrans", "Juvenile survival during transport",
                 min = 0, max = 1, value = 1, step = 0.01),
               sliderInput("breeding_jsred", "Transported juvenile survival reduction for 1 year",

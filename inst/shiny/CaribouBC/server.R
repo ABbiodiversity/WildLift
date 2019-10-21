@@ -1099,6 +1099,13 @@ server <- function(input, output, session) {
                 min = 0, max = input$tmax, value = 1, step = 1)
         )
     })
+    output$breeding_jyears <- renderUI({
+        tagList(
+            sliderInput("breeding_jyrs",
+                "Number of years to delay juvenile transfer",
+                min = 0, max = input$tmax, value = 0, step = 1)
+        )
+    })
     output$breeding_demogr_sliders <- renderUI({
         if (input$breeding_herd != "Default")
             return(p("Demography settings not available for specific herds."))
@@ -1151,8 +1158,9 @@ server <- function(input, output, session) {
     })
     ## breeding reduction without penning
     breeding_getF <- reactive({
-        req(input$breeding_yrs, input$breeding_ininds)
+        req(input$breeding_yrs, input$breeding_ininds, input$breeding_jyrs)
         nn <- rep(input$breeding_ininds, input$breeding_yrs)
+        op <- c(rep(0, input$breeding_jyrs), input$breeding_outprop)
         caribou_breeding(values$breeding,
             tmax = input$tmax,
             pop.start = input$popstart,
@@ -1160,7 +1168,7 @@ server <- function(input, output, session) {
             j.surv.trans = input$breeding_jtrans,
             j.surv.red = input$breeding_jsred,
             in.inds = nn,
-            out.prop = input$breeding_outprop)
+            out.prop = op)
     })
     ## plot
     output$breeding_Plot <- renderPlotly({
@@ -1211,7 +1219,7 @@ server <- function(input, output, session) {
             "f.surv.capt" = "Adult female survival, captive",
             "f.preg.wild" = "Pregnancy rate, wild",
             "f.preg.capt" = "Pregnancy rate, captive",
-            "out.prop"="Proportion of calves transferred",
+            #"out.prop"="Proportion of calves transferred",
             "f.surv.trans"="Female survival during transport",
             "j.surv.trans"="Juvenile survival during transport",
             "j.surv.red"="Juvenile survival reduction in year 1")
