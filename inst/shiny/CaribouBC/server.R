@@ -1110,17 +1110,17 @@ server <- function(input, output, session) {
         if (input$breeding_herd != "Default")
             return(p("Demography settings not available for specific herds."))
         tagList(
-            sliderInput("breeding_DemCsc", "Calf survival, captive",
+            sliderInput("breeding_DemCsc", "Calf survival, penned",
                 min = 0, max = 1, value = inits$breeding$c.surv.capt, step = 0.01),
-            sliderInput("breeding_DemCsw", "Calf survival, recipient & wild",
+            sliderInput("breeding_DemCsw", "Calf survival, recipient & status quo",
                 min = 0, max = 1, value = inits$breeding$c.surv.wild, step = 0.01),
-            sliderInput("breeding_DemFsc", "Adult female survival, captive",
+            sliderInput("breeding_DemFsc", "Adult female survival, penned",
                 min = 0, max = 1, value = inits$breeding$f.surv.capt, step = 0.01),
-            sliderInput("breeding_DemFsw", "Adult female survival, recipient & wild",
+            sliderInput("breeding_DemFsw", "Adult female survival, recipient & status quo",
                 min = 0, max = 1, value = inits$breeding$f.surv.wild, step = 0.01),
-            sliderInput("breeding_DemFpc", "Pregnancy rate, captive",
+            sliderInput("breeding_DemFpc", "Pregnancy rate, penned",
                 min = 0, max = 1, value = inits$breeding$f.preg.capt, step = 0.01),
-            sliderInput("breeding_DemFpw", "Pregnancy rate, recipient & wild",
+            sliderInput("breeding_DemFpw", "Pregnancy rate, recipient & status quo",
                 min = 0, max = 1, value = inits$breeding$f.preg.wild, step = 0.01)
         )
     })
@@ -1181,16 +1181,16 @@ server <- function(input, output, session) {
             text = hover(t(bb$Nrecip)),
             hoverinfo = 'text',
             color=I('red')) %>%
-            add_trace(y = ~Nwild, name = 'Wild', data = dF,
+            add_trace(y = ~Nwild, name = 'Status quo', data = dF,
                     mode = 'lines', color=I('blue'),
                     text = hover(t(bb$Nwild))) %>%
-            add_trace(y = ~Ncapt, name = 'Captive', data = dF,
+            add_trace(y = ~Ncapt, name = 'Penned', data = dF,
                     mode = 'lines', color=I('black'),
                     text = hover(t(bb$Ncapt))) %>%
-            add_trace(y = ~Nout, name = 'Calves out', data = dF,
+            add_trace(y = ~Nout, name = 'Juvenile females out', data = dF,
                     mode = 'lines', color=I('orange'),
                     text = hover(t(bb$Nout))) %>%
-            add_trace(y = ~Nin, name = 'Females in', data = dF,
+            add_trace(y = ~Nin, name = 'Adult females in', data = dF,
                 line=list(color='grey'),
                 text = hover(t(bb$Nin))) %>%
             layout(legend = list(x = 100, y = 0)) %>%
@@ -1214,15 +1214,15 @@ server <- function(input, output, session) {
             "tmax" = "T max",
             "pop.start" = "N start",
             "c.surv.wild" = "Calf survival, wild",
-            "c.surv.capt" = "Calf survival, captive",
+            "c.surv.capt" = "Calf survival, penned",
             "f.surv.wild" = "Adult female survival, wild",
-            "f.surv.capt" = "Adult female survival, captive",
+            "f.surv.capt" = "Adult female survival, penned",
             "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate, captive",
+            "f.preg.capt" = "Pregnancy rate, penned",
             #"out.prop"="Proportion of calves transferred",
-            "f.surv.trans"="Female survival during transport",
-            "j.surv.trans"="Juvenile survival during transport",
-            "j.surv.red"="Juvenile survival reduction in year 1")
+            "f.surv.trans"="Adult female survival during capture/transport",
+            "j.surv.trans"="Juvenile female survival during capture/transport",
+            "j.surv.red"="Juvenile female survival reduction in year 1")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- "Breeding"
@@ -1232,7 +1232,7 @@ server <- function(input, output, session) {
     output$breeding_Table <- renderTable({
         req(breeding_getF())
         dF <- summary(breeding_getF())[,-(1:3)]
-        colnames(dF) <- c("Captive", "Recipient", "Wild")
+        colnames(dF) <- c("Penned", "Recipient", "Status quo")
         N0 <- dF[nrow(dF)-1L,,drop=FALSE]
         N1 <- dF[nrow(dF),,drop=FALSE]
         df <- rbind('N'=N1, '&lambda;'=round(N1/N0, 3))

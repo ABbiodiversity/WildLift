@@ -19,7 +19,7 @@ dashboardPage(
       menuItem("Predator exclosure", tabName = "predator"),
       menuItem("Moose reduction", tabName = "moose"),
       menuItem("Wolf reduction", tabName = "wolf"),
-      menuItem("Captive breeding", tabName = "breeding")
+      menuItem("Conservation breeding", tabName = "breeding")
     )
   ),
   dashboardBody(
@@ -274,7 +274,7 @@ dashboardPage(
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Summary: captive breeding",
+              title = "Summary: conservation breeding",
               tableOutput("breeding_Table"),
               downloadButton("breeding_download", "Download results as Excel file"),
               bsTooltip("breeding_Table",
@@ -295,19 +295,19 @@ dashboardPage(
               bsTooltip("breeding_herd",
                 "Select a herd for herd specific demography parameters.",
                 placement="top"),
-              sliderInput("breeding_outprop", "Proportion of juveniles transferred",
+              sliderInput("breeding_outprop", "Proportion of juvenile females captured/transferred",
                 min = 0, max = 1, value = 0.5, step = 0.01),
               bsTooltip("breeding_outprop",
-                "The proportion of juveniles transferred from the captive to the recipient herd."),
-              sliderInput("breeding_ininds", "Number of females put into captivity each year (max)",
+                "The proportion of juvenile females captured/transferred from the captive to the recipient herd."),
+              sliderInput("breeding_ininds", "Number of females put into pen each year (max)",
                 min = 0, max = 20, value = 10, step = 1),
               uiOutput("breeding_years"),
-              sliderInput("breeding_ftrans", "Female survival during transport",
+              sliderInput("breeding_ftrans", "Adult female survival during capture/transport",
                 min = 0, max = 1, value = 1, step = 0.01),
               uiOutput("breeding_jyears"),
-              sliderInput("breeding_jtrans", "Juvenile survival during transport",
+              sliderInput("breeding_jtrans", "Juvenile female survival during capture/transport",
                 min = 0, max = 1, value = 1, step = 0.01),
-              sliderInput("breeding_jsred", "Transported juvenile survival reduction for 1 year",
+              sliderInput("breeding_jsred", "Transported juvenile female survival reduction for 1 year after transport",
                 min = 0, max = 1, value = 1, step = 0.01)
             ),
             box(

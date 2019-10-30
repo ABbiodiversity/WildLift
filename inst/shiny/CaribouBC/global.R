@@ -40,7 +40,8 @@ inits <- list(
         c.surv.capt=0.295,
         c.surv.wild=0.295),
     breeding = caribou_settings("mat.pen",
-        c.surv.capt=0.7)
+        c.surv.capt=0.7,
+        c.surv.wild=0.25)
 )
 
 get_settings <- function(x, use_perc=TRUE) {
