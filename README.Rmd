@@ -22,8 +22,6 @@ knitr::opts_chunk$set(
 Try the [Shiny app](https://psolymos.shinyapps.io/CaribouBC/) or run locally as 
 `shiny::runGitHub("bcgov/CaribouBC", subdir = "inst/shiny/matpen")`.
 
-![](caribou.gif)
-
 ## Installation
 
 Stable version:
