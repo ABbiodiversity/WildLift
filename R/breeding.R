@@ -20,7 +20,7 @@ age.cens=3, age.1st.litter=3, age.calf.max=1) {
     }
     for (i in seq_len(age.cens)+1L) {
         if (i > age.1st.litter)
-            A[1L, i] <- 0.5*preg.f*surv.f
+            A[1L, i] <- 0.5*preg.f*surv.f # 0.5x b/c we only track females
     }
     A[age.cens+1L, age.cens+1L] <- if (age.cens+1L > age.calf.max)
         surv.f else surv.c

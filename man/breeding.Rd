@@ -5,10 +5,10 @@
 \alias{summary.caribou_breeding}
 \alias{plot.caribou_breeding}
 \title{
-Caribou Captive Breeding
+Caribou Conservation Breeding
 }
 \description{
-Functions evaluate different options for captive breeding.
+Functions evaluate different options for conservation breeding.
 }
 \usage{
 caribou_matrix(settings, wild=TRUE,
@@ -28,7 +28,7 @@ caribou_breeding(settings,
 a settings object returned by \code{\link{caribou_settings}}.
 }
   \item{wild}{
-logical, whether to use the captive or wild vital \code{settings}.
+logical, whether to use the penned or wild vital \code{settings}.
 }
   \item{age.cens}{
 censoring age. The projection matrix will contain one-year
@@ -43,35 +43,36 @@ integer, maximum age class to be considered as calf, [0-2) by default
 (i.e. age class starting with year 1).
 }
   \item{in.inds}{
-integer vector, number of females put into captivity each year.
+integer vector, number of adult females put into pen each year.
 0s are appended to the value meaning that no females
 are added after the last value (up until year \code{tmax}).
 }
   \item{out.prop}{
-numeric vector between 0 and 1, the proportion of juveniles
-transferred from the captive to the recipient herd.
+numeric vector between 0 and 1, the proportion of juvenile females
+transferred from the penned to the recipient herd.
 The last value is repeated when length is less than \code{tmax}.
-Can be useful if juvenile transfer should be delayed
+Can be useful if juvenile female transfer should be delayed
 to build up stock first.
 }
   \item{f.surv.trans}{
-numeric between 0 and 1, female survival during transportation
-into the captive population.
+numeric between 0 and 1, adult female survival during
+capture and transportation into the penned population.
 }
   \item{j.surv.trans}{
-numeric between 0 and 1, juvenile survival during transportation
-from captive to recipient herd.
+numeric between 0 and 1, juvenile female survival during
+capture and transportation from penned to recipient herd.
 }
   \item{j.surv.red}{
 numeric between 0 and 1,
-transported juv survival reduction factor for 1 year following traportation.
+transported juvenile female survival reduction factor
+for 1 year following capture and traportation.
 }
   \item{tmax}{
 positive integer, number of years to forecast after initial year 0.
 }
   \item{pop.start}{
 positive integer, initial population size in year 0 for the
-recipient and wild populations.
+recipient and status quo populations (wild not receiving females).
 }
   \item{x, object}{
 an object to print, summarize, plot, etc.
@@ -84,31 +85,36 @@ additional arguments to functions.
 }
 }
 \details{
-The captive breeding functionality is based on vital rates
+The conservation breeding functionality is based on vital rates
 provided via the \code{settings} argument.
 These rates are turned into a projection matrix
-using \code{caribou_matrix}.
+using \code{caribou_matrix}. This projection matrix
+reflects survival and reproduction rates based on
+the settings, tracking females only based on a sex ratio of 0.5.
 
 The \code{caribou_breeding} function tracks changes
-in the captive population starting with adding
+in the conservation population starting with adding
 females to produce offspring.
 
-Calves are transferred to the recipient herd.
-The proportion of calves transferred can be changed through \code{out.prop}
-(0: none, 1: all).
+Juvenile females are captured and transferred to the recipient herd.
+The proportion of juvenile females transferred can be changed through
+\code{out.prop} (0: none, 1: all).
 
-The output object tracks the individuals added to the captive population,
-and the individuals transferred from the captive to the recipient herd.
-Besides these, a wild population trajectory is used as a reference.
-This wild population uses the same vital rates as the recipient herd,
-but does not get the extra calves from the breeding population.
+The output object tracks the number of adult females added to the
+penned population, and the number of juvenile females captured transferred
+from the penned to the recipient herd.
+
+Besides these, a status quo (wild without receiving juveniles)
+population trajectory is used as a reference.
+This status quo population uses the same vital rates as the recipient herd,
+but does not get the extra juvenile females from the penned population.
 }
 \value{
 \code{caribou_matrix} returns a projection matrix.
 
 \code{caribou_breeding} returns a captive breeding object.
 It contains age specific population sizes for the
-captive, recipient, and wild populations.
+penned, recipient, and status quo populations (females only).
 
 The \code{print} method returns the input object \code{x} invisibly.
 
@@ -128,7 +134,7 @@ s <- caribou_settings()
 caribou_matrix(s, wild=TRUE)  # wild
 caribou_matrix(s, wild=FALSE) # captive
 
-## out.prop = 0.5: move half of the youngs
+## out.prop = 0.5: move half of the juveniles
 x0 <- caribou_breeding(s,
     tmax = 20,        # projection horizon
     in.inds = rep(10, 5),
@@ -136,7 +142,7 @@ x0 <- caribou_breeding(s,
 x0
 summary(x0)
 
-## out.prop = 1: move all youngs
+## out.prop = 1: move all juveniles
 x1 <- update(x0, out.prop = 1)
 x1
 
