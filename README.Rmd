@@ -80,30 +80,6 @@ par(op)
 ## - or a vector of individuals for subsequent years
 caribou_forecast(s1, fpen.inds = 5)
 caribou_forecast(s2, fpen.inds = c(5, 0, 4, 6))
-
-## Create projection matrices
-s <- caribou_settings()
-caribou_matrix(s, wild=TRUE)  # wild
-caribou_matrix(s, wild=FALSE) # captive
-
-## Compare scenarios for captive breeding
-## out.prop = 0: move only N[t]-in.max youngs
-x0 <- caribou_breeding(s,
-    tmax = 20,        # projection horizon
-    in.inds = rep(10, 5),
-    out.prop = 0.5)
-x0
-summary(x0)
-
-## out.prop = 1: move all youngs
-x1 <- update(x0, out.prop = 1)
-x1
-
-## Visualize the 2 scenarios
-op <- par(mfrow=c(1, 2))
-plot(x0, main="out.prop = 0")
-plot(x1, main="out.prop = 1")
-par(op)
 ```
 
 ## Getting Help or Reporting an Issue
