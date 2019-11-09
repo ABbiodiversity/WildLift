@@ -101,7 +101,7 @@ The proportion of juvenile females transferred can be changed through
 \code{out.prop} (0: none, 1: all).
 
 The output object tracks the number of adult females added to the
-penned population, and the number of juvenile females captured transferred
+penned population, and the number of juvenile females transferred
 from the penned to the recipient herd.
 
 Besides these, a status quo (wild without receiving juveniles)
@@ -112,14 +112,14 @@ but does not get the extra juvenile females from the penned population.
 \value{
 \code{caribou_matrix} returns a projection matrix.
 
-\code{caribou_breeding} returns a captive breeding object.
+\code{caribou_breeding} returns a conservation breeding object.
 It contains age specific population sizes for the
 penned, recipient, and status quo populations (females only).
 
 The \code{print} method returns the input object \code{x} invisibly.
 
 The \code{summary} method returns population summaries
-for the captive breeding object.
+for the conservation breeding object.
 
 The \code{plot} method return the plotted data invisibly
 and produces a plot as a side effect.
