@@ -10,8 +10,8 @@ age.cens=3, age.1st.litter=3, age.calf.max=1) {
         surv.f <- settings$f.surv.capt
         preg.f <- settings$f.preg.capt
     }
-    if (age.1st.litter < age.calf.max)
-        stop("age.1st.litter must be >= age.calf.max")
+    if (age.1st.litter <= age.calf.max)
+        stop("age.1st.litter must be > age.calf.max")
     # i=1 is [0,1), i=2 is [1,2)
     A <- matrix(0, age.cens+1, age.cens+1)
     for (i in seq_len(age.cens)) {
