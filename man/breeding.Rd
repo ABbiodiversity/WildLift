@@ -36,11 +36,12 @@ age classes up to \code{age.cens}, all age classes above
 this are combined into a single age class.
 }
   \item{age.1st.litter}{
-integer, female age class at 1st litter.
+integer, female age at 1st litter; lower limit of the age class,
+default is 3 years, i.e. the [3, Inf] interval.
 }
   \item{age.calf.max}{
-integer, maximum age class to be considered as calf, [0-2) by default
-(i.e. age class starting with year 1).
+integer, maximum age to be considered as calf;
+upper limit of the age class, default is 1 year, i.e. the [0, 1) interval.
 }
   \item{in.inds}{
 integer vector, number of adult females put into pen each year.
