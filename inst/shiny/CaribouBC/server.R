@@ -1233,9 +1233,15 @@ server <- function(input, output, session) {
         req(breeding_getF())
         dF <- summary(breeding_getF())[,-(1:3)]
         colnames(dF) <- c("Penned", "Recipient", "Status quo")
-        N0 <- dF[nrow(dF)-1L,,drop=FALSE]
-        N1 <- dF[nrow(dF),,drop=FALSE]
-        df <- rbind('N'=N1, '&lambda;'=round(N1/N0, 3))
+        N0 <- dF[1,,drop=FALSE]
+        Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
+        Ntmax <- dF[nrow(dF),,drop=FALSE]
+        df <- rbind(
+            'N'=Ntmax,
+            '&lambda; (N<sub>tmax</sub>/N<sub>tmax-1</sub>)'=round(Ntmax/Ntmax1, 3),
+            '&lambda; (N<sub>tmax</sub>/N<sub>0</sub>)'=round(Ntmax/N0, 3))
+        df[3,1] <- NA
+        df
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
     sanitize.text.function = function(x) x)
