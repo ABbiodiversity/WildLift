@@ -1238,9 +1238,8 @@ server <- function(input, output, session) {
         Ntmax <- dF[nrow(dF),,drop=FALSE]
         df <- rbind(
             'N'=Ntmax,
-            '&lambda; (N<sub>tmax</sub>/N<sub>tmax-1</sub>)'=round(Ntmax/Ntmax1, 3),
-            '&lambda; (N<sub>tmax</sub>/N<sub>0</sub>)'=round(Ntmax/N0, 3))
-        df[3,1] <- NA
+            '&lambda;'=round(Ntmax/Ntmax1, 3))
+        df[2,2] <- round((Ntmax/N0)^(1/nrow(dF)), 3)[2]
         df
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
