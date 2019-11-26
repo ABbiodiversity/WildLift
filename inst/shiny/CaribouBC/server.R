@@ -1095,7 +1095,7 @@ server <- function(input, output, session) {
     output$breeding_years <- renderUI({
         tagList(
             sliderInput("breeding_yrs",
-                "Number of years to put females in captivity",
+                "Number of years females are added to the facility",
                 min = 0, max = input$tmax, value = 1, step = 1)
         )
     })
@@ -1222,7 +1222,7 @@ server <- function(input, output, session) {
             #"out.prop"="Proportion of calves transferred",
             "f.surv.trans"="Adult female survival during capture/transport",
             "j.surv.trans"="Juvenile female survival during capture/transport",
-            "j.surv.red"="Juvenile female survival reduction in year 1")
+            "j.surv.red"="Relative reduction in survival of juvenile females transported to recipient herd for 1 year after transport")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- "Breeding"

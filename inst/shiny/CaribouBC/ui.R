@@ -299,7 +299,7 @@ dashboardPage(
                 min = 0, max = 1, value = 0.5, step = 0.01),
               bsTooltip("breeding_outprop",
                 "The proportion of juvenile females captured/transferred from the captive to the recipient herd."),
-              sliderInput("breeding_ininds", "Number of females put into pen each year (max)",
+              sliderInput("breeding_ininds", "Number of females put into facility each year (max)",
                 min = 0, max = 20, value = 10, step = 1),
               uiOutput("breeding_years"),
               sliderInput("breeding_ftrans", "Adult female survival during capture/transport",
@@ -307,7 +307,7 @@ dashboardPage(
               uiOutput("breeding_jyears"),
               sliderInput("breeding_jtrans", "Juvenile female survival during capture/transport",
                 min = 0, max = 1, value = 1, step = 0.01),
-              sliderInput("breeding_jsred", "Transported juvenile female survival reduction for 1 year after transport",
+              sliderInput("breeding_jsred", "Relative reduction in survival of juvenile females transported to recipient herd for 1 year after transport",
                 min = 0, max = 1, value = 1, step = 0.01)
             ),
             box(
