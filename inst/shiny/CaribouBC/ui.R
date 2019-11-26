@@ -278,7 +278,7 @@ dashboardPage(
               tableOutput("breeding_Table"),
               downloadButton("breeding_download", "Download results as Excel file"),
               bsTooltip("breeding_Table",
-                "Table summarizing reports. &lambda; is defined based on the last 2 years for penned and as (N<sub>t</sub>/N<sub>0</sub>)<sup>1/t</sup> otherwise. Click below to download the full summary.",
+                "Table summarizing reports. &lambda; is defined based on the last 2 years in facility or as (N<sub>t</sub>/N<sub>0</sub>)<sup>1/t</sup> otherwise. Click below to download the full summary.",
                 placement="right"),
               bsTooltip("breeding_download",
                 "Click here to download results.",

@@ -1110,15 +1110,15 @@ server <- function(input, output, session) {
         if (input$breeding_herd != "Default")
             return(p("Demography settings not available for specific herds."))
         tagList(
-            sliderInput("breeding_DemCsc", "Calf survival, penned",
+            sliderInput("breeding_DemCsc", "Calf survival in facility",
                 min = 0, max = 1, value = inits$breeding$c.surv.capt, step = 0.01),
             sliderInput("breeding_DemCsw", "Calf survival, recipient & status quo",
                 min = 0, max = 1, value = inits$breeding$c.surv.wild, step = 0.01),
-            sliderInput("breeding_DemFsc", "Adult female survival, penned",
+            sliderInput("breeding_DemFsc", "Adult female survivalin facility",
                 min = 0, max = 1, value = inits$breeding$f.surv.capt, step = 0.01),
             sliderInput("breeding_DemFsw", "Adult female survival, recipient & status quo",
                 min = 0, max = 1, value = inits$breeding$f.surv.wild, step = 0.01),
-            sliderInput("breeding_DemFpc", "Pregnancy rate, penned",
+            sliderInput("breeding_DemFpc", "Pregnancy ratein facility",
                 min = 0, max = 1, value = inits$breeding$f.preg.capt, step = 0.01),
             sliderInput("breeding_DemFpw", "Pregnancy rate, recipient & status quo",
                 min = 0, max = 1, value = inits$breeding$f.preg.wild, step = 0.01)
@@ -1184,7 +1184,7 @@ server <- function(input, output, session) {
             add_trace(y = ~Nwild, name = 'Status quo', data = dF,
                     mode = 'lines', color=I('blue'),
                     text = hover(t(bb$Nwild))) %>%
-            add_trace(y = ~Ncapt, name = 'Penned', data = dF,
+            add_trace(y = ~Ncapt, name = 'Inside facility', data = dF,
                     mode = 'lines', color=I('black'),
                     text = hover(t(bb$Ncapt))) %>%
             add_trace(y = ~Nout, name = 'Juvenile females out', data = dF,
@@ -1214,11 +1214,11 @@ server <- function(input, output, session) {
             "tmax" = "T max",
             "pop.start" = "N start",
             "c.surv.wild" = "Calf survival, wild",
-            "c.surv.capt" = "Calf survival, penned",
+            "c.surv.capt" = "Calf survival in facility",
             "f.surv.wild" = "Adult female survival, wild",
-            "f.surv.capt" = "Adult female survival, penned",
+            "f.surv.capt" = "Adult female survival in facility",
             "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate, penned",
+            "f.preg.capt" = "Pregnancy rate in facility",
             #"out.prop"="Proportion of calves transferred",
             "f.surv.trans"="Adult female survival during capture/transport",
             "j.surv.trans"="Juvenile female survival during capture/transport",
@@ -1232,7 +1232,7 @@ server <- function(input, output, session) {
     output$breeding_Table <- renderTable({
         req(breeding_getF())
         dF <- summary(breeding_getF())[,-(1:3)]
-        colnames(dF) <- c("Penned", "Recipient", "Status quo")
+        colnames(dF) <- c("In facility", "Recipient", "Status quo")
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
