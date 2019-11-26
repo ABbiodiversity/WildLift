@@ -284,7 +284,7 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'No maternity pen',
                 mode = 'lines', color=I('blue')) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         if (values$penning_compare) {
             df0 <- plot(penning_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Maternity pen, reference', data = df0,
@@ -602,7 +602,7 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'No predator exclosure',
                 mode = 'lines', color=I('blue')) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         if (values$predator_compare) {
             df0 <- plot(predator_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Predator exclosure, reference', data = df0,
@@ -853,7 +853,7 @@ server <- function(input, output, session) {
             add_trace(y = ~Npen, name = 'No moose reduction, penned', data = dB,
                 line=list(dash = 'dash', color='blue')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
     ## table
@@ -1036,7 +1036,7 @@ server <- function(input, output, session) {
             add_trace(y = ~Npen, name = 'No wolf reduction', data = dB0,
                     mode = 'lines', color=I('blue')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
     ## table
@@ -1095,32 +1095,25 @@ server <- function(input, output, session) {
     output$breeding_years <- renderUI({
         tagList(
             sliderInput("breeding_yrs",
-                "Number of years females are added to the facility",
+                "Number of years to put females in captivity",
                 min = 0, max = input$tmax, value = 1, step = 1)
-        )
-    })
-    output$breeding_jyears <- renderUI({
-        tagList(
-            sliderInput("breeding_jyrs",
-                "Number of years to delay juvenile transfer",
-                min = 0, max = input$tmax, value = 0, step = 1)
         )
     })
     output$breeding_demogr_sliders <- renderUI({
         if (input$breeding_herd != "Default")
             return(p("Demography settings not available for specific herds."))
         tagList(
-            sliderInput("breeding_DemCsc", "Calf survival in facility",
+            sliderInput("breeding_DemCsc", "Calf survival, captive",
                 min = 0, max = 1, value = inits$breeding$c.surv.capt, step = 0.01),
-            sliderInput("breeding_DemCsw", "Calf survival, recipient & status quo",
+            sliderInput("breeding_DemCsw", "Calf survival, recipient & wild",
                 min = 0, max = 1, value = inits$breeding$c.surv.wild, step = 0.01),
-            sliderInput("breeding_DemFsc", "Adult female survivalin facility",
+            sliderInput("breeding_DemFsc", "Adult female survival, captive",
                 min = 0, max = 1, value = inits$breeding$f.surv.capt, step = 0.01),
-            sliderInput("breeding_DemFsw", "Adult female survival, recipient & status quo",
+            sliderInput("breeding_DemFsw", "Adult female survival, recipient & wild",
                 min = 0, max = 1, value = inits$breeding$f.surv.wild, step = 0.01),
-            sliderInput("breeding_DemFpc", "Pregnancy ratein facility",
+            sliderInput("breeding_DemFpc", "Pregnancy rate, captive",
                 min = 0, max = 1, value = inits$breeding$f.preg.capt, step = 0.01),
-            sliderInput("breeding_DemFpw", "Pregnancy rate, recipient & status quo",
+            sliderInput("breeding_DemFpw", "Pregnancy rate, recipient & wild",
                 min = 0, max = 1, value = inits$breeding$f.preg.wild, step = 0.01)
         )
     })
@@ -1158,9 +1151,8 @@ server <- function(input, output, session) {
     })
     ## breeding reduction without penning
     breeding_getF <- reactive({
-        req(input$breeding_yrs, input$breeding_ininds, input$breeding_jyrs)
+        req(input$breeding_yrs, input$breeding_ininds)
         nn <- rep(input$breeding_ininds, input$breeding_yrs)
-        op <- c(rep(0, input$breeding_jyrs), input$breeding_outprop)
         caribou_breeding(values$breeding,
             tmax = input$tmax,
             pop.start = input$popstart,
@@ -1168,33 +1160,26 @@ server <- function(input, output, session) {
             j.surv.trans = input$breeding_jtrans,
             j.surv.red = input$breeding_jsred,
             in.inds = nn,
-            out.prop = op)
+            out.prop = input$breeding_outprop)
     })
     ## plot
     output$breeding_Plot <- renderPlotly({
         req(breeding_getF())
-        bb <- breeding_getF()
-        dF <- summary(bb)
+        dF <- summary(breeding_getF())
         colnames(dF)[colnames(dF) == "Nrecip"] <- "Individuals"
         p <- plot_ly(dF, x = ~Years, y = ~Individuals,
             name = 'Recipient', type = 'scatter', mode = 'lines',
-            text = hover(t(bb$Nrecip)),
-            hoverinfo = 'text',
             color=I('red')) %>%
-            add_trace(y = ~Nwild, name = 'Status quo', data = dF,
-                    mode = 'lines', color=I('blue'),
-                    text = hover(t(bb$Nwild))) %>%
-            add_trace(y = ~Ncapt, name = 'Inside facility', data = dF,
-                    mode = 'lines', color=I('black'),
-                    text = hover(t(bb$Ncapt))) %>%
-            add_trace(y = ~Nout, name = 'Juvenile females out', data = dF,
-                    mode = 'lines', color=I('orange'),
-                    text = hover(t(bb$Nout))) %>%
-            add_trace(y = ~Nin, name = 'Adult females in', data = dF,
-                line=list(color='grey'),
-                text = hover(t(bb$Nin))) %>%
+            add_trace(y = ~Nwild, name = 'Wild', data = dF,
+                    mode = 'lines', color=I('blue')) %>%
+            add_trace(y = ~Ncapt, name = 'Captive', data = dF,
+                    mode = 'lines', color=I('black')) %>%
+            add_trace(y = ~Nout, name = 'Calves out', data = dF,
+                    mode = 'lines', color=I('orange')) %>%
+            add_trace(y = ~Nin, name = 'Females in', data = dF,
+                line=list(color='grey')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
     ## making nice table of the settings
@@ -1206,23 +1191,17 @@ server <- function(input, output, session) {
         tab <- cbind(c(tmax = x$tmax,
             pop.start = x$pop.start,
             out.prop=x$out.prop,
-            f.surv.trans=x$f.surv.trans,
-            j.surv.trans=x$j.surv.trans,
-            j.surv.red=x$j.surv.red,
             unlist(s)))
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
             "c.surv.wild" = "Calf survival, wild",
-            "c.surv.capt" = "Calf survival in facility",
+            "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
-            "f.surv.capt" = "Adult female survival in facility",
+            "f.surv.capt" = "Adult female survival, captive",
             "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate in facility",
-            #"out.prop"="Proportion of calves transferred",
-            "f.surv.trans"="Adult female survival during capture/transport",
-            "j.surv.trans"="Juvenile female survival during capture/transport",
-            "j.surv.red"="Relative reduction in survival of juvenile females transported to recipient herd for 1 year after transport")
+            "f.preg.capt" = "Pregnancy rate, captive",
+            "out.prop"="Proportion of calves transferred")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- "Breeding"
@@ -1232,15 +1211,10 @@ server <- function(input, output, session) {
     output$breeding_Table <- renderTable({
         req(breeding_getF())
         dF <- summary(breeding_getF())[,-(1:3)]
-        colnames(dF) <- c("In facility", "Recipient", "Status quo")
-        N0 <- dF[1,,drop=FALSE]
-        Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
-        Ntmax <- dF[nrow(dF),,drop=FALSE]
-        df <- rbind(
-            'N'=Ntmax,
-            '&lambda;'=round(Ntmax/Ntmax1, 3))
-        df[2,2] <- round((Ntmax/N0)^(1/nrow(dF)), 3)[2]
-        df
+        colnames(dF) <- c("Captive", "Recipient", "Wild")
+        N0 <- dF[nrow(dF)-1L,,drop=FALSE]
+        N1 <- dF[nrow(dF),,drop=FALSE]
+        df <- rbind('N'=N1, '&lambda;'=round(N1/N0, 3))
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
     sanitize.text.function = function(x) x)
@@ -1248,16 +1222,14 @@ server <- function(input, output, session) {
     ## dowload
     breeding_xlslist <- reactive({
         req(breeding_getF())
-        bb <- breeding_getF()
-        dF <- summary(bb)
+        dF <- summary(breeding_getF())
         ss <- breeding_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
             Settings=as.data.frame(ss),
-            TimeSeries=as.data.frame(dF),
-            AgeClasses=stack_breeding(bb))
+            TimeSeries=as.data.frame(dF))
         out$Settings$Parameters <- rownames(ss)
         out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
         out
