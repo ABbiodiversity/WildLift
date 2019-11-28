@@ -284,7 +284,7 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'No maternity pen',
                 mode = 'lines', color=I('blue')) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         if (values$penning_compare) {
             df0 <- plot(penning_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Maternity pen, reference', data = df0,
@@ -602,7 +602,7 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'No predator exclosure',
                 mode = 'lines', color=I('blue')) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         if (values$predator_compare) {
             df0 <- plot(predator_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Predator exclosure, reference', data = df0,
@@ -853,7 +853,7 @@ server <- function(input, output, session) {
             add_trace(y = ~Npen, name = 'No moose reduction, penned', data = dB,
                 line=list(dash = 'dash', color='blue')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
     ## table
@@ -1036,7 +1036,7 @@ server <- function(input, output, session) {
             add_trace(y = ~Npen, name = 'No wolf reduction', data = dB0,
                     mode = 'lines', color=I('blue')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
     ## table
@@ -1194,7 +1194,7 @@ server <- function(input, output, session) {
                 line=list(color='grey'),
                 text = hover(t(bb$Nin))) %>%
             layout(legend = list(x = 100, y = 0)) %>%
-            config(displayModeBar = FALSE)
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
     ## making nice table of the settings
