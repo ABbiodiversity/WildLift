@@ -18,12 +18,13 @@ forecasting, and to inspect the results.
 }
 \usage{
 caribou_settings(pen.type = c("mat.pen",  "pred.excl",
-    "moose.red"), herd = NULL, ...)
+    "moose.red", "wolf.red"), herd = NULL, ...)
 
 caribou_forecast(settings, tmax = 20, pop.start = 100,
-    fpen.prop = 0)
+    fpen.prop, fpen.inds)
 
-caribou_breakeven(forecast, lambda = 1, tol = 0.001)
+caribou_breakeven(forecast, lambda=1,
+    type=c("prop", "inds"), max=10^4, tol=0.01)
 
 \method{print}{caribou_settings}(x, ...)
 \method{print}{caribou_forecast}(x, ...)
@@ -35,14 +36,23 @@ caribou_breakeven(forecast, lambda = 1, tol = 0.001)
 }
 \arguments{
   \item{pen.type}{
-character: maternity penning, predator exclusion, or moose reduction.
+character: maternity penning, predator exclusion, moose reduction,
+or wolf reduction.
 It can also be a settings object.
 }
   \item{herd}{
-\code{NULL} (default) or character (herd name: one of
+\code{NULL} (default) or character. The following herds are available:
 \code{"ColumbiaNorth"}, \code{"ColumbiaSouth"},
 \code{"FrisbyQueest"}, \code{"WellsGreySouth"},
-\code{"Groundhog"}, \code{"Parsnip"}).
+\code{"Groundhog"}, \code{"Parsnip"},
+\code{"KennedySiding"}, \code{"KlinsezaMoberly"}, \code{"Quintette"}.
+Note: only \code{"KennedySiding"}, \code{"KlinsezaMoberly"},
+or \code{"Quintette"} can be selected when \code{pen.type = "wolf.red"},
+beside a generic herd setting when herd is \code{NULL} that is
+specific to the 'wolf removal' treatment type (wild, i.e. 'no wolf removal'
+settings for these herds are available under the default
+\code{pen.type = "mat.pen"} treatment but no separate generic herd
+settings are provided for the 'no wolf removal' treatment).
 }
   \item{settings}{
 a settings object returned by \code{caribou_settings}.
@@ -53,14 +63,30 @@ positive integer, number of years to forecast after initial year 0.
   \item{pop.start}{
 positive integer, initial population size in year 0.
 }
-  \item{fpen.prop}{
-numeric between 0 and 1, proportion of females penned.
+  \item{fpen.prop, fpen.inds}{
+\code{fpen.prop} is a single numeric value between 0 and 1
+for the proportion of females penned;
+\code{fpen.inds} is a non-negative integer
+for the number of females penned, can be a vector giving
+number of females penned in each year to be accumulated.
+Only one of \code{fpen.prop} or \code{fpen.inds} can be provided at a time.
+Any of the two arguments can be \code{NULL} or missing, but
+not both at the same time.
 }
   \item{forecast}{
 a forecast object returned by \code{caribou_forecast}.
 }
   \item{lambda}{
 numeric, annual intrinsic growth rate, must be >0.
+}
+  \item{type}{
+what to provide as output: proportion (\code{"prop"})
+or numbers (\code{"inds"}) of females penned
+at breakeven point.
+}
+  \item{max}{
+numeric (>0), maximum value for breakeven optimization when
+\code{type = "inds"}.
 }
   \item{tol}{
 numeric, tolerance limit, i.e. the maximum acceptable deviation
@@ -120,7 +146,7 @@ The following demographic parameters can be set by \code{caribou_settings}:
 \code{caribou_breakeven} returns a numeric value representing the
 'breakeven' proportion of females penned where \code{lambda}
 is within \code{tol}erance. It returns \code{NA} when
-proportion satisfying the \code{lambda} critrion cannot be found,
+proportion satisfying the \code{lambda} criterion cannot be found,
 alongside a warning.
 
 The \code{print} method returns the input object \code{x} invisibly.
@@ -132,6 +158,9 @@ The \code{plot} and \code{lines} methods return the plotted data invisibly
 (years, pen and no-pen population size for \code{plot};
 years, pen or no-pen population size for \code{lines}).
 Both methods produce plots as a side effect.
+}
+\seealso{
+\code{\link{caribou_matrix}}, \code{\link{caribou_breeding}}
 }
 \examples{
 ## Predefined settings

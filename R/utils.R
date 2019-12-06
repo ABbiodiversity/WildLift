@@ -1,14 +1,24 @@
+## methods for caribou_settings
+
 print.caribou_settings <- function(x, ...) {
     cat("Caribou settings - pen type:", attr(x, "pen.type"),
         "\n\n")
-    str(x,
+    str(x[names(x) != "call"],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     invisible(x)
 }
+
+## methods for caribou_forecast
+
 print.caribou_forecast <- function(x, ...) {
     cat("Caribou forecast - pen type:", attr(x$settings, "pen.type"),
         "\n\n")
-    str(x[c("tmax", "pop.start", "fpen.prop")],
+    WHAT <- if (is.null(x$fpen.prop)) {
+        c("tmax", "pop.start", "fpen.inds")
+    } else {
+        c("tmax", "pop.start", "fpen.prop")
+    }
+    str(x[WHAT],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     invisible(x)
 }
@@ -30,13 +40,20 @@ lines.caribou_forecast <- function(x, pen=TRUE, plot=TRUE, ...) {
 }
 summary.caribou_forecast <- function(object, ...) {
     object$Npop <- NULL
+    object$call <- NULL
+    object$settings$call <- NULL
     class(object) <- "summary.caribou_forecast"
     object
 }
 print.summary.caribou_forecast <- function(x, ...) {
     cat("Caribou forecast - pen type:", attr(x$settings, "pen.type"),
         "\n\n")
-    str(x[c("tmax", "pop.start", "fpen.prop")],
+    WHAT <- if (is.null(x$fpen.prop)) {
+        c("tmax", "pop.start", "fpen.inds")
+    } else {
+        c("tmax", "pop.start", "fpen.prop")
+    }
+    str(x[WHAT],
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     cat("\n")
     str(x[c("npens", "lam.pen", "lam.nopen",
@@ -44,3 +61,39 @@ print.summary.caribou_forecast <- function(x, ...) {
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     invisible(x)
 }
+
+## methods for caribou_breeding
+
+print.caribou_breeding <- function(x, ...) {
+    cat("Caribou captive breeding:\n\n")
+    WHAT <- c("tmax", "pop.start",
+        "f.surv.trans", "j.surv.trans", "j.surv.red")
+    str(x[WHAT],
+        give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
+    cat("\n")
+    N <- x$population[x$tmax:(x$tmax+1L), c("Ncapt", "Nrecip", "Nwild")]
+    m <- rbind(N=N[2L,], lambda=N[2L,]/N[1L,])
+    colnames(m) <- c("capt", "recip", "wild")
+    print(format(m, digits=getOption("digits")-3L))
+    invisible(x)
+}
+
+summary.caribou_breeding <- function(object, ...) {
+    object$population
+}
+
+plot.caribou_breeding <- function(x, plot=TRUE, ...) {
+    N <- x$population
+    if (plot) {
+        plot(N$Year, N$Ncapt, ylim=c(0, max(N[,-1])), type="l",
+            ylab="Individuals", xlab="Years", ...)
+        lines(N$Year, N$Nrecip, col=2)
+        lines(N$Year, N$Nwild, col=4)
+        lines(N$Year, N$Ncapt-N$Nout, col=1, lty=2)
+        lines(N$Year, N$Nin, col=1, lty=3)
+        legend("topright", bty="n", lty=1, col=c(1,2,4),
+            legend=c("Captive", "Recipient", "Wild"))
+    }
+    invisible(N)
+}
+

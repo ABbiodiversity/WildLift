@@ -1,8 +1,24 @@
 ## preset demography parameters
 .get_demography <-
-function(pen.type=c("mat.pen", "pred.excl", "moose.red"), herd=NULL) {
+function(
+pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red"),
+herd=NULL) {
     pen.type <- match.arg(pen.type)
     parms <- list()
+    Herds <- c(
+        "ColumbiaNorth",
+        "ColumbiaSouth",
+        "FrisbyQueest",
+        "WellsGreySouth",
+        "Groundhog",
+        "Parsnip",
+        "KennedySiding",
+        "KlinsezaMoberly",
+        "Quintette")
+    HerdsW <- c(
+        "KennedySiding",
+        "KlinsezaMoberly",
+        "Quintette")
     if (pen.type != "pred.excl") {
         parms$c.surv.wild <- 0.163       # calf survival rate in the wild, annual
         c.surv1.capt <- 0.9       # calf survival rate when captive, 0-1 month
@@ -22,53 +38,109 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red"), herd=NULL) {
         parms$f.preg.wild <- 0.92         # pregnancy rate, same for captive and wild
         parms$f.preg.capt <- parms$f.preg.wild       # pregnancy rate, same for captive and wild
     }
-    if (!is.null(herd)) {
-        Herds <- c(
-            "ColumbiaNorth",
-            "ColumbiaSouth",
-            "FrisbyQueest",
-            "WellsGreySouth",
-            "Groundhog",
-            "Parsnip")
-        herd <- match.arg(herd, Herds)
-        #baseline calf survival and AFS for 6 ranges
-        if (herd == "ColumbiaNorth") {
-            parms$c.surv.wild <- 0.217
-            parms$f.surv.wild <- 0.784
+    if (pen.type == "wolf.red") {
+        if (is.null(herd)) {
+            #stop("Must specify a herd for wolf reduction.")
+            parms$f.surv.wild <- 0.912 # 0.801 when no wolf reduction
+            parms$c.surv.wild <- 0.513 # 0.295 when no wolf reduction
+            parms$f.surv.capt <- parms$f.surv.wild
+            parms$c.surv.capt <- parms$c.surv.wild
+        } else {
+            herd <- match.arg(herd, HerdsW)
+            # these are herds from wolf reduction study: WITH wolf reduction
+            # no penning (captive=wild) option is considered
+            if (herd == "KennedySiding") {
+                parms$f.surv.wild <- 0.962
+                parms$c.surv.wild <- 0.554
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
+            }
+            if (herd == "KlinsezaMoberly") {
+                parms$f.surv.wild <- 0.860
+                parms$c.surv.wild <- 0.506
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
+            }
+            if (herd == "Quintette") {
+                parms$f.surv.wild <- 0.917
+                parms$c.surv.wild <- 0.489
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
+            }
         }
-        if (herd == "ColumbiaSouth") {
-            parms$c.surv.wild <- 0.285
-            parms$f.surv.wild <- 0.767
-        }
-        if (herd == "FrisbyQueest") {
-            parms$c.surv.wild <- 0.363
-            parms$f.surv.wild <- 0.853 # default value
-        }
-        if (herd == "WellsGreySouth") {
-            parms$c.surv.wild <- 0.239
-            parms$f.surv.wild <- 0.868
-        }
-        if (herd == "Groundhog") {
-            parms$c.surv.wild <- 0.234
-            parms$f.surv.wild <- 0.853 # default value
-        }
-        if (herd == "Parsnip") {
-            parms$c.surv.wild <- 0.163 # default value
-            parms$f.surv.wild <- 0.875
-        }
-        # Maternity Pen:
-        # - AFS increases by 0.05 for each of the ranges.
-        # - Calf Survival always increases to 0.54.
-        if (pen.type == "mat.pen") {
-            parms$c.surv.capt <- 0.54
-            parms$f.surv.capt <- parms$f.surv.wild + 0.05
-        }
-        # Predator Exclosures:
-        # - AFS always increases to 0.95 and
-        # - Calf Survival always increases to 0.72.
-        if (pen.type == "pred.excl") {
-            parms$c.surv.capt <- 0.72
-            parms$f.surv.capt <- 0.95
+    } else {
+        if (!is.null(herd)) {
+            herd <- match.arg(herd, c(Herds, HerdsW))
+            #baseline calf survival and AFS for 6 ranges
+            if (herd == "ColumbiaNorth") {
+                parms$c.surv.wild <- 0.217
+                parms$f.surv.wild <- 0.784
+            }
+            if (herd == "ColumbiaSouth") {
+                parms$c.surv.wild <- 0.285
+                parms$f.surv.wild <- 0.767
+            }
+            if (herd == "FrisbyQueest") {
+                parms$c.surv.wild <- 0.363
+                parms$f.surv.wild <- 0.853 # default value
+            }
+            if (herd == "WellsGreySouth") {
+                parms$c.surv.wild <- 0.239
+                parms$f.surv.wild <- 0.868
+            }
+            if (herd == "Groundhog") {
+                parms$c.surv.wild <- 0.234
+                parms$f.surv.wild <- 0.853 # default value
+            }
+            if (herd == "Parsnip") {
+                parms$c.surv.wild <- 0.163 # default value
+                parms$f.surv.wild <- 0.875
+            }
+
+            # these are herds from wolf reduction study: NO wolf reduction
+            # no penning (captive=wild) option is considered
+            if (herd == "KennedySiding") {
+                if (pen.type != "mat.pen")
+                    stop(sprintf("%s herd is not available for pen.type=%s.",
+                                 herd, pen.type))
+                parms$f.surv.wild <- 0.844
+                parms$c.surv.wild <- 0.283
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
+            }
+            if (herd == "KlinsezaMoberly") {
+                if (pen.type != "mat.pen")
+                    stop(sprintf("%s herd is not available for pen.type=%s.",
+                                 herd, pen.type))
+                parms$f.surv.wild <- 0.748
+                parms$c.surv.wild <- 0.308
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
+            }
+            if (herd == "Quintette") {
+                if (pen.type != "mat.pen")
+                    stop(sprintf("%s herd is not available for pen.type=%s.",
+                                 herd, pen.type))
+                parms$f.surv.wild <- 0.810
+                parms$c.surv.wild <- 0.294
+                parms$f.surv.capt <- parms$f.surv.wild
+                parms$c.surv.capt <- parms$c.surv.wild
+            }
+
+            # Maternity Pen:
+            # - AFS increases by 0.05 for each of the ranges.
+            # - Calf Survival always increases to 0.54.
+            if (pen.type == "mat.pen") {
+                parms$c.surv.capt <- 0.54
+                parms$f.surv.capt <- parms$f.surv.wild + 0.05
+            }
+            # Predator Exclosures:
+            # - AFS always increases to 0.95 and
+            # - Calf Survival always increases to 0.72.
+            if (pen.type == "pred.excl") {
+                parms$c.surv.capt <- 0.72
+                parms$f.surv.capt <- 0.95
+            }
         }
     }
     if (pen.type == "moose.red") {
@@ -79,17 +151,18 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red"), herd=NULL) {
 
 ## preset cost parameters
 .get_cost <-
-function(pen.type=c("mat.pen", "pred.excl", "moose.red")) {
+function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red")) {
     pen.type <- match.arg(pen.type)
     parms <- list()
-    if (pen.type != "pred.excl") {
+    if (pen.type == "mat.pen") {
         parms$pen.cap <- 35       # how many individual caribou can live in mat pen?
         parms$pen.cost.setup <- 500 # cost in thousands to set up pen
         parms$pen.cost.proj <- 80 # costs of project manager
         parms$pen.cost.maint <- 300 # cost in thousands for patrolling and repairing fence + shepherd + contingencies
         parms$pen.cost.capt <- 250 # cost in thousands to capture cows, monitor, survey, calf collar
         parms$pen.cost.pred <- 0 # cost in thousands for removing predators annually
-    } else {
+    }
+    if (pen.type == "pred.excl") {
         parms$pen.cap <- 35        # how many individual caribou can live in big pen?
         parms$pen.cost.setup <- (77*24) + 20 # cost in thousands to set up pen
         parms$pen.cost.proj <- 80 # costs of project manager
@@ -97,17 +170,26 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red")) {
         parms$pen.cost.capt <- 200 # cost in thousands to capture cows, monitor, survey, calf collar
         parms$pen.cost.pred <- 80 # cost in thousands for removing predators annually
     }
+    if (!(pen.type %in% c("mat.pen", "pred.excl"))) {
+        parms$pen.cap <- 0
+        parms$pen.cost.setup <- 0
+        parms$pen.cost.proj <- 0
+        parms$pen.cost.maint <- 0
+        parms$pen.cost.capt <- 0
+        parms$pen.cost.pred <- 0
+    }
     parms
 }
 
 caribou_settings <-
 function(
-pen.type=c("mat.pen", "pred.excl", "moose.red"),
+pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red"),
 herd=NULL,
 ...) {
     if (inherits(pen.type, "caribou_settings")) {
         parms <- pen.type
     } else {
+        pen.type <- match.arg(pen.type)
         parms <- c(.get_demography(pen.type, herd), .get_cost(pen.type))
         attr(parms, "pen.type") <- pen.type
         if (!is.null(herd))
@@ -127,5 +209,6 @@ herd=NULL,
             stop(sprintf("Unexpected parameter: %s.", i))
         }
     }
+    parms$call <- match.call()
     parms
 }

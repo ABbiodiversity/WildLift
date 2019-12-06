@@ -1,7 +1,7 @@
 ---
 output:
   md_document:
-    variant: markdown_github
+    variant: gfm
 ---
 
 ```{r, echo = FALSE}
@@ -19,14 +19,24 @@ knitr::opts_chunk$set(
 [![Linux build status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
 [![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
-Try the [Shiny app](https://psolymos.shinyapps.io/matpen/) or run locally as 
-`shiny::runGitHub("psolymos/CaribouBC", subdir = "inst/shiny/matpen")`.
+Try the [Shiny app](https://psolymos.shinyapps.io/CaribouBC/) or run locally as 
+`shiny::runGitHub("bcgov/CaribouBC", subdir = "inst/shiny/matpen")`.
 
 ## Installation
 
+Stable version:
+
 ```{r install,eval=FALSE}
-devtools::install_github("psolymos/CaribouBC")
+remotes::install_github("bcgov/CaribouBC")
 ```
+
+Development version is available as this fork:
+
+```{r install_dev,eval=FALSE}
+remotes::install_github("psolymos/CaribouBC")
+```
+
+See user visible changes in the [NEWS](NEWS.md) file.
 
 ## Usage
 
@@ -64,11 +74,17 @@ op <- par(mfrow = c(1, 2))
 plot(f3, main = "Mat pen")
 plot(f4, main = "Pred excl")
 par(op)
+
+## Forecast using number of penned females
+## - it can be an initial number
+## - or a vector of individuals for subsequent years
+caribou_forecast(s1, fpen.inds = 5)
+caribou_forecast(s2, fpen.inds = c(5, 0, 4, 6))
 ```
 
 ## Getting Help or Reporting an Issue
 
-To report bugs/issues/feature requests, please file an [issue](https://github.com/psolymos/CaribouBC/issues/).
+To report bugs/issues/feature requests, please file an [issue](https://github.com/bcgov/CaribouBC/issues/).
 
 ## How to Contribute
 

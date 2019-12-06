@@ -1095,7 +1095,7 @@ server <- function(input, output, session) {
     output$breeding_years <- renderUI({
         tagList(
             sliderInput("breeding_yrs",
-                "Number of years females that are added to the facility",
+                "Number of years that females are added to the facility",
                 min = 0, max = input$tmax, value = 1, step = 1)
         )
     })
