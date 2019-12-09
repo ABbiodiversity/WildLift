@@ -1111,17 +1111,23 @@ server <- function(input, output, session) {
             return(p("Demography settings not available for specific herds."))
         tagList(
             sliderInput("breeding_DemCsc", "Calf survival in facility",
-                min = 0, max = 1, value = 0, step = 0.01), # value = inits$breeding$c.surv.capt
+                min = 0, max = 1,
+                value = inits$breeding$c.surv.capt, step = 0.01),
             sliderInput("breeding_DemCsw", "Calf survival, recipient & status quo",
-                min = 0, max = 1, value = 0, step = 0.01), # inits$breeding$c.surv.wild
+                min = 0, max = 1,
+                value = inits$breeding$c.surv.wild, step = 0.01),
             sliderInput("breeding_DemFsc", "Adult female survival in facility",
-                min = 0, max = 1, value = 0, step = 0.01), # value = inits$breeding$f.surv.capt
+                min = 0, max = 1,
+                value = inits$breeding$f.surv.capt, step = 0.01),
             sliderInput("breeding_DemFsw", "Adult female survival, recipient & status quo",
-                min = 0, max = 1, value = 0, step = 0.01), # value = inits$breeding$f.surv.wild
+                min = 0, max = 1,
+                value = inits$breeding$f.surv.wild, step = 0.01),
             sliderInput("breeding_DemFpc", "Pregnancy rate in facility",
-                min = 0, max = 1, value = 0, step = 0.01), # value = inits$breeding$f.preg.capt
+                min = 0, max = 1,
+                value = inits$breeding$f.preg.capt, step = 0.01),
             sliderInput("breeding_DemFpw", "Pregnancy rate, recipient & status quo",
-                min = 0, max = 1, value = 0, step = 0.01) # value = inits$breeding$f.preg.wild
+                min = 0, max = 1,
+                value = inits$breeding$f.preg.wild, step = 0.01)
         )
     })
     ## dynamically render herd selector
