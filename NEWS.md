@@ -1,3 +1,7 @@
+# Version 0.2.3
+
+* Added `COMPLIANCE.yaml` and updated `.Rbuildignore`.
+
 # Version 0.2.2
 
 * Added transportation related mortality to captive breeding.
