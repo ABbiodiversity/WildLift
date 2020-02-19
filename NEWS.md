@@ -1,3 +1,10 @@
+# Version 0.2.4
+
+* Fixes to the in app:
+  - sliders rounded demogr rates to 2 digits but some were pre set to 3 digits, now using 0.001 steps
+  - percent was used instead of proportion in breakeven calculation that gave error, fixed
+  - predator tab used mat pen defaults when before demogr sliders were rendered, fixed
+
 # Version 0.2.3
 
 * Added `COMPLIANCE.yaml` and updated `.Rbuildignore`.
