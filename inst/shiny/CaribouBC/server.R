@@ -29,17 +29,17 @@ server <- function(input, output, session) {
             return(p("Demography settings not available for specific herds."))
         tagList(
             sliderInput("penning_DemCsw", "Calf survival, wild",
-                min = 0, max = 1, value = inits$penning$c.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$penning$c.surv.wild, step = 0.001),
             sliderInput("penning_DemCsc", "Calf survival, captive",
-                min = 0, max = 1, value = inits$penning$c.surv.capt, step = 0.01),
+                min = 0, max = 1, value = inits$penning$c.surv.capt, step = 0.001),
             sliderInput("penning_DemFsw", "Adult female survival, wild",
-                min = 0, max = 1, value = inits$penning$f.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$penning$f.surv.wild, step = 0.001),
             sliderInput("penning_DemFsc", "Adult female survival, captive",
-                min = 0, max = 1, value = inits$penning$f.surv.capt, step = 0.01),
+                min = 0, max = 1, value = inits$penning$f.surv.capt, step = 0.001),
             sliderInput("penning_DemFpw", "Pregnancy rate, wild",
-                min = 0, max = 1, value = inits$penning$f.preg.wild, step = 0.01),
+                min = 0, max = 1, value = inits$penning$f.preg.wild, step = 0.001),
             sliderInput("penning_DemFpc", "Pregnancy rate, captive",
-                min = 0, max = 1, value = inits$penning$f.preg.capt, step = 0.01)
+                min = 0, max = 1, value = inits$penning$f.preg.capt, step = 0.001)
         )
     })
     ## dynamically render button
@@ -348,19 +348,20 @@ server <- function(input, output, session) {
             return(p("Demography settings not available for specific herds."))
         tagList(
              sliderInput("predator_DemCsw", "Calf survival, wild",
-                min = 0, max = 1, value = inits$predator$c.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$predator$c.surv.wild, step = 0.001),
              sliderInput("predator_DemCsc", "Calf survival, captive",
-                min = 0, max = 1, value = inits$predator$c.surv.capt, step = 0.01),
+                min = 0, max = 1, value = inits$predator$c.surv.capt, step = 0.001),
              sliderInput("predator_DemFsw", "Adult female survival, wild",
-                min = 0, max = 1, value = inits$predator$f.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$predator$f.surv.wild, step = 0.001),
              sliderInput("predator_DemFsc", "Adult female survival, captive",
-                min = 0, max = 1, value = inits$predator$f.surv.capt, step = 0.01),
+                min = 0, max = 1, value = inits$predator$f.surv.capt, step = 0.001),
              sliderInput("predator_DemFpw", "Pregnancy rate, wild",
-                min = 0, max = 1, value = inits$predator$f.preg.wild, step = 0.01),
+                min = 0, max = 1, value = inits$predator$f.preg.wild, step = 0.001),
              sliderInput("predator_DemFpc", "Pregnancy rate, captive",
-                min = 0, max = 1, value = inits$predator$f.preg.capt, step = 0.01)
+                min = 0, max = 1, value = inits$predator$f.preg.capt, step = 0.001)
         )
     })
+
     ## dynamically render button
     output$predator_button <- renderUI({
         tagList(
@@ -404,7 +405,7 @@ server <- function(input, output, session) {
         values$predator <- c(
             fpen.prop = values$predator$fpen.prop,
             fpen.inds = values$predator$fpen.inds,
-            caribou_settings("mat.pen",
+            caribou_settings("pred.excl",
                 herd = if (input$predator_herd == "Default") NULL else input$predator_herd))
         if (values$predator_compare) {
             values$predator0 <- values$predator
@@ -666,17 +667,17 @@ server <- function(input, output, session) {
             return(p("Demography settings not available for specific herds."))
         tagList(
             sliderInput("moose_DemCsw", "Calf survival, moose reduction",
-                min = 0, max = 1, value = inits$moose$c.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$moose$c.surv.wild, step = 0.001),
             sliderInput("moose_DemCsc", "Calf survival, no moose reduction",
-                min = 0, max = 1, value = inits$moose0$c.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$moose0$c.surv.wild, step = 0.001),
             sliderInput("moose_DemFsw", "Adult female survival, moose reduction",
-                min = 0, max = 1, value = inits$moose$f.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$moose$f.surv.wild, step = 0.001),
             sliderInput("moose_DemFsc", "Adult female survival, no moose reduction",
-                min = 0, max = 1, value = inits$moose0$f.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$moose0$f.surv.wild, step = 0.001),
             sliderInput("moose_DemFpw", "Pregnancy rate, moose reduction",
-                min = 0, max = 1, value = inits$moose$f.preg.wild, step = 0.01),
+                min = 0, max = 1, value = inits$moose$f.preg.wild, step = 0.001),
             sliderInput("moose_DemFpc", "Pregnancy rate, no moose reduction",
-                min = 0, max = 1, value = inits$moose0$f.preg.wild, step = 0.01)
+                min = 0, max = 1, value = inits$moose0$f.preg.wild, step = 0.001)
         )
     })    ## dynamically render herd selector
     output$moose_herd <- renderUI({
@@ -912,17 +913,17 @@ server <- function(input, output, session) {
             return(p("Demography settings not available for specific herds."))
         tagList(
             sliderInput("wolf_DemCsw", "Calf survival, wolf reduction",
-                min = 0, max = 1, value = inits$wolf$c.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$wolf$c.surv.wild, step = 0.001),
             sliderInput("wolf_DemCsc", "Calf survival, no wolf reduction",
-                min = 0, max = 1, value = inits$wolf0$c.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$wolf0$c.surv.wild, step = 0.001),
             sliderInput("wolf_DemFsw", "Adult female survival, wolf reduction",
-                min = 0, max = 1, value = inits$wolf$f.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$wolf$f.surv.wild, step = 0.001),
             sliderInput("wolf_DemFsc", "Adult female survival, no wolf reduction",
-                min = 0, max = 1, value = inits$wolf0$f.surv.wild, step = 0.01),
+                min = 0, max = 1, value = inits$wolf0$f.surv.wild, step = 0.001),
             sliderInput("wolf_DemFpw", "Pregnancy rate, wolf reduction",
-                min = 0, max = 1, value = inits$wolf$f.preg.wild, step = 0.01),
+                min = 0, max = 1, value = inits$wolf$f.preg.wild, step = 0.001),
             sliderInput("wolf_DemFpc", "Pregnancy rate, no wolf reduction",
-                min = 0, max = 1, value = inits$wolf0$f.preg.wild, step = 0.01)
+                min = 0, max = 1, value = inits$wolf0$f.preg.wild, step = 0.001)
         )
     })
     ## dynamically render herd selector
