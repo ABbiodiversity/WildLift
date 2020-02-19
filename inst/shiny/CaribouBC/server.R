@@ -182,7 +182,7 @@ server <- function(input, output, session) {
         req(penning_getF0())
         p <- suppressWarnings(
             caribou_breakeven(penning_getF0(),
-                type = if (values$use_perc) "perc" else "inds")
+                type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
@@ -500,7 +500,7 @@ server <- function(input, output, session) {
         req(predator_getF0())
         p <- suppressWarnings(
             caribou_breakeven(predator_getF0(),
-                type = if (values$use_perc) "perc" else "inds")
+                type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
