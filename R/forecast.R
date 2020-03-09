@@ -17,7 +17,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     if (missing(fpen.inds))
         fpen.inds <- NULL
     if (!is.null(fpen.prop) && !is.null(fpen.inds)) {
-        stop("Aprovide fpen.prop or fpen.inds but not both.")
+        stop("Provide fpen.prop or fpen.inds but not both.")
     }
     fpen.inds.vec <- numeric(tmax) # default is 0
     if (is.null(fpen.prop) && is.null(fpen.inds)) {
