@@ -151,11 +151,11 @@ herd=NULL) {
 
 ## preset cost parameters
 .get_cost <-
-function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red")) {
+function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed")) {
     pen.type <- match.arg(pen.type)
     parms <- list()
     if (pen.type == "mat.pen") {
-        parms$pen.cap <- 35       # how many individual caribou can live in mat pen?
+        parms$pen.cap <- 35       # how many adult females can live in mat pen?
         parms$pen.cost.setup <- 500 # cost in thousands to set up pen
         parms$pen.cost.proj <- 80 # costs of project manager
         parms$pen.cost.maint <- 300 # cost in thousands for patrolling and repairing fence + shepherd + contingencies
@@ -163,13 +163,25 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red")) {
         parms$pen.cost.pred <- 0 # cost in thousands for removing predators annually
     }
     if (pen.type == "pred.excl") {
-        parms$pen.cap <- 35        # how many individual caribou can live in big pen?
-        parms$pen.cost.setup <- (77*24) + 20 # cost in thousands to set up pen
+        parms$pen.cap <- 35        # how many adult females can live in big pen?
+        parms$pen.cost.setup <- 1898 # cost in thousands to set up pen
         parms$pen.cost.proj <- 80 # costs of project manager
         parms$pen.cost.maint <- 600 # cost in thousands for patrolling and repairing fence + contingencies
         parms$pen.cost.capt <- 200 # cost in thousands to capture cows, monitor, survey, calf collar
         parms$pen.cost.pred <- 80 # cost in thousands for removing predators annually
     }
+
+    # for later:
+    if (pen.type == "cons.breed") {
+        parms$pen.cap <- 35        # how many adult females can live in big pen?
+        parms$pen.cost.setup <- 9000 # cost in thousands to set up pen
+        parms$pen.cost.proj <- 80 # costs of project manager
+        parms$pen.cost.maint <- 280 # cost in thousands for patrolling and repairing fence + contingencies
+        parms$pen.cost.capt <- 50 # cost in thousands to capture cows, monitor, survey, calf collar
+        parms$pen.cost.pred <- 0 # cost in thousands for removing predators annually
+    }
+    ## wolf reduction: 5.1/wolf
+
     if (!(pen.type %in% c("mat.pen", "pred.excl"))) {
         parms$pen.cap <- 0
         parms$pen.cost.setup <- 0
