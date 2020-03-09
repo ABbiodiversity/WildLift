@@ -17,19 +17,19 @@ ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
 ## initialize sliders for the different pen types
 inits <- list(
     penning = c(
-        fpen.prop = 0.25,
+        fpen.prop = 0.35,
         fpen.inds = 10,
         caribou_settings("mat.pen")),
     predator = c(
-        fpen.prop = 0.25,
+        fpen.prop = 0.35,
         fpen.inds = 10,
         caribou_settings("pred.excl")),
     moose = c(
-        fpen.prop = 0.25,
+        fpen.prop = 0.35,
         fpen.inds = 10,
         caribou_settings("moose.red")),
     moose0 = c(
-        fpen.prop = 0.25,
+        fpen.prop = 0.35,
         fpen.inds = 10,
         caribou_settings("mat.pen")),
     wolf = caribou_settings("wolf.red"),
