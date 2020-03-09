@@ -133,6 +133,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         rep.adult.nopen <- N2[4,]
         # total pop. size of penned pop
         tot.pen <- sum(N1[,1])
+        # how many adult females in the pen?
+        tot.adult.in.pen = N1[4,1]*fpen.prop
         # total pop. size of wild pop
         tot.nopen <- sum(N2[,1])
         # how many new bou made in time t?
@@ -145,7 +147,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
             pens.avail <- pens.needed
         }
         # no partial pens allowed... current pen needs.
-        pens.needed <- ceiling(round(tot.pen)/pen.cap)
+        #pens.needed <- ceiling(round(tot.pen)/pen.cap)
+        pens.needed = ceiling(round(tot.adult.in.pen)/pen.cap)
         new.pens <- pens.needed-pens.avail
         num.pens <- pens.avail + new.pens
         pens.cost.t <- (pen.cost1*new.pens + # cost to construct new pens
