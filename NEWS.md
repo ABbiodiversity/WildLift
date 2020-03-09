@@ -1,6 +1,11 @@
+# Version 0.2.5
+
+* App: default percent females penned is now 35%.
+* Costs updated, number of pens now based on females only and not the total.
+
 # Version 0.2.4
 
-* Fixes to the in app:
+* Fixes to the app:
   - sliders rounded demogr rates to 2 digits but some were pre set to 3 digits, now using 0.001 steps
   - percent was used instead of proportion in breakeven calculation that gave error, fixed
   - predator tab used mat pen defaults when before demogr sliders were rendered, fixed
