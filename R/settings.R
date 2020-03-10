@@ -19,6 +19,7 @@ herd=NULL) {
         "KennedySiding",
         "KlinsezaMoberly",
         "Quintette")
+    # default is based on Boreal/East Side Athabasca
     if (pen.type != "pred.excl") {
         parms$c.surv.wild <- 0.163       # calf survival rate in the wild, annual
         c.surv1.capt <- 0.9       # calf survival rate when captive, 0-1 month

@@ -41,7 +41,8 @@ or wolf reduction.
 It can also be a settings object.
 }
   \item{herd}{
-\code{NULL} (default) or character. The following herds are available:
+\code{NULL} (default, East Side Athabasca, Boreal ecotype) or character.
+The following herds (Southern Mountain ecotype) are available:
 \code{"ColumbiaNorth"}, \code{"ColumbiaSouth"},
 \code{"FrisbyQueest"}, \code{"WellsGreySouth"},
 \code{"Groundhog"}, \code{"Parsnip"},
