@@ -2,6 +2,8 @@
 
 * App: default percent females penned is now 35%.
 * Costs updated, number of pens now based on females only and not the total.
+* Initial population size is constructed so that only adult females number
+  is equal to `pop.start` and not the total.
 
 # Version 0.2.4
 
