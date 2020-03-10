@@ -46,7 +46,9 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     pen.type <- attr(settings, "type")
     ## Cost
     pen.cap <- settings$pen.cap
+    ## one time cost
     pen.cost1 <- settings$pen.cost.setup
+    ## yearly costs
     pen.cost2 <- settings$pen.cost.proj +
         settings$pen.cost.maint +
         settings$pen.cost.capt +
@@ -78,7 +80,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     # extract stable stage distribution
     Stable.st <- eigen.analysis(A)$stable.stage
     # assign correct # of animals to each age class
-    Nstart <- matrix(pop.start*Stable.st, ncol=1)
+    Nstart <- matrix(pop.start*Stable.st/Stable.st[4], ncol=1)
     # starting populations for time loop
     N1 <- N2 <- Nstart
 
@@ -139,6 +141,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         tot.nopen <- sum(N2[,1])
         # how many new bou made in time t?
         new.bou.t <- tot.pen-tot.nopen
+
         #### Calculate costs of penning
         # how many pens exist at time t-1?
         if (i==1) {
@@ -147,8 +150,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
             pens.avail <- pens.needed
         }
         # no partial pens allowed... current pen needs.
-        #pens.needed <- ceiling(round(tot.pen)/pen.cap)
-        pens.needed = ceiling(round(tot.adult.in.pen)/pen.cap)
+        pens.needed <- ceiling(round(tot.adult.in.pen)/pen.cap)
         new.pens <- pens.needed-pens.avail
         num.pens <- pens.avail + new.pens
         pens.cost.t <- (pen.cost1*new.pens + # cost to construct new pens
@@ -157,18 +159,19 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         pens.cost.per.bou <- pens.cost.t/new.bou.t
         # cumulative cost of penning
         if (i==1) {
-            pens.cost.cum=pens.cost.t
+            pens.cost.cum <- pens.cost.t
         } else {
-            pens.cost.cum=sum(pens.cost.t, Npop$pens.cost.t)
+            pens.cost.cum <- sum(pens.cost.t, Npop$pens.cost.t)
         }
         # cumulative caribou produced
         if (i==1) {
-            cum.bou = new.bou.t
+            cum.bou <- new.bou.t
         } else {
-            cum.bou =sum(new.bou.t, Npop$new.bou.t)
+            cum.bou <- sum(new.bou.t, Npop$new.bou.t)
         }
         # cost per bou: cumulative cost/cum caribou pop diff
         pens.cost.cum.bou <- pens.cost.cum/cum.bou
+
         Nt <- data.frame(
             lam.pen = eigs.A1$lambda1,
             lam.nopen = eigs.A2$lambda1, # store the data for time t
@@ -181,13 +184,13 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
             pens.cost.cum = pens.cost.cum,
             pens.cost.cum.bou = pens.cost.cum.bou,
             rep.adult.pen = rep.adult.pen,
-            rep.adult.nopen=rep.adult.nopen,
+            rep.adult.nopen = rep.adult.nopen,
             juv.from.pen.t = juv.from.pen.t,
             adult.from.pen.t = adult.from.pen.t,
             s.c.pop.pen= surv.c1,
             s.c.pop.nopen=surv.c2,
             s.f.pop.pen = surv.f1,
-            s.f.pop.nopen=surv.f2)
+            s.f.pop.nopen = surv.f2)
         # store the data for all t
         if (i==1) {
             Npop <- Nt
@@ -211,7 +214,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         juv.from.pen.t = 0,
         adult.from.pen.t = 0,
         s.c.pop.pen= surv.c1,
-        s.c.pop.nopen=surv.c2,
+        s.c.pop.nopen = surv.c2,
         s.f.pop.pen = surv.f1,
         s.f.pop.nopen=surv.f2)
     # add year 0 data to projection data
@@ -244,5 +247,6 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     }
     class(out) <- "caribou_forecast"
     out$call <- match.call()
+
     out
 }
