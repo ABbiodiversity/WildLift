@@ -153,7 +153,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         }
         # no partial pens allowed... current pen needs.
         pens.needed <- ceiling(round(tot.adult.in.pen)/pen.cap)
-        new.pens <- pens.needed-pens.avail
+        new.pens <- max(0, pens.needed-pens.avail)
         num.pens <- pens.avail + new.pens
         pens.cost.t <- (pen.cost1*new.pens + # cost to construct new pens
             pen.cost2*num.pens)/1000         # cost to maintain all pens
