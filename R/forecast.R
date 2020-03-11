@@ -137,7 +137,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         # total pop. size of penned pop
         tot.pen <- sum(N1[,1])
         # how many adult females in the pen?
-        tot.adult.in.pen = N1[4,1]*fpen.prop
+        #tot.adult.in.pen = N1[4,1]*fpen.prop
+        tot.adult.in.pen = N1[4,1]
         # total pop. size of wild pop
         tot.nopen <- sum(N2[,1])
         # how many new bou made in time t?
