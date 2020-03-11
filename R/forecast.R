@@ -80,7 +80,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     # extract stable stage distribution
     Stable.st <- eigen.analysis(A)$stable.stage
     # assign correct # of animals to each age class
-    Nstart <- matrix(pop.start*Stable.st/Stable.st[4], ncol=1)
+    Nstart <- matrix(pop.start*Stable.st, ncol=1)
+    #Nstart <- matrix(pop.start*Stable.st/Stable.st[4], ncol=1) # 2018-11-04
     # starting populations for time loop
     N1 <- N2 <- Nstart
 
