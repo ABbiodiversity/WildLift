@@ -165,7 +165,7 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed
     }
     if (pen.type == "pred.excl") {
         parms$pen.cap <- 35        # how many adult females can live in big pen?
-        parms$pen.cost.setup <- 1898 # cost in thousands to set up pen
+        parms$pen.cost.setup <- (77*24) + 20 # cost in thousands to set up pen
         parms$pen.cost.proj <- 80 # costs of project manager
         parms$pen.cost.maint <- 600 # cost in thousands for patrolling and repairing fence + contingencies
         parms$pen.cost.capt <- 200 # cost in thousands to capture cows, monitor, survey, calf collar
