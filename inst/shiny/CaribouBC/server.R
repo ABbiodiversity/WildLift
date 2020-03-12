@@ -36,9 +36,9 @@ server <- function(input, output, session) {
                 min = 0, max = 1, value = inits$penning$f.surv.wild, step = 0.001),
             sliderInput("penning_DemFsc", "Adult female survival, captive",
                 min = 0, max = 1, value = inits$penning$f.surv.capt, step = 0.001),
-            sliderInput("penning_DemFpw", "Pregnancy rate, wild",
+            sliderInput("penning_DemFpw", "Fecundity, wild",
                 min = 0, max = 1, value = inits$penning$f.preg.wild, step = 0.001),
-            sliderInput("penning_DemFpc", "Pregnancy rate, captive",
+            sliderInput("penning_DemFpc", "Fecundity, captive",
                 min = 0, max = 1, value = inits$penning$f.preg.capt, step = 0.001)
         )
     })
@@ -248,8 +248,8 @@ server <- function(input, output, session) {
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
             "f.surv.capt" = "Adult female survival, captive",
-            "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate, captive",
+            "f.preg.wild" = "Fecundity, wild",
+            "f.preg.capt" = "Fecundity, captive",
             "pen.cap" = "Max in a single pen",
             "pen.cost.setup" = "Initial set up (x $1000)",
             "pen.cost.proj" = "Project manager (x $1000)",
@@ -355,9 +355,9 @@ server <- function(input, output, session) {
                 min = 0, max = 1, value = inits$predator$f.surv.wild, step = 0.001),
              sliderInput("predator_DemFsc", "Adult female survival, captive",
                 min = 0, max = 1, value = inits$predator$f.surv.capt, step = 0.001),
-             sliderInput("predator_DemFpw", "Pregnancy rate, wild",
+             sliderInput("predator_DemFpw", "Fecundity, wild",
                 min = 0, max = 1, value = inits$predator$f.preg.wild, step = 0.001),
-             sliderInput("predator_DemFpc", "Pregnancy rate, captive",
+             sliderInput("predator_DemFpc", "Fecundity, captive",
                 min = 0, max = 1, value = inits$predator$f.preg.capt, step = 0.001)
         )
     })
@@ -567,8 +567,8 @@ server <- function(input, output, session) {
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
             "f.surv.capt" = "Adult female survival, captive",
-            "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate, captive",
+            "f.preg.wild" = "Fecundity, wild",
+            "f.preg.capt" = "Fecundity, captive",
             "pen.cap" = "Max in a single pen",
             "pen.cost.setup" = "Initial set up (x $1000)",
             "pen.cost.proj" = "Project manager (x $1000)",
@@ -674,9 +674,9 @@ server <- function(input, output, session) {
                 min = 0, max = 1, value = inits$moose$f.surv.wild, step = 0.001),
             sliderInput("moose_DemFsc", "Adult female survival, no moose reduction",
                 min = 0, max = 1, value = inits$moose0$f.surv.wild, step = 0.001),
-            sliderInput("moose_DemFpw", "Pregnancy rate, moose reduction",
+            sliderInput("moose_DemFpw", "Fecundity, moose reduction",
                 min = 0, max = 1, value = inits$moose$f.preg.wild, step = 0.001),
-            sliderInput("moose_DemFpc", "Pregnancy rate, no moose reduction",
+            sliderInput("moose_DemFpc", "Fecundity, no moose reduction",
                 min = 0, max = 1, value = inits$moose0$f.preg.wild, step = 0.001)
         )
     })    ## dynamically render herd selector
@@ -824,8 +824,8 @@ server <- function(input, output, session) {
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
             "f.surv.capt" = "Adult female survival, captive",
-            "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate, captive",
+            "f.preg.wild" = "Fecundity, wild",
+            "f.preg.capt" = "Fecundity, captive",
             "pen.cap" = "Max in a single pen")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
@@ -920,9 +920,9 @@ server <- function(input, output, session) {
                 min = 0, max = 1, value = inits$wolf$f.surv.wild, step = 0.001),
             sliderInput("wolf_DemFsc", "Adult female survival, no wolf reduction",
                 min = 0, max = 1, value = inits$wolf0$f.surv.wild, step = 0.001),
-            sliderInput("wolf_DemFpw", "Pregnancy rate, wolf reduction",
+            sliderInput("wolf_DemFpw", "Fecundity, wolf reduction",
                 min = 0, max = 1, value = inits$wolf$f.preg.wild, step = 0.001),
-            sliderInput("wolf_DemFpc", "Pregnancy rate, no wolf reduction",
+            sliderInput("wolf_DemFpc", "Fecundity, no wolf reduction",
                 min = 0, max = 1, value = inits$wolf0$f.preg.wild, step = 0.001)
         )
     })
@@ -1013,8 +1013,8 @@ server <- function(input, output, session) {
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
             "f.surv.capt" = "Adult female survival, captive",
-            "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate, captive",
+            "f.preg.wild" = "Fecundity, wild",
+            "f.preg.capt" = "Fecundity, captive",
             "pen.cap" = "Max in a single pen")
         print("wolf_getS 3")
         df <- tab[names(SNAM),,drop=FALSE]
@@ -1123,10 +1123,10 @@ server <- function(input, output, session) {
             sliderInput("breeding_DemFsw", "Adult female survival, recipient & status quo",
                 min = 0, max = 1,
                 value = inits$breeding$f.surv.wild, step = 0.01),
-            sliderInput("breeding_DemFpc", "Pregnancy rate in facility",
+            sliderInput("breeding_DemFpc", "Fecundity in facility",
                 min = 0, max = 1,
                 value = inits$breeding$f.preg.capt, step = 0.01),
-            sliderInput("breeding_DemFpw", "Pregnancy rate, recipient & status quo",
+            sliderInput("breeding_DemFpw", "Fecundity, recipient & status quo",
                 min = 0, max = 1,
                 value = inits$breeding$f.preg.wild, step = 0.01)
         )
@@ -1224,8 +1224,8 @@ server <- function(input, output, session) {
             "c.surv.capt" = "Calf survival in facility",
             "f.surv.wild" = "Adult female survival, wild",
             "f.surv.capt" = "Adult female survival in facility",
-            "f.preg.wild" = "Pregnancy rate, wild",
-            "f.preg.capt" = "Pregnancy rate in facility",
+            "f.preg.wild" = "Fecundity, wild",
+            "f.preg.capt" = "Fecundity in facility",
             #"out.prop"="Proportion of calves transferred",
             "f.surv.trans"="Adult female survival during capture/transport to facility",
             "j.surv.trans"="Juvenile female survival during capture/transport from facility to recipient herd",
