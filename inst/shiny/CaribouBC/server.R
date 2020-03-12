@@ -211,7 +211,7 @@ server <- function(input, output, session) {
             df[1L,] <- df[1L,]*100
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (maternity penning)", "&lambda; (no maternity penning)",
-            "N (end, maternity penning)", "N (end, no maternity penning)", "N (end, difference)",
+            "N (end, maternity penning)", "N (end, no maternity penning)", "N (new)",
             "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
@@ -531,7 +531,7 @@ server <- function(input, output, session) {
             df[1L,] <- df[1L,]*100
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (predator exclosure)", "&lambda; (no predator exclosure)",
-            "N (end, predator exclosure)", "N (end, no predator exclosure)", "N (end, difference)",
+            "N (end, predator exclosure)", "N (end, no predator exclosure)", "N (new)",
             "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
