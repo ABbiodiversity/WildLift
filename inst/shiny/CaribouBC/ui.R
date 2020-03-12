@@ -15,7 +15,7 @@ dashboardPage(
     radioButtons("use_perc", "How to provide females penned",
       list("Percent"="perc", "Number of individuals"="inds")),
     sidebarMenu(
-      menuItem("Maternity pen", tabName = "penning"),
+      menuItem("Maternity penning", tabName = "penning"),
       menuItem("Predator exclosure", tabName = "predator"),
       menuItem("Moose reduction", tabName = "moose"),
       menuItem("Wolf reduction", tabName = "wolf"),
@@ -31,7 +31,7 @@ dashboardPage(
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Population forecast: Maternity pen",
+              title = "Population forecast: Maternity penning",
               plotlyOutput("penning_Plot", width = "100%", height = 400),
               bsTooltip("penning_Plot",
                 "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
@@ -40,7 +40,7 @@ dashboardPage(
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Summary: Maternity pen",
+              title = "Summary: Maternity penning",
               tableOutput("penning_Table"),
               downloadButton("penning_download", "Download results as Excel file"),
               bsTooltip("penning_Table",

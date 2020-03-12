@@ -68,7 +68,7 @@ server <- function(input, output, session) {
                     min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
                     step = 1),
                 bsTooltip("penning_Fpen",
-                    "Change the percent of female population in maternity pens. Default set, but the user can toggle.")
+                    "Change the percent of female population in maternity penning. Default set, but the user can toggle.")
             )
         } else {
             tagList(
@@ -76,7 +76,7 @@ server <- function(input, output, session) {
                     min = 0, max = input$popstart, value = inits$penning$fpen.inds,
                     step = 1),
                 bsTooltip("penning_Fpen",
-                    "Change the number of females in maternity pens. Default set, but the user can toggle.")
+                    "Change the number of females in maternity penning. Default set, but the user can toggle.")
             )
         }
     })
@@ -209,8 +209,8 @@ server <- function(input, output, session) {
         if (values$use_perc)
             df[1L,] <- df[1L,]*100
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
-            "# pens", "&lambda; (maternity pen)", "&lambda; (no maternity pen)",
-            "N (end, maternity pen)", "N (end, no maternity pen)", "N (end, difference)",
+            "# pens", "&lambda; (maternity penning)", "&lambda; (no maternity penning)",
+            "N (end, maternity penning)", "N (end, no maternity penning)", "N (end, difference)",
             "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
@@ -280,16 +280,16 @@ server <- function(input, output, session) {
         df <- plot(penning_getF(), plot=FALSE)
         colnames(df)[colnames(df) == "Npen"] <- "Individuals"
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
-            name = 'Maternity pen', type = 'scatter', mode = 'lines',
+            name = 'Maternity penning', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Nnopen, name = 'No maternity pen',
+            add_trace(y = ~Nnopen, name = 'No maternity penning',
                 mode = 'lines', color=I('blue')) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         if (values$penning_compare) {
             df0 <- plot(penning_getF0(), plot=FALSE)
-            p <- p %>% add_trace(y = ~Npen, name = 'Maternity pen, reference', data = df0,
+            p <- p %>% add_trace(y = ~Npen, name = 'Maternity penning, reference', data = df0,
                     line=list(dash = 'dash', color='red')) %>%
-                add_trace(y = ~Nnopen, name = 'No maternity pen, reference', data = df0,
+                add_trace(y = ~Nnopen, name = 'No maternity penning, reference', data = df0,
                     line=list(dash = 'dash', color='blue'))
         }
         p <- p %>% layout(legend = list(x = 100, y = 0))
@@ -310,8 +310,8 @@ server <- function(input, output, session) {
         if (values$penning_compare) {
             TS <- cbind(plot(penning_getF0(), plot=FALSE), TS[,-1])
             colnames(TS) <- c("Years",
-                "N no maternity pen, reference", "N maternity pen, reference",
-                "N no maternity pen", "N maternity pen")
+                "N no maternity penning, reference", "N maternity penning, reference",
+                "N no maternity penning", "N maternity penning")
         }
         df <- penning_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
@@ -388,7 +388,7 @@ server <- function(input, output, session) {
                     min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
                     step = 1),
                 bsTooltip("predator_Fpen",
-                    "Change the percent of female population in maternity pens. Default set, but the user can toggle.")
+                    "Change the percent of female population in maternity penning. Default set, but the user can toggle.")
             )
         } else {
             tagList(
@@ -396,7 +396,7 @@ server <- function(input, output, session) {
                     min = 0, max = input$popstart, value = inits$predator$fpen.inds,
                     step = 1),
                 bsTooltip("predator_Fpen",
-                    "Change the number of females in maternity pens. Default set, but the user can toggle.")
+                    "Change the number of females in maternity penning. Default set, but the user can toggle.")
             )
         }
     })
@@ -695,7 +695,7 @@ server <- function(input, output, session) {
                     min = 0, max = 100, value = round(100*inits$moose$fpen.prop),
                     step = 1),
                 bsTooltip("moose_Fpen",
-                    "Change the percent of female population in maternity pens. Default set, but the user can toggle.")
+                    "Change the percent of female population in maternity penning. Default set, but the user can toggle.")
             )
         } else {
             tagList(
@@ -703,7 +703,7 @@ server <- function(input, output, session) {
                     min = 0, max = input$popstart, value = inits$moose$fpen.inds,
                     step = 1),
                 bsTooltip("moose_Fpen",
-                    "Change the number of females in maternity pens. Default set, but the user can toggle.")
+                    "Change the number of females in maternity penning. Default set, but the user can toggle.")
             )
         }
     })
