@@ -56,7 +56,8 @@ server <- function(input, output, session) {
     output$penning_herd <- renderUI({
         tagList(
             selectInput(
-                "penning_herd", "Herd", c("Default"="Default", Herds, HerdsWolf)
+                "penning_herd", "Herd",
+                c("Default (East Side Athabasca)"="Default", Herds, HerdsWolf)
             )
         )
     })
@@ -376,7 +377,8 @@ server <- function(input, output, session) {
     output$predator_herd <- renderUI({
         tagList(
             selectInput(
-                "predator_herd", "Herd", c("Default"="Default", Herds)
+                "predator_herd", "Herd",
+                c("Default (East Side Athabasca)"="Default", Herds)
             )
         )
     })
@@ -683,7 +685,8 @@ server <- function(input, output, session) {
     output$moose_herd <- renderUI({
         tagList(
             selectInput(
-                "moose_herd", "Herd", c("Default"="Default", Herds)
+                "moose_herd", "Herd",
+                c("Default (East Side Athabasca)"="Default", Herds)
             )
         )
     })
@@ -930,7 +933,8 @@ server <- function(input, output, session) {
     output$wolf_herd <- renderUI({
         tagList(
             selectInput(
-                "wolf_herd", "Herd", c("Default"="Default", HerdsWolf)
+                "wolf_herd", "Herd",
+                c("Default (East Side Athabasca)"="Default", HerdsWolf)
             )
         )
     })
@@ -1135,7 +1139,8 @@ server <- function(input, output, session) {
     output$breeding_herd <- renderUI({
         tagList(
             selectInput(
-                "breeding_herd", "Herd", c("Default"="Default", Herds)
+                "breeding_herd", "Herd",
+                c("Default (East Side Athabasca)"="Default", Herds)
             )
         )
     })
