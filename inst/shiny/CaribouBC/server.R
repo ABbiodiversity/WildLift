@@ -1113,22 +1113,22 @@ server <- function(input, output, session) {
         tagList(
             sliderInput("breeding_DemCsc", "Calf survival in facility",
                 min = 0, max = 1,
-                value = inits$breeding$c.surv.capt, step = 0.01),
+                value = inits$breeding$c.surv.capt, step = 0.001),
             sliderInput("breeding_DemCsw", "Calf survival, recipient & status quo",
                 min = 0, max = 1,
-                value = inits$breeding$c.surv.wild, step = 0.01),
+                value = inits$breeding$c.surv.wild, step = 0.001),
             sliderInput("breeding_DemFsc", "Adult female survival in facility",
                 min = 0, max = 1,
-                value = inits$breeding$f.surv.capt, step = 0.01),
+                value = inits$breeding$f.surv.capt, step = 0.001),
             sliderInput("breeding_DemFsw", "Adult female survival, recipient & status quo",
                 min = 0, max = 1,
-                value = inits$breeding$f.surv.wild, step = 0.01),
+                value = inits$breeding$f.surv.wild, step = 0.001),
             sliderInput("breeding_DemFpc", "Fecundity in facility",
                 min = 0, max = 1,
-                value = inits$breeding$f.preg.capt, step = 0.01),
+                value = inits$breeding$f.preg.capt, step = 0.001),
             sliderInput("breeding_DemFpw", "Fecundity, recipient & status quo",
                 min = 0, max = 1,
-                value = inits$breeding$f.preg.wild, step = 0.01)
+                value = inits$breeding$f.preg.wild, step = 0.001)
         )
     })
     ## dynamically render herd selector
