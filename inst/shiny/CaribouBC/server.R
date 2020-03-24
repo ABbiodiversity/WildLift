@@ -934,7 +934,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "wolf_herd", "Herd",
-                c("Default (East Side Athabasca)"="Default", HerdsWolf)
+                c("Default (Average of all herds)"="Default", HerdsWolf)
             )
         )
     })

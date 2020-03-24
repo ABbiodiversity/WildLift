@@ -2,6 +2,8 @@
 
 * App: default percent females penned is now 35%.
 * Costs updated, number of pens now based on females only and not the total.
+* Added costs to conservation breeding option (demography is same as for
+  predator exclosure).
 
 # Version 0.2.4
 

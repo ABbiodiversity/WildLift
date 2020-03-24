@@ -1,9 +1,11 @@
 ## preset demography parameters
 .get_demography <-
 function(
-pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red"),
+pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed"),
 herd=NULL) {
     pen.type <- match.arg(pen.type)
+    if (pen.type == "cons.breed")
+        pen.type <- "pred.excl"
     parms <- list()
     Herds <- c(
         "ColumbiaNorth",
@@ -172,7 +174,6 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed
         parms$pen.cost.pred <- 80 # cost in thousands for removing predators annually
     }
 
-    # for later:
     if (pen.type == "cons.breed") {
         parms$pen.cap <- 35        # how many adult females can live in big pen?
         parms$pen.cost.setup <- 9000 # cost in thousands to set up pen
@@ -183,7 +184,7 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed
     }
     ## wolf reduction: 5.1/wolf
 
-    if (!(pen.type %in% c("mat.pen", "pred.excl"))) {
+    if (!(pen.type %in% c("mat.pen", "pred.excl", "cons.breed"))) {
         parms$pen.cap <- 0
         parms$pen.cost.setup <- 0
         parms$pen.cost.proj <- 0
@@ -196,7 +197,7 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed
 
 caribou_settings <-
 function(
-pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red"),
+pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed"),
 herd=NULL,
 ...) {
     if (inherits(pen.type, "caribou_settings")) {

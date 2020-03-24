@@ -18,7 +18,7 @@ forecasting, and to inspect the results.
 }
 \usage{
 caribou_settings(pen.type = c("mat.pen",  "pred.excl",
-    "moose.red", "wolf.red"), herd = NULL, ...)
+    "moose.red", "wolf.red", "cons.breed"), herd = NULL, ...)
 
 caribou_forecast(settings, tmax = 20, pop.start = 100,
     fpen.prop, fpen.inds)
@@ -37,7 +37,7 @@ caribou_breakeven(forecast, lambda=1,
 \arguments{
   \item{pen.type}{
 character: maternity penning, predator exclusion, moose reduction,
-or wolf reduction.
+wolf reduction, or conservation breeding.
 It can also be a settings object.
 }
   \item{herd}{

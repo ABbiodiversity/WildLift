@@ -300,7 +300,7 @@ dashboardPage(
               bsTooltip("breeding_outprop",
                 "The proportion of juvenile females transferred from the facility to the recipient herd."),
               sliderInput("breeding_ininds", "Number of females put into facility each year (max)",
-                min = 0, max = 20, value = 10, step = 1),
+                min = 0, max = 100, value = 10, step = 1),
               uiOutput("breeding_years"),
               sliderInput("breeding_ftrans", "Adult female survival during capture/transport to the facility",
                 min = 0, max = 1, value = 1, step = 0.01),
