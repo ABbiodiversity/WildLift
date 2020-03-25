@@ -4,6 +4,7 @@ function(
 pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed"),
 herd=NULL) {
     pen.type <- match.arg(pen.type)
+    ## cons breeding uses pred exclosure numbers according to RobS
     if (pen.type == "cons.breed")
         pen.type <- "pred.excl"
     parms <- list()

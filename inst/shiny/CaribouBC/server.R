@@ -1146,7 +1146,7 @@ server <- function(input, output, session) {
     })
     ## observers
     observeEvent(input$breeding_herd, {
-        values$breeding <- caribou_settings("mat.pen",
+        values$breeding <- caribou_settings("cons.breed",
                 herd = if (input$breeding_herd == "Default")
                     NULL else input$breeding_herd)
     })
@@ -1232,25 +1232,44 @@ server <- function(input, output, session) {
             "f.preg.wild" = "Fecundity, wild",
             "f.preg.capt" = "Fecundity in facility",
             #"out.prop"="Proportion of calves transferred",
+            "pen.cost.setup" = "Initial set up (x $1000)",
+            "pen.cost.proj" = "Project manager (x $1000)",
+            "pen.cost.maint" = "Maintenance (x $1000)",
+            "pen.cost.capt" = "Capture/monitor (x $1000)",
+            "pen.cost.pred" = "Removing predators (x $1000)",
             "f.surv.trans"="Adult female survival during capture/transport to facility",
             "j.surv.trans"="Juvenile female survival during capture/transport from facility to recipient herd",
             "j.surv.red"="Relative reduction in survival of juvenile females transported to recipient herd for 1 year after transport")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- "Breeding"
+        print(df)
         df
     })
+
     ## table
     output$breeding_Table <- renderTable({
         req(breeding_getF())
-        dF <- summary(breeding_getF())[,-(1:3)]
+        zz <- breeding_getF()
+
+        ## one time cost
+        cost1 <- zz$settings$pen.cost.setup
+        ## yearly costs
+        cost2 <- zz$settings$pen.cost.proj +
+            zz$settings$pen.cost.maint +
+            zz$settings$pen.cost.capt +
+            zz$settings$pen.cost.pred
+        cost <- (cost1 + zz$tmax * cost2) / 1000
+
+        dF <- summary(zz)[,-(1:3)]
         colnames(dF) <- c("In facility", "Recipient", "Status quo")
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
         df <- rbind(
             'N'=Ntmax,
-            '&lambda;'=round(Ntmax/Ntmax1, 3))
+            '&lambda;'=round(Ntmax/Ntmax1, 3),
+            "Total cost (x $1000)"=c(cost, NA, NA))
         df[2,2] <- round((Ntmax/N0)^(1/nrow(dF)), 3)[2]
         df
     }, rownames=TRUE, colnames=TRUE,
