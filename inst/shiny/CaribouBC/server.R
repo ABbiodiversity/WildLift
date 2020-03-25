@@ -1295,10 +1295,86 @@ server <- function(input, output, session) {
     })
     output$breeding_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_breeding_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("CaribouBC_conservation_breeding_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(breeding_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
+
+    ## >>> linear features <<<=====================================
+
+    seismic_all <- reactive({
+        caribou_seismic(
+            input$tmax,
+            input$popstart,
+            input$seismic_ld,
+            input$seismic_young,
+            input$seismic_cost,
+            input$seismic_deact,
+            input$seismic_restor)
+    })
+    ## plot
+    output$seismic_Plot <- renderPlotly({
+        req(seismic_all())
+        sm <- seismic_all()
+        dF <- data.frame(sm$pop)
+        colnames(dF)[1:2] <- c("Years", "Individuals")
+        p <- plot_ly(dF, x = ~Years, y = ~Individuals,
+            name = 'No linear features', type = 'scatter', mode = 'lines',
+            #text = hover(t(df$Individuals)),
+            #hoverinfo = 'text',
+            color=I('red')) %>%
+            add_trace(y = ~N1, name = 'Status quo', data = dF,
+                    mode = 'lines', color=I('blue')) %>%
+            add_trace(y = ~Ndeact, name = 'Deactivation', data = dF,
+                    mode = 'lines', color=I('black')) %>%
+            add_trace(y = ~Nrestor, name = 'Restoration', data = dF,
+                    mode = 'lines', color=I('orange')) %>%
+            layout(legend = list(x = 100, y = 0)) %>%
+            config(displayModeBar = 'hover', displaylogo = FALSE)
+        p
+    })
+    ## table
+    output$seismic_Table <- renderTable({
+        req(seismic_all())
+        sm <- seismic_all()
+        dF <- data.frame(sm$pop)
+        colnames(dF) <- c("Years", "No linear features", "No restoration",
+                          "Deactivation", "Restoration",
+        "Linear density, deactivation", "Linear density, restoration",
+        "Percent young forest")
+        df <- dF[nrow(dF),2:5]
+        rownames(df) <- "Population size"
+        df <- rbind(df, "Cost (x$1000)"=c(NA, NA, sm$costdeact, sm$costrestor))
+        df
+    }, rownames=TRUE, colnames=TRUE,
+    striped=TRUE, bordered=TRUE, na="n/a",
+    sanitize.text.function = function(x) x)
+
+    ## dowload
+    seismic_xlslist <- reactive({
+        req(seismic_all())
+        sm <- seismic_all()
+        dF <- data.frame(sm$pop)
+        colnames(dF) <- c("Years", "No linear features", "No restoration",
+                          "Deactivation", "Restoration",
+        "Linear density, deactivation", "Linear density, restoration",
+        "Percent young forest")
+        out <- list(
+            Info=data.frame(CaribouBC=paste0(
+                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+            TimeSeries=as.data.frame(dF))
+        out
+    })
+    output$seismic_download <- downloadHandler(
+        filename = function() {
+            paste0("CaribouBC_linear_features_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(seismic_xlslist(), file=file, overwrite=TRUE)
         },
         contentType="application/octet-stream"
     )

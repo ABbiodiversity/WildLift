@@ -102,3 +102,29 @@ stack_breeding <- function(x) {
     colnames(N) <- c("Part", "Year", rr)
     N
 }
+
+caribou_seismic <- function(tmax=20, pop.start=100, ld=0, young=0,
+cost=12, yr_deact=5, yr_restor=15) {
+    cn <- c("year", "N0", "N1", "Ndeact", "Nrestor",
+        "lddeact", "ldrestor", "young")
+    out <- matrix(0, tmax+1L, length(cn))
+    colnames(out) <- cn
+    out[1,c("N0", "N1", "Ndeact", "Nrestor")] <- pop.start
+    out[1,"lddeact"] <- ld
+    out[1,"ldrestor"] <- ld
+    out[,"young"] <- young
+    lamfun <- function(ld, young)
+        1.0184-0.0234*ld-0.0021*young
+    for (i in seq_len(tmax)+1L) {
+        out[i, "year"] <- i
+        out[i, "lddeact"] <- max(0, out[i-1L, "lddeact"]-ld/yr_deact)
+        out[i, "ldrestor"] <- max(0, out[i-1L, "ldrestor"]-ld/yr_restor)
+        out[i, "N0"] <- floor(out[i-1L, "N0"] * lamfun(0, 0))
+        out[i, "N1"] <- floor(out[i-1L, "N1"] * lamfun(ld, young))
+        out[i, "Ndeact"] <- floor(out[i-1L, "Ndeact"] * lamfun(out[i, "lddeact"], young))
+        out[i, "Nrestor"] <- floor(out[i-1L, "Nrestor"] * lamfun(out[i, "ldrestor"], young))
+    }
+    list(costdeact=diff(range(out[,"lddeact"]))*cost,
+         costrestor=diff(range(out[,"ldrestor"]))*cost,
+         pop=out)
+}

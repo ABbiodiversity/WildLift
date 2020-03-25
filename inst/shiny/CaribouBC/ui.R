@@ -19,7 +19,8 @@ dashboardPage(
       menuItem("Predator exclosure", tabName = "predator"),
       menuItem("Moose reduction", tabName = "moose"),
       menuItem("Wolf reduction", tabName = "wolf"),
-      menuItem("Conservation breeding", tabName = "breeding")
+      menuItem("Conservation breeding", tabName = "breeding"),
+      menuItem("Linear feature", tabName = "seismic")
     )
   ),
   dashboardBody(
@@ -315,6 +316,58 @@ dashboardPage(
               collapsible = TRUE, collapsed = TRUE,
               title = "Demography",
               uiOutput("breeding_demogr_sliders")
+            )
+          )
+        )
+      ),
+
+      tabItem("seismic",
+        fluidRow(
+          column(width=8,
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Population forecast: linear feature",
+              plotlyOutput("seismic_Plot", width = "100%", height = 400),
+              bsTooltip("seismic_Plot",
+                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                placement="right")
+            ),
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Summary: linear feature",
+              tableOutput("seismic_Table"),
+              downloadButton("seismic_download", "Download results as Excel file"),
+              bsTooltip("seismic_Table",
+                "Table summarizing reports. ",
+                placement="right"),
+              bsTooltip("seismic_download",
+                "Click here to download results.",
+                placement="top")
+            ),
+            HTML(FooterText)
+          ),
+          column(width=4,
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Settings",
+              sliderInput("seismic_ld",
+                "Linear feature density (km)",
+                min = 0, max = 100, value = 10, step = 1),
+              sliderInput("seismic_young",
+                "Percent young forest (<30 yrs; %)",
+                min = 0, max = 100, value = 10, step = 1),
+              sliderInput("seismic_cost",
+                "Cost of deactivation ($1000/km)",
+                min = 0, max = 100, value = 12, step = 1),
+              sliderInput("seismic_deact",
+                "Years for 100% deactivation",
+                min = 0, max = 50, value = 5, step = 1),
+              sliderInput("seismic_restor",
+                "Years for 100% restoration",
+                min = 0, max = 50, value = 15, step = 1)
             )
           )
         )
