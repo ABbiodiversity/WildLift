@@ -143,9 +143,6 @@ server <- function(input, output, session) {
     observeEvent(input$penning_CostCapt, {
         values$penning$pen.cost.capt <- input$penning_CostCapt
     })
-    #observeEvent(input$penning_CostPred, {
-    #    values$penning$pen.cost.pred <- input$penning_CostPred
-    #})
     ## apply settings and get forecast
     penning_getF <- reactive({
         caribou_forecast(values$penning,
@@ -790,12 +787,12 @@ server <- function(input, output, session) {
             moose_getB0())
         subs <- c("lam.pen", "Nend.pen")
         df <- cbind(
-            MooseNoPen=get_summary(moose_getF0(), values$use_perc)[subs],
-            MoosePen=get_summary(moose_getF(), values$use_perc)[subs],
             NoMooseNoPen=get_summary(moose_getB0(), values$use_perc)[subs],
-            NoMoosePen=get_summary(moose_getB(), values$use_perc)[subs]
+            NoMoosePen=get_summary(moose_getB(), values$use_perc)[subs],
+            MooseNoPen=get_summary(moose_getF0(), values$use_perc)[subs],
+            MoosePen=get_summary(moose_getF(), values$use_perc)[subs]
         )
-        Nnew <- pmax(0, df[2,] - input$popstart)
+        Nnew <- pmax(0, df[2,]-df[2,1])
         df <- rbind(df,
             Nnew=Nnew,
             Cost=c(NA, NA, NA, NA),
@@ -803,14 +800,11 @@ server <- function(input, output, session) {
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
                           "Total cost (x $1000)",
                           "Cost per new caribou (x $1000)")
-        #print(str(df))
-        #df <- tab[subs,,drop=FALSE]
-        #rownames(df) <- c("&lambda;", "N (end)")
         colnames(df) <- c(
-            "Moose reduction, no pen",
-            "Moose reduction, penned",
             "No moose reduction, no pen",
-            "No moose reduction, penned")
+            "No moose reduction, penned",
+            "Moose reduction, no pen",
+            "Moose reduction, penned")
         df
     })
 
@@ -1002,7 +996,7 @@ server <- function(input, output, session) {
         df <- cbind(
             WolfNoPen=get_summary(wolf_getF0(), values$use_perc)[subs],
             NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs])
-        Nnew <- max(0, df[2,1] - input$popstart)
+        Nnew <- max(0, df[2,1] - df[2,2])
         CostPerNew <- if (Nnew <= 0) NA else Cost/Nnew
         df <- rbind(df,
             Nnew=c(Nnew,NA),
@@ -1370,13 +1364,10 @@ server <- function(input, output, session) {
     output$seismic_Plot <- renderPlotly({
         req(seismic_all())
         sm <- seismic_all()
-        str(sm)
         dF <- data.frame(sm$pop)
         colnames(dF)[1:2] <- c("Years", "Individuals")
         p <- plot_ly(dF, x = ~Years, y = ~Individuals,
             name = 'No linear features', type = 'scatter', mode = 'lines',
-            #text = hover(t(df$Individuals)),
-            #hoverinfo = 'text',
             color=I('red')) %>%
             add_trace(y = ~N1, name = 'Status quo', data = dF,
                     mode = 'lines', color=I('blue')) %>%
@@ -1392,16 +1383,15 @@ server <- function(input, output, session) {
     seismic_getT <- reactive({
         req(seismic_all())
         sm <- seismic_all()
-        print(sm)
         dF <- data.frame(sm$pop)
         colnames(dF) <- c("Years", "No linear features", "No restoration",
-                          "Deactivation", "Restoration",
-        "Linear density, deactivation", "Linear density, restoration",
-        "Percent young forest")
+            "Deactivation", "Restoration",
+            "Linear density, deactivation", "Linear density, restoration",
+            "Percent young forest")
         df <- dF[nrow(dF),2:5]
         rownames(df) <- "N (end)"
         cost <- c(NA, NA, sm$costdeact, sm$costrestor)
-        Nnew <- c(NA, NA, pmax(0, dF[nrow(dF),4:5]-dF[1,4:5]))
+        Nnew <- c(NA, NA, pmax(0, dF[nrow(dF),4:5]-dF[nrow(dF),3]))
         df <- rbind(
             "&lambda;"=dF[nrow(dF),2:5]/dF[nrow(dF)-1,2:5],
             df,
