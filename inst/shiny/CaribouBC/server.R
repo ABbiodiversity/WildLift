@@ -212,7 +212,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (maternity penning)", "&lambda; (no maternity penning)",
             "N (end, maternity penning)", "N (end, no maternity penning)", "N (new)",
-            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+            "Total cost (x $1000)", "Cost per new caribou (x $1000)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
                 #NA else unlist(summary(penning_getB0()))
@@ -532,7 +532,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (predator exclosure)", "&lambda; (no predator exclosure)",
             "N (end, predator exclosure)", "N (end, no predator exclosure)", "N (new)",
-            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+            "Total cost (x $1000)", "Cost per new caribou (x $1000)")
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
                 #NA else unlist(summary(predator_getB0()))
@@ -802,7 +802,7 @@ server <- function(input, output, session) {
             CostPerNew=c(NA, NA, NA, NA))
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
                           "Total cost (x $1000)",
-                          "Cost per capita (x $1000 / caribou)")
+                          "Cost per new caribou (x $1000)")
         #print(str(df))
         #df <- tab[subs,,drop=FALSE]
         #rownames(df) <- c("&lambda;", "N (end)")
@@ -1010,7 +1010,7 @@ server <- function(input, output, session) {
             CostPerNew=c(CostPerNew, NA))
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
                           "Total cost (x $1000)",
-                          "Cost per capita (x $1000 / caribou)")
+                          "Cost per new caribou (x $1000)")
         colnames(df) <- c(
             "Wolf reduction",
             "No wolf reduction")
@@ -1289,7 +1289,7 @@ server <- function(input, output, session) {
             'N (end)'=Ntmax,
             'N (new)'=c(max(0,Nnew), NA, NA),
             "Total cost (x $1000)"=c(cost, NA, NA),
-            "Total per new Caribou (x $1000)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
+            "Cost per new caribou (x $1000)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
         df[2,2] <- round((Ntmax/N0)^(1/nrow(dF)), 3)[2]
         df
     }, rownames=TRUE, colnames=TRUE,
@@ -1407,7 +1407,7 @@ server <- function(input, output, session) {
             df,
             "N (new)"=Nnew,
             "Total cost (x $1000)"=cost,
-            "Total per new Caribou (x $1000)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
+            "Cost per new caribou (x $1000)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
         df
     })
     output$seismic_Table <- renderTable({
