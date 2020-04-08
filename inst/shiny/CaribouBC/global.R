@@ -119,10 +119,12 @@ cost=12, yr_deact=5, yr_restor=15) {
         out[i, "year"] <- i
         out[i, "lddeact"] <- max(0, out[i-1L, "lddeact"]-ld/yr_deact)
         out[i, "ldrestor"] <- max(0, out[i-1L, "ldrestor"]-ld/yr_restor)
-        out[i, "N0"] <- floor(out[i-1L, "N0"] * lamfun(0, 0))
-        out[i, "N1"] <- floor(out[i-1L, "N1"] * lamfun(ld, young))
-        out[i, "Ndeact"] <- floor(out[i-1L, "Ndeact"] * lamfun(out[i, "lddeact"], young))
-        out[i, "Nrestor"] <- floor(out[i-1L, "Nrestor"] * lamfun(out[i, "ldrestor"], young))
+        out[i, "N0"] <- max(0, floor(out[i-1L, "N0"] * lamfun(0, 0)))
+        out[i, "N1"] <- max(0, floor(out[i-1L, "N1"] * lamfun(ld, young)))
+        out[i, "Ndeact"] <- max(0,
+            floor(out[i-1L, "Ndeact"] * lamfun(out[i, "lddeact"], young)))
+        out[i, "Nrestor"] <- max(0,
+            floor(out[i-1L, "Nrestor"] * lamfun(out[i, "ldrestor"], young)))
     }
     list(costdeact=diff(range(out[,"lddeact"]))*cost,
          costrestor=diff(range(out[,"ldrestor"]))*cost,

@@ -19,8 +19,8 @@ dashboardPage(
       menuItem("Predator exclosure", tabName = "predator"),
       menuItem("Moose reduction", tabName = "moose"),
       menuItem("Wolf reduction", tabName = "wolf"),
-      menuItem("Conservation breeding", tabName = "breeding"),
-      menuItem("Linear feature", tabName = "seismic")
+      menuItem("Linear feature", tabName = "seismic"),
+      menuItem("Conservation breeding", tabName = "breeding")
     )
   ),
   dashboardBody(
@@ -353,21 +353,15 @@ dashboardPage(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Settings",
-              sliderInput("seismic_ld",
-                "Linear feature density (km)",
-                min = 0, max = 100, value = 10, step = 1),
-              sliderInput("seismic_young",
-                "Percent young forest (<30 yrs; %)",
-                min = 0, max = 100, value = 10, step = 1),
-              sliderInput("seismic_cost",
-                "Cost of deactivation ($1000/km)",
-                min = 0, max = 100, value = 12, step = 1),
-              sliderInput("seismic_deact",
-                "Years for 100% deactivation",
-                min = 0, max = 50, value = 5, step = 1),
-              sliderInput("seismic_restor",
-                "Years for 100% restoration",
-                min = 0, max = 50, value = 15, step = 1)
+              selectInput(
+                "seismic_herd", "Herd",
+                c("Default (Average of all herds)"="default",
+                  "Cold Lake"="coldlake", "ESAR"="esar", "WSAR"="wsar")
+              ),
+              bsTooltip("seismic_herd",
+                "Select a herd for herd range specific parameters.",
+                placement="top"),
+              uiOutput("seismic_sliders")
             )
           )
         )

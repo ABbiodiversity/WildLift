@@ -1259,17 +1259,20 @@ server <- function(input, output, session) {
             zz$settings$pen.cost.maint +
             zz$settings$pen.cost.capt +
             zz$settings$pen.cost.pred
-        cost <- (cost1 + zz$tmax * cost2) / 1000
+        cost <- (cost1 + zz$tmax * cost2)
+        print(c(cost1, cost2, cost))
 
         dF <- summary(zz)[,-(1:3)]
         colnames(dF) <- c("In facility", "Recipient", "Status quo")
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
+        Nnew <- summary(zz)$Nout[nrow(dF)]
         df <- rbind(
             'N'=Ntmax,
             '&lambda;'=round(Ntmax/Ntmax1, 3),
-            "Total cost (x $1000)"=c(cost, NA, NA))
+            "Total cost (x $1000)"=c(cost, NA, NA),
+            "Total per new Caribou (x $1000)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
         df[2,2] <- round((Ntmax/N0)^(1/nrow(dF)), 3)[2]
         df
     }, rownames=TRUE, colnames=TRUE,
@@ -1305,7 +1308,37 @@ server <- function(input, output, session) {
 
     ## >>> linear features <<<=====================================
 
+    output$seismic_sliders <- renderUI({
+        dlin <- switch(input$seismic_herd,
+            "default"=1.81,
+            "coldlake"=1.70,
+            "esar"=1.99,
+            "wsar"=1.69)
+        yng <- switch(input$seismic_herd,
+            "default"=15.15,
+            "coldlake"=13.85,
+            "esar"=25.70,
+            "wsar"=6.88)
+        tagList(
+            sliderInput("seismic_ld",
+                "Linear feature density (km / km sq)",
+                min = 0, max = 10, value = round(dlin, 2), step = 0.01),
+            sliderInput("seismic_young",
+                "Percent young forest (<30 yrs; %)",
+                min = 0, max = 100, value = round(yng, 1), step = 0.11),
+            sliderInput("seismic_cost",
+                "Cost per km (x $1000)",
+                min = 0, max = 100, value = 12, step = 1),
+            sliderInput("seismic_deact",
+                "Years for 100% deactivation",
+                min = 0, max = 50, value = 5, step = 1),
+            sliderInput("seismic_restor",
+                "Years for 100% restoration",
+                min = 0, max = 50, value = 15, step = 1)
+        )
+    })
     seismic_all <- reactive({
+        req(input$seismic_ld, input$seismic_young)
         caribou_seismic(
             input$tmax,
             input$popstart,
@@ -1315,10 +1348,12 @@ server <- function(input, output, session) {
             input$seismic_deact,
             input$seismic_restor)
     })
+
     ## plot
     output$seismic_Plot <- renderPlotly({
         req(seismic_all())
         sm <- seismic_all()
+        str(sm)
         dF <- data.frame(sm$pop)
         colnames(dF)[1:2] <- c("Years", "Individuals")
         p <- plot_ly(dF, x = ~Years, y = ~Individuals,
