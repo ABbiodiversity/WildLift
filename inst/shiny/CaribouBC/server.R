@@ -795,9 +795,17 @@ server <- function(input, output, session) {
             NoMooseNoPen=get_summary(moose_getB0(), values$use_perc)[subs],
             NoMoosePen=get_summary(moose_getB(), values$use_perc)[subs]
         )
+        Nnew <- pmax(0, df[2,] - input$popstart)
+        df <- rbind(df,
+            Nnew=Nnew,
+            Cost=c(NA, NA, NA, NA),
+            CostPerNew=c(NA, NA, NA, NA))
+        rownames(df) <- c("&lambda;", "N (end)", "N (new)",
+                          "Total cost (x $1000)",
+                          "Cost per capita (x $1000 / caribou)")
         #print(str(df))
         #df <- tab[subs,,drop=FALSE]
-        rownames(df) <- c("&lambda;", "N (end)")
+        #rownames(df) <- c("&lambda;", "N (end)")
         colnames(df) <- c(
             "Moose reduction, no pen",
             "Moose reduction, penned",
@@ -805,6 +813,7 @@ server <- function(input, output, session) {
             "No moose reduction, penned")
         df
     })
+
     ## making nice table of the settings
     moose_getS <- reactive({
         req(moose_getF(),
@@ -989,15 +998,22 @@ server <- function(input, output, session) {
         req(wolf_getF0(),
             wolf_getB0())
         subs <- c("lam.pen", "Nend.pen")
-        df <- rbind(
+        Cost <- input$wolf_nremove * 5.1
+        df <- cbind(
             WolfNoPen=get_summary(wolf_getF0(), values$use_perc)[subs],
             NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs])
-        df <- rbind(df, c(NA, df[1, "Nend.pen"]-df[2, "Nend.pen"]))
-        colnames(df) <- c("&lambda;", "N (end)")
-        rownames(df) <- c(
+        Nnew <- max(0, df[2,1] - input$popstart)
+        CostPerNew <- if (Nnew <= 0) NA else Cost/Nnew
+        df <- rbind(df,
+            Nnew=c(Nnew,NA),
+            Cost=c(Cost, NA),
+            CostPerNew=c(CostPerNew, NA))
+        rownames(df) <- c("&lambda;", "N (end)", "N (new)",
+                          "Total cost (x $1000)",
+                          "Cost per capita (x $1000 / caribou)")
+        colnames(df) <- c(
             "Wolf reduction",
-            "No wolf reduction",
-            "Difference")
+            "No wolf reduction")
         df
     })
     ## making nice table of the settings
@@ -1269,8 +1285,9 @@ server <- function(input, output, session) {
         Ntmax <- dF[nrow(dF),,drop=FALSE]
         Nnew <- summary(zz)$Nout[nrow(dF)]
         df <- rbind(
-            'N'=Ntmax,
             '&lambda;'=round(Ntmax/Ntmax1, 3),
+            'N (end)'=Ntmax,
+            'N (new)'=c(max(0,Nnew), NA, NA),
             "Total cost (x $1000)"=c(cost, NA, NA),
             "Total per new Caribou (x $1000)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
         df[2,2] <- round((Ntmax/N0)^(1/nrow(dF)), 3)[2]
@@ -1372,36 +1389,54 @@ server <- function(input, output, session) {
         p
     })
     ## table
-    output$seismic_Table <- renderTable({
+    seismic_getT <- reactive({
         req(seismic_all())
         sm <- seismic_all()
+        print(sm)
         dF <- data.frame(sm$pop)
         colnames(dF) <- c("Years", "No linear features", "No restoration",
                           "Deactivation", "Restoration",
         "Linear density, deactivation", "Linear density, restoration",
         "Percent young forest")
         df <- dF[nrow(dF),2:5]
-        rownames(df) <- "Population size"
-        df <- rbind(df, "Cost (x$1000)"=c(NA, NA, sm$costdeact, sm$costrestor))
+        rownames(df) <- "N (end)"
+        cost <- c(NA, NA, sm$costdeact, sm$costrestor)
+        Nnew <- c(NA, NA, pmax(0, dF[nrow(dF),4:5]-dF[1,4:5]))
+        df <- rbind(
+            "&lambda;"=dF[nrow(dF),2:5]/dF[nrow(dF)-1,2:5],
+            df,
+            "N (new)"=Nnew,
+            "Total cost (x $1000)"=cost,
+            "Total per new Caribou (x $1000)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
         df
+    })
+    output$seismic_Table <- renderTable({
+        req(seismic_getT())
+        seismic_getT()
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
     sanitize.text.function = function(x) x)
 
     ## dowload
     seismic_xlslist <- reactive({
-        req(seismic_all())
+        req(seismic_all(), seismic_getT())
         sm <- seismic_all()
         dF <- data.frame(sm$pop)
         colnames(dF) <- c("Years", "No linear features", "No restoration",
                           "Deactivation", "Restoration",
         "Linear density, deactivation", "Linear density, restoration",
         "Percent young forest")
+        df <- seismic_getT()
+        print("getT")
+        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         out <- list(
             Info=data.frame(CaribouBC=paste0(
                 c("R package version: ", "Date of analysis: ", "Caribou herd: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d")))),
-            TimeSeries=as.data.frame(dF))
+            TimeSeries=as.data.frame(dF),
+            Summary=as.data.frame(df))
+        out$Summary$Variables <- rownames(df)
+        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
         out
     })
     output$seismic_download <- downloadHandler(

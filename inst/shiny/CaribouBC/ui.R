@@ -248,7 +248,9 @@ dashboardPage(
               uiOutput("wolf_herd"),
               bsTooltip("wolf_herd",
                 "Select a herd for herd specific demography parameters.",
-                placement="top")
+                placement="top"),
+              sliderInput("wolf_nremove", "Number of wolfs to remove",
+                min = 0, max = 200, value = 0, step = 1)
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,
