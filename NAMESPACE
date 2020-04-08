@@ -2,7 +2,8 @@ export("caribou_settings",
        "caribou_forecast",
        "caribou_breakeven",
        "caribou_matrix",
-       "caribou_breeding")
+       "caribou_breeding",
+       "run_app")
 
 S3method("print", "caribou_settings")
 

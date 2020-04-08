@@ -1,7 +1,7 @@
 Package: CaribouBC
 Title: Caribou Population Forecasting
-Date: 2020-03-09
-Version: 0.2.5
+Date: 2020-04-06
+Version: 0.2.6
 Authors@R: 
     c(person(given = "Peter",
              family = "Solymos",

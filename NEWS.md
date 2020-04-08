@@ -1,3 +1,7 @@
+# Version 0.2.6
+
+* Added `run_app` function to run Shiny apps locally.
+
 # Version 0.2.5
 
 * App: default percent females penned is now 35%.
