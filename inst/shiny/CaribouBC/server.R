@@ -1277,7 +1277,7 @@ server <- function(input, output, session) {
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
-        Nnew <- summary(zz)$Nout[nrow(dF)]
+        Nnew <- dF[,"Recipient"] - dF[,"Status quo"]
         df <- rbind(
             '&lambda;'=round(Ntmax/Ntmax1, 3),
             'N (end)'=Ntmax,
