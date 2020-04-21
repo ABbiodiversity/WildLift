@@ -1,6 +1,11 @@
+# Version 0.2.71
+
+* This version is the 0.3.0 release candidate.
+
 # Version 0.2.6
 
 * Added `run_app` function to run Shiny apps locally.
+* Checked all inputs (demography, costs) and calculations.
 
 # Version 0.2.5
 

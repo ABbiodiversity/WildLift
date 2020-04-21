@@ -1277,14 +1277,14 @@ server <- function(input, output, session) {
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
-        Nnew <- dF[,"Recipient"] - dF[,"Status quo"]
+        Nnew <- Ntmax[1,"Recipient"] - Ntmax[1,"Status quo"]
         df <- rbind(
             '&lambda;'=round(Ntmax/Ntmax1, 3),
             'N (end)'=Ntmax,
-            'N (new)'=c(max(0,Nnew), NA, NA),
-            "Total cost (x $1000)"=c(cost, NA, NA),
-            "Cost per new caribou (x $1000)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
-        df[2,2] <- round((Ntmax/N0)^(1/nrow(dF)), 3)[2]
+            'N (new)'=c(NA, max(0,Nnew),NA),
+            "Total cost (x $1000)"=c(NA, cost, NA),
+            "Cost per new caribou (x $1000)"=c(NA,
+                ifelse(Nnew>0,cost/Nnew, NA), NA))
         df
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
