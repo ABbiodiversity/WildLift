@@ -1320,20 +1320,25 @@ server <- function(input, output, session) {
     ## >>> linear features <<<=====================================
 
     output$seismic_sliders <- renderUI({
-        dlin <- switch(input$seismic_herd,
-            "default"=1.81,
-            "coldlake"=1.70,
-            "esar"=1.99,
-            "wsar"=1.69)
+        area <- switch(input$seismic_herd,
+            "coldlake"=6726,
+            "esar"=13119,
+            "wsar"=15707)
+        linkm <- switch(input$seismic_herd,
+            "coldlake"=11432,
+            "esar"=26154,
+            "wsar"=26620)
         yng <- switch(input$seismic_herd,
-            "default"=15.15,
             "coldlake"=13.85,
             "esar"=25.70,
             "wsar"=6.88)
         tagList(
-            sliderInput("seismic_ld",
-                "Linear feature density (km / km sq)",
-                min = 0, max = 10, value = round(dlin, 2), step = 0.01),
+            sliderInput("seismic_area",
+                "Range area (sq km)",
+                min = 0, max = 20000, value = round(area, 2), step = 1),
+            sliderInput("seismic_linkm",
+                "Linear feature length (km)",
+                min = 0, max = 40000, value = round(linkm, 2), step = 1),
             sliderInput("seismic_young",
                 "Percent young forest (<30 yrs; %)",
                 min = 0, max = 100, value = round(yng, 1), step = 0.11),
@@ -1349,21 +1354,23 @@ server <- function(input, output, session) {
         )
     })
     seismic_all <- reactive({
-        req(input$seismic_ld, input$seismic_young)
+        req(input$seismic_area, input$seismic_linkm, input$seismic_young)
         caribou_seismic(
-            input$tmax,
-            input$popstart,
-            input$seismic_ld,
-            input$seismic_young,
-            input$seismic_cost,
-            input$seismic_deact,
-            input$seismic_restor)
+            tmax=input$tmax,
+            pop.start=input$popstart,
+            area=input$seismic_area,
+            lin=input$seismic_linkm,
+            young=input$seismic_young,
+            cost=input$seismic_cost,
+            yr_deact=input$seismic_deact,
+            yr_restor=input$seismic_restor)
     })
 
     ## plot
     output$seismic_Plot <- renderPlotly({
         req(seismic_all())
         sm <- seismic_all()
+        print(sm)
         dF <- data.frame(sm$pop)
         colnames(dF)[1:2] <- c("Years", "Individuals")
         p <- plot_ly(dF, x = ~Years, y = ~Individuals,

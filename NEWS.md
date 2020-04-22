@@ -1,6 +1,7 @@
-# Version 0.2.71
+# Version 0.2.72
 
 * This version is the 0.3.0 release candidate.
+* km/km^2 linear feature density and cost calculation updated.
 
 # Version 0.2.6
 

@@ -103,8 +103,10 @@ stack_breeding <- function(x) {
     N
 }
 
-caribou_seismic <- function(tmax=20, pop.start=100, ld=0, young=0,
+caribou_seismic <- function(tmax=20, pop.start=100,
+area=10000, lin=0, young=0,
 cost=12, yr_deact=5, yr_restor=15) {
+    ld <- lin/area
     lamfun <- function(ld, young)
         1.0184-0.0234*ld-0.0021*young
     cn <- c("year", "N0", "N1", "Ndeact", "Nrestor",
@@ -129,7 +131,7 @@ cost=12, yr_deact=5, yr_restor=15) {
         out[i, "lamrestor"] <- lamfun(out[i, "ldrestor"], young)
         out[i, "Nrestor"] <- max(0, floor(out[i-1L, "Nrestor"] * out[i, "lamrestor"]))
     }
-    list(costdeact=diff(range(out[,"lddeact"]))*cost,
-         costrestor=diff(range(out[,"ldrestor"]))*cost,
+    list(costdeact=diff(range(out[,"lddeact"]))*area*cost,
+         costrestor=diff(range(out[,"ldrestor"]))*area*cost,
          pop=out)
 }

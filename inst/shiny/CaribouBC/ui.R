@@ -357,8 +357,8 @@ dashboardPage(
               title = "Settings",
               selectInput(
                 "seismic_herd", "Herd",
-                c("Default (Average of all herds)"="default",
-                  "Cold Lake"="coldlake", "ESAR"="esar", "WSAR"="wsar")
+                c(#"Default (Average of all herds)"="default",
+                  "ESAR"="esar", "WSAR"="wsar", "Cold Lake"="coldlake")
               ),
               bsTooltip("seismic_herd",
                 "Select a herd for herd range specific parameters.",
