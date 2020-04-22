@@ -1328,6 +1328,10 @@ server <- function(input, output, session) {
             "coldlake"=11432,
             "esar"=26154,
             "wsar"=26620)
+        lin2d <- switch(input$seismic_herd,
+            "coldlake"=8012,
+            "esar"=21235,
+            "wsar"=21941)
         yng <- switch(input$seismic_herd,
             "coldlake"=13.85,
             "esar"=25.70,
@@ -1335,10 +1339,13 @@ server <- function(input, output, session) {
         tagList(
             sliderInput("seismic_area",
                 "Range area (sq km)",
-                min = 0, max = 20000, value = round(area, 2), step = 1),
+                min = 0, max = 20000, value = area, step = 1),
             sliderInput("seismic_linkm",
                 "Linear feature length (km)",
-                min = 0, max = 40000, value = round(linkm, 2), step = 1),
+                min = 0, max = 40000, value = linkm, step = 1),
+            sliderInput("seismic_lin2d",
+                "2D seismic length (km)",
+                min = 0, max = 40000, value = lin2d, step = 1),
             sliderInput("seismic_young",
                 "Percent young forest (<30 yrs; %)",
                 min = 0, max = 100, value = round(yng, 1), step = 0.11),
@@ -1354,12 +1361,21 @@ server <- function(input, output, session) {
         )
     })
     seismic_all <- reactive({
-        req(input$seismic_area, input$seismic_linkm, input$seismic_young)
+        req(input$seismic_area,
+            input$seismic_linkm,
+            input$seismic_lin2d,
+            input$seismic_young)
+        if (input$seismic_linkm < input$seismic_lin2d) {
+            showNotification("2D seismic cannot be more than total linear",
+                             type="error")
+            return(NULL)
+        }
         caribou_seismic(
             tmax=input$tmax,
             pop.start=input$popstart,
             area=input$seismic_area,
             lin=input$seismic_linkm,
+            seism=input$seismic_lin2d,
             young=input$seismic_young,
             cost=input$seismic_cost,
             yr_deact=input$seismic_deact,

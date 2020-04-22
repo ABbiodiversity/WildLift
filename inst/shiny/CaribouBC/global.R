@@ -104,9 +104,13 @@ stack_breeding <- function(x) {
 }
 
 caribou_seismic <- function(tmax=20, pop.start=100,
-area=10000, lin=0, young=0,
+area=10000, lin=0, seism=0, young=0,
 cost=12, yr_deact=5, yr_restor=15) {
     ld <- lin/area
+    if (seism > lin) # seismic <= linear
+        seism <- lin
+    perm <- lin - seism # permanent linear features
+    ldperm <- perm/area
     lamfun <- function(ld, young)
         1.0184-0.0234*ld-0.0021*young
     cn <- c("year", "N0", "N1", "Ndeact", "Nrestor",
@@ -122,8 +126,8 @@ cost=12, yr_deact=5, yr_restor=15) {
     out[1,c("lamdeact", "lamrestor")] <- lamfun(ld, young)
     for (i in seq_len(tmax)+1L) {
         out[i, "year"] <- i
-        out[i, "lddeact"] <- max(0, out[i-1L, "lddeact"]-ld/yr_deact)
-        out[i, "ldrestor"] <- max(0, out[i-1L, "ldrestor"]-ld/yr_restor)
+        out[i, "lddeact"] <- max(ldperm, out[i-1L, "lddeact"]-ld/yr_deact)
+        out[i, "ldrestor"] <- max(ldperm, out[i-1L, "ldrestor"]-ld/yr_restor)
         out[i, "N0"] <- max(0, floor(out[i-1L, "N0"] * out[i,"lam0"]))
         out[i, "N1"] <- max(0, floor(out[i-1L, "N1"] * out[i,"lam1"]))
         out[i, "lamdeact"] <- lamfun(out[i, "lddeact"], young)
