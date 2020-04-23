@@ -135,7 +135,7 @@ cost=12, yr_deact=5, yr_restor=15) {
         out[i, "lamrestor"] <- lamfun(out[i, "ldrestor"], young)
         out[i, "Nrestor"] <- max(0, floor(out[i-1L, "Nrestor"] * out[i, "lamrestor"]))
     }
-    list(costdeact=diff(range(out[,"lddeact"]))*area*cost,
-         costrestor=diff(range(out[,"ldrestor"]))*area*cost,
+    list(costdeact=diff(range(out[,"lddeact"]))*area*cost/1000,
+         costrestor=diff(range(out[,"ldrestor"]))*area*cost/1000,
          pop=out)
 }

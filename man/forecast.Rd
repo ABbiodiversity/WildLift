@@ -153,7 +153,7 @@ alongside a warning.
 The \code{print} method returns the input object \code{x} invisibly.
 
 The \code{summary} method returns population and cost summaries
-for the forecast object.
+for the forecast object (cost is in million dollars).
 
 The \code{plot} and \code{lines} methods return the plotted data invisibly
 (years, pen and no-pen population size for \code{plot};

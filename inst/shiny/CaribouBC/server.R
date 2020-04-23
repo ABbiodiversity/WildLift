@@ -209,7 +209,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (maternity penning)", "&lambda; (no maternity penning)",
             "N (end, maternity penning)", "N (end, no maternity penning)", "N (new)",
-            "Total cost (x $1000)", "Cost per new caribou (x $1000)")
+            "Total cost (x $million)", "Cost per new caribou (x $million)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
                 #NA else unlist(summary(penning_getB0()))
@@ -529,7 +529,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (predator exclosure)", "&lambda; (no predator exclosure)",
             "N (end, predator exclosure)", "N (end, no predator exclosure)", "N (new)",
-            "Total cost (x $1000)", "Cost per new caribou (x $1000)")
+            "Total cost (x $million)", "Cost per new caribou (x $million)")
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
                 #NA else unlist(summary(predator_getB0()))
@@ -798,8 +798,8 @@ server <- function(input, output, session) {
             Cost=c(NA, NA, NA, NA),
             CostPerNew=c(NA, NA, NA, NA))
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
-                          "Total cost (x $1000)",
-                          "Cost per new caribou (x $1000)")
+                          "Total cost (x $million)",
+                          "Cost per new caribou (x $million)")
         colnames(df) <- c(
             "No moose reduction, no pen",
             "No moose reduction, penned",
@@ -992,7 +992,7 @@ server <- function(input, output, session) {
         req(wolf_getF0(),
             wolf_getB0())
         subs <- c("lam.pen", "Nend.pen")
-        Cost <- input$wolf_nremove * 5.1
+        Cost <- input$wolf_nremove * input$tmax * 5.1 / 1000
         df <- cbind(
             WolfNoPen=get_summary(wolf_getF0(), values$use_perc)[subs],
             NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs])
@@ -1003,8 +1003,8 @@ server <- function(input, output, session) {
             Cost=c(Cost, NA),
             CostPerNew=c(CostPerNew, NA))
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
-                          "Total cost (x $1000)",
-                          "Cost per new caribou (x $1000)")
+                          "Total cost (x $million)",
+                          "Cost per new caribou (x $million)")
         colnames(df) <- c(
             "Wolf reduction",
             "No wolf reduction")
@@ -1269,7 +1269,7 @@ server <- function(input, output, session) {
             zz$settings$pen.cost.maint +
             zz$settings$pen.cost.capt +
             zz$settings$pen.cost.pred
-        cost <- (cost1 + zz$tmax * cost2)
+        cost <- (cost1 + zz$tmax * cost2) / 1000
         print(c(cost1, cost2, cost))
 
         dF <- summary(zz)[,-(1:3)]
@@ -1282,8 +1282,8 @@ server <- function(input, output, session) {
             '&lambda;'=round(Ntmax/Ntmax1, 3),
             'N (end)'=Ntmax,
             'N (new)'=c(NA, max(0,Nnew),NA),
-            "Total cost (x $1000)"=c(NA, cost, NA),
-            "Cost per new caribou (x $1000)"=c(NA,
+            "Total cost (x $million)"=c(NA, cost, NA),
+            "Cost per new caribou (x $million)"=c(NA,
                 ifelse(Nnew>0,cost/Nnew, NA), NA))
         df
     }, rownames=TRUE, colnames=TRUE,
@@ -1419,8 +1419,8 @@ server <- function(input, output, session) {
             "&lambda;"=dF[nrow(dF),2:5]/dF[nrow(dF)-1,2:5],
             df,
             "N (new)"=Nnew,
-            "Total cost (x $1000)"=cost,
-            "Cost per new caribou (x $1000)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
+            "Total cost (x $million)"=cost,
+            "Cost per new caribou (x $million)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
         df
     })
     output$seismic_Table <- renderTable({
