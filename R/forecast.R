@@ -43,7 +43,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         fpen.inds.vec[seq_along(fpen.inds)] <- fpen.inds
     }
     ## settings
-    pen.type <- attr(settings, "type")
+    #pen.type <- attr(settings, "pen.type")
     ## Cost
     pen.cap <- settings$pen.cap
     ## one time cost
@@ -137,8 +137,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         # total pop. size of penned pop
         tot.pen <- sum(N1[,1])
         # how many adult females in the pen?
-        #tot.adult.in.pen = N1[4,1]*fpen.prop
-        tot.adult.in.pen = N1[4,1]
+        tot.adult.in.pen = N1[4,1]*fpen.prop
+        #tot.adult.in.pen = N1[4,1]
         # total pop. size of wild pop
         tot.nopen <- sum(N2[,1])
         # how many new bou made in time t?
@@ -155,6 +155,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
         pens.needed <- ceiling(round(tot.adult.in.pen)/pen.cap)
         new.pens <- max(0, pens.needed-pens.avail)
         num.pens <- pens.avail + new.pens
+        pens.needed <- num.pens
         pens.cost.t <- (pen.cost1*new.pens + # cost to construct new pens
             pen.cost2*num.pens)/1000         # cost to maintain all pens
         # how much will these pens cost per new bou?

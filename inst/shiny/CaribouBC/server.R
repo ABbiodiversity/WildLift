@@ -1270,7 +1270,7 @@ server <- function(input, output, session) {
             zz$settings$pen.cost.capt +
             zz$settings$pen.cost.pred
         cost <- (cost1 + zz$tmax * cost2) / 1000
-        print(c(cost1, cost2, cost))
+        print(c(cost1/1000, cost2/1000, cost))
 
         dF <- summary(zz)[,-(1:3)]
         colnames(dF) <- c("In facility", "Recipient", "Status quo")
