@@ -1344,7 +1344,7 @@ server <- function(input, output, session) {
                 "Linear feature length (km)",
                 min = 0, max = 40000, value = linkm, step = 1),
             sliderInput("seismic_lin2d",
-                "2D seismic length (km)",
+                "Conventional seismic length (km)",
                 min = 0, max = 40000, value = lin2d, step = 1),
             sliderInput("seismic_young",
                 "Percent young forest (<30 yrs; %)",
@@ -1366,7 +1366,7 @@ server <- function(input, output, session) {
             input$seismic_lin2d,
             input$seismic_young)
         if (input$seismic_linkm < input$seismic_lin2d) {
-            showNotification("2D seismic cannot be more than total linear",
+            showNotification("Conventional seismic cannot be more than total linear",
                              type="error")
             return(NULL)
         }
