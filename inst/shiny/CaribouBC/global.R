@@ -121,7 +121,7 @@ cost=12, yr_deact=5, yr_restor=15) {
     out[1,"lddeact"] <- ld
     out[1,"ldrestor"] <- ld
     out[,"young"] <- young
-    out[,"lam0"] <- lamfun(0, 0)
+    out[,"lam0"] <- lamfun(0, young)
     out[,"lam1"] <- lamfun(ld, young)
     out[1,c("lamdeact", "lamrestor")] <- lamfun(ld, young)
     for (i in seq_len(tmax)+1L) {
