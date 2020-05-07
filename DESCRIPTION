@@ -18,6 +18,9 @@ Authors@R:
       person(given = "Melanie",
              family = "Dickie",
              role = c("aut")),
+      person(given = "Mariana",
+             family = "Nagy Baldy dos Reis",
+             role = c("aut")),
       person(given = "Province of British Columbia",
              role = "cph"))
 Description: Caribou population forecasting.
