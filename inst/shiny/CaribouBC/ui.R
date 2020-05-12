@@ -60,7 +60,7 @@ dashboardPage(
               title = "Settings",
               uiOutput("penning_herd"),
               bsTooltip("penning_herd",
-                "Select a herd for herd specific demography parameters.",
+                "Select a subpopulation for subpopulation specific demography parameters.",
                 placement="top"),
               uiOutput("penning_perc_or_inds"),
               uiOutput("penning_button"),
@@ -127,7 +127,7 @@ dashboardPage(
               title = "Settings",
               uiOutput("predator_herd"),
               bsTooltip("predator_herd",
-                "Select a herd for herd specific demography parameters.",
+                "Select a subpopulation for subpopulation specific demography parameters.",
                 placement="top"),
               uiOutput("predator_perc_or_inds"),
               uiOutput("predator_button"),
@@ -196,7 +196,7 @@ dashboardPage(
               title = "Settings",
               uiOutput("moose_herd"),
               bsTooltip("moose_herd",
-                "Select a herd for herd specific demography parameters.",
+                "Select a subpopulation for subpopulation specific demography parameters.",
                 placement="top"),
               uiOutput("moose_perc_or_inds"),
               uiOutput("moose_button"),
@@ -247,7 +247,7 @@ dashboardPage(
               title = "Settings",
               uiOutput("wolf_herd"),
               bsTooltip("wolf_herd",
-                "Select a herd for herd specific demography parameters.",
+                "Select a subpopulation for subpopulation specific demography parameters.",
                 placement="top")
             ),
             box(
@@ -304,21 +304,21 @@ dashboardPage(
               title = "Settings",
               uiOutput("breeding_herd"),
               bsTooltip("breeding_herd",
-                "Select a herd for herd specific demographic parameters.",
+                "Select a subpopulation for subpopulation specific demographic parameters.",
                 placement="top"),
               sliderInput("breeding_outprop", "Proportion of juvenile females transferred",
                 min = 0, max = 1, value = 0.5, step = 0.01),
               bsTooltip("breeding_outprop",
-                "The proportion of juvenile females transferred from the facility to the recipient herd."),
+                "The proportion of juvenile females transferred from the facility to the recipient subpopulation."),
               sliderInput("breeding_ininds", "Number of females put into facility each year (max)",
                 min = 0, max = 40, value = 10, step = 1),
               uiOutput("breeding_years"),
               sliderInput("breeding_ftrans", "Adult female survival during capture/transport to the facility",
                 min = 0, max = 1, value = 1, step = 0.01),
               uiOutput("breeding_jyears"),
-              sliderInput("breeding_jtrans", "Juvenile female survival during capture/transport from the facility to the recipient herd",
+              sliderInput("breeding_jtrans", "Juvenile female survival during capture/transport from the facility to the recipient subpopulation",
                 min = 0, max = 1, value = 1, step = 0.01),
-              sliderInput("breeding_jsred", "Relative reduction in survival of juvenile females transported to recipient herd for 1 year after transport",
+              sliderInput("breeding_jsred", "Relative reduction in survival of juvenile females transported to recipient subpopulation for 1 year after transport",
                 min = 0, max = 1, value = 1, step = 0.01)
             ),
             box(
@@ -364,12 +364,11 @@ dashboardPage(
               collapsible = FALSE, collapsed = FALSE,
               title = "Settings",
               selectInput(
-                "seismic_herd", "Herd",
-                c(#"Default (Average of all herds)"="default",
-                  "ESAR"="esar", "WSAR"="wsar", "Cold Lake"="coldlake")
+                "seismic_herd", "Subpopulation",
+                c("ESAR"="esar", "WSAR"="wsar", "Cold Lake"="coldlake")
               ),
               bsTooltip("seismic_herd",
-                "Select a herd for herd range specific parameters.",
+                "Select a subpopulation for subpopulation range specific parameters.",
                 placement="top"),
               uiOutput("seismic_sliders")
             )

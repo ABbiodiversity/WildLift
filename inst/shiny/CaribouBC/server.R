@@ -26,7 +26,7 @@ server <- function(input, output, session) {
     ## dynamically render sliders
     output$penning_demogr_sliders <- renderUI({
         if (input$penning_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("penning_DemCsw", "Calf survival, wild",
                 min = 0, max = 1, value = inits$penning$c.surv.wild, step = 0.001),
@@ -52,11 +52,11 @@ server <- function(input, output, session) {
                     "stop-circle" else "arrows-alt-h"))
         )
     })
-    ## dynamically render herd selector
+    ## dynamically render subpopulation selector
     output$penning_herd <- renderUI({
         tagList(
             selectInput(
-                "penning_herd", "Herd",
+                "penning_herd", "Subpopulation",
                 c("Default (East Side Athabasca)"="Default", Herds, HerdsWolf)
             )
         )
@@ -316,7 +316,7 @@ server <- function(input, output, session) {
         ss <- penning_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$penning_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -343,7 +343,7 @@ server <- function(input, output, session) {
     ## dynamically render sliders
     output$predator_demogr_sliders <- renderUI({
         if (input$predator_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
              sliderInput("predator_DemCsw", "Calf survival, wild",
                 min = 0, max = 1, value = inits$predator$c.surv.wild, step = 0.001),
@@ -370,11 +370,11 @@ server <- function(input, output, session) {
                     "stop-circle" else "arrows-alt-h"))
         )
     })
-    ## dynamically render herd selector
+    ## dynamically render subpopulation selector
     output$predator_herd <- renderUI({
         tagList(
             selectInput(
-                "predator_herd", "Herd",
+                "predator_herd", "Subpopulation",
                 c("Default (East Side Athabasca)"="Default", Herds)
             )
         )
@@ -636,7 +636,7 @@ server <- function(input, output, session) {
         ss <- predator_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$predator_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -663,7 +663,7 @@ server <- function(input, output, session) {
     ## dynamically render sliders
     output$moose_demogr_sliders <- renderUI({
         if (input$moose_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("moose_DemCsw", "Calf survival, moose reduction",
                 min = 0, max = 1, value = inits$moose$c.surv.wild, step = 0.001),
@@ -678,11 +678,11 @@ server <- function(input, output, session) {
             sliderInput("moose_DemFpc", "Fecundity, no moose reduction",
                 min = 0, max = 1, value = inits$moose0$f.preg.wild, step = 0.001)
         )
-    })    ## dynamically render herd selector
+    })    ## dynamically render subpopulation selector
     output$moose_herd <- renderUI({
         tagList(
             selectInput(
-                "moose_herd", "Herd",
+                "moose_herd", "Subpopulation",
                 c("Default (East Side Athabasca)"="Default", Herds)
             )
         )
@@ -889,7 +889,7 @@ server <- function(input, output, session) {
         ss <- moose_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$moose_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -916,7 +916,7 @@ server <- function(input, output, session) {
     ## dynamically render sliders
     output$wolf_demogr_sliders <- renderUI({
         if (input$wolf_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("wolf_DemCsw", "Calf survival, wolf reduction",
                 min = 0, max = 1, value = inits$wolf$c.surv.wild, step = 0.001),
@@ -932,12 +932,12 @@ server <- function(input, output, session) {
                 min = 0, max = 1, value = inits$wolf0$f.preg.wild, step = 0.001)
         )
     })
-    ## dynamically render herd selector
+    ## dynamically render subpopulation selector
     output$wolf_herd <- renderUI({
         tagList(
             selectInput(
-                "wolf_herd", "Herd",
-                c("Default (Average of all herds)"="Default", HerdsWolf)
+                "wolf_herd", "Subpopulation",
+                c("Default (Average of all subpopulations)"="Default", HerdsWolf)
             )
         )
     })
@@ -1081,7 +1081,7 @@ server <- function(input, output, session) {
         print("getS")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$wolf_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -1123,7 +1123,7 @@ server <- function(input, output, session) {
     })
     output$breeding_demogr_sliders <- renderUI({
         if (input$breeding_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("breeding_DemCsc", "Calf survival in facility",
                 min = 0, max = 1,
@@ -1145,11 +1145,11 @@ server <- function(input, output, session) {
                 value = inits$breeding$f.preg.wild, step = 0.001)
         )
     })
-    ## dynamically render herd selector
+    ## dynamically render subpopulation selector
     output$breeding_herd <- renderUI({
         tagList(
             selectInput(
-                "breeding_herd", "Herd",
+                "breeding_herd", "Subpopulation",
                 c("Default (East Side Athabasca)"="Default", Herds)
             )
         )
@@ -1248,8 +1248,8 @@ server <- function(input, output, session) {
             "pen.cost.capt" = "Capture/monitor (x $1000)",
             "pen.cost.pred" = "Removing predators (x $1000)",
             "f.surv.trans"="Adult female survival during capture/transport to facility",
-            "j.surv.trans"="Juvenile female survival during capture/transport from facility to recipient herd",
-            "j.surv.red"="Relative reduction in survival of juvenile females transported to recipient herd for 1 year after transport")
+            "j.surv.trans"="Juvenile female survival during capture/transport from facility to recipient subpopulation",
+            "j.surv.red"="Relative reduction in survival of juvenile females transported to recipient subpopulation for 1 year after transport")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- "Breeding"
@@ -1298,7 +1298,7 @@ server <- function(input, output, session) {
         ss <- breeding_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(dF),
@@ -1444,7 +1444,7 @@ server <- function(input, output, session) {
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d")))),
             TimeSeries=as.data.frame(dF),
             Summary=as.data.frame(df))
