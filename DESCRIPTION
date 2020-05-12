@@ -34,5 +34,6 @@ Suggests:
     shiny,
     shinydashboard,
     plotly,
-    openxlsx
+    openxlsx,
+    shinyBS
 VignetteBuilder: knitr
