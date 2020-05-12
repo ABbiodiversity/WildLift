@@ -87,7 +87,7 @@ dashboardPage(
               sliderInput("penning_CostMaint", "Maintenance",
                 min = 0, max = 1000, value = inits$penning$pen.cost.maint, step = 10),
               sliderInput("penning_CostCapt", "Capture/monitor",
-                min = 0, max = 500, value = inits$penning$pen.cost.capt, step = 10)#,
+                min = 0, max = 500, value = inits$penning$pen.cost.capt, step = 10)
             )
           )
         )
@@ -248,18 +248,23 @@ dashboardPage(
               uiOutput("wolf_herd"),
               bsTooltip("wolf_herd",
                 "Select a herd for herd specific demography parameters.",
-                placement="top"),
-              sliderInput("wolf_nremove", "Number of wolfs to remove",
-                min = 0, max = 200, value = 0, step = 1),
-              bsTooltip("wolf_nremove",
-                "The wolf slider does not change outcomes because it assumes users are entering the optimal number of wolves to be removed (i.e., enough wolves to achieve 2/1000 sq km). The slider is used only to calculate costs.",
-                placement="left"),
+                placement="top")
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
               title = "Demography",
               uiOutput("wolf_demogr_sliders")
+            ),
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Cost",
+              sliderInput("wolf_nremove", "Number of wolves to remove (cost $5100 each)",
+                min = 0, max = 200, value = 0, step = 1),
+              bsTooltip("wolf_nremove",
+                "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
+                placement="bottom"),
             )
           )
         )
