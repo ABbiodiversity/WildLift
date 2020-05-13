@@ -992,7 +992,7 @@ server <- function(input, output, session) {
         req(wolf_getF0(),
             wolf_getB0())
         subs <- c("lam.pen", "Nend.pen")
-        Cost <- input$wolf_nremove * input$tmax * 5.1 / 1000
+        Cost <- input$wolf_nremove * input$tmax * (input$wolf_cost1/1000) / 1000
         df <- cbind(
             WolfNoPen=get_summary(wolf_getF0(), values$use_perc)[subs],
             NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs])
@@ -1349,9 +1349,9 @@ server <- function(input, output, session) {
             sliderInput("seismic_young",
                 "Percent young forest (<30 yrs; %)",
                 min = 0, max = 100, value = round(yng, 1), step = 0.11),
-            sliderInput("seismic_cost",
-                "Cost per km (x $1000)",
-                min = 0, max = 100, value = 12, step = 1),
+#            sliderInput("seismic_cost",
+#                "Cost per km (x $1000)",
+#                min = 0, max = 100, value = 12, step = 1),
             sliderInput("seismic_deact",
                 "Years for 100% deactivation",
                 min = 0, max = 50, value = 5, step = 1),

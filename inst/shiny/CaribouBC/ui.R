@@ -260,11 +260,13 @@ dashboardPage(
               width = NULL, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
               title = "Cost",
+              sliderInput("wolf_cost1", "Cost of removing one wolf ($)",
+                min = 0, max = 10000, value = 5100, step = 100),
               sliderInput("wolf_nremove", "Number of wolves to remove (cost $5100 each)",
                 min = 0, max = 200, value = 0, step = 1),
               bsTooltip("wolf_nremove",
                 "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
-                placement="bottom"),
+                placement="bottom")
             )
           )
         )
@@ -371,6 +373,14 @@ dashboardPage(
                 "Select a subpopulation for subpopulation range specific parameters.",
                 placement="top"),
               uiOutput("seismic_sliders")
+            ),
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Cost",
+              sliderInput("seismic_cost",
+                "Cost per km (x $1000)",
+                min = 0, max = 100, value = 12, step = 1),
             )
           )
         )
