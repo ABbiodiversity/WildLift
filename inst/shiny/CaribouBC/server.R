@@ -1253,7 +1253,7 @@ server <- function(input, output, session) {
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- "Breeding"
-        print(df)
+        #print(df)
         df
     })
 
@@ -1270,7 +1270,7 @@ server <- function(input, output, session) {
             zz$settings$pen.cost.capt +
             zz$settings$pen.cost.pred
         cost <- (cost1 + zz$tmax * cost2) / 1000
-        print(c(cost1/1000, cost2/1000, cost))
+        #print(c(cost1/1000, cost2/1000, cost))
 
         dF <- summary(zz)[,-(1:3)]
         colnames(dF) <- c("In facility", "Recipient", "Status quo")
@@ -1386,7 +1386,7 @@ server <- function(input, output, session) {
     output$seismic_Plot <- renderPlotly({
         req(seismic_all())
         sm <- seismic_all()
-        print(sm)
+        #print(sm)
         dF <- data.frame(sm$pop)
         colnames(dF)[1:2] <- c("Years", "Individuals")
         p <- plot_ly(dF, x = ~Years, y = ~Individuals,
