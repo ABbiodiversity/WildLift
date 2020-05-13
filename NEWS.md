@@ -1,10 +1,11 @@
-# Version 0.2.75
+# Version 0.2.76
 
 * This version is the 0.3.0 release candidate.
 * km/km^2 linear feature density and cost calculation updated.
 * Output costs are in $ millions (CAD 2020).
 * Mariana added to authors list.
 * No linear feature option is still affected by % early seral.
+* Added Dockerfile for isolated testing purposes.
 
 # Version 0.2.6
 
