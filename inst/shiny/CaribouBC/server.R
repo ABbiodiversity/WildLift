@@ -1178,6 +1178,18 @@ server <- function(input, output, session) {
     observeEvent(input$breeding_DemFpc, {
         values$breeding$f.preg.capt <- input$breeding_DemFpc
     })
+    observeEvent(input$breeding_CostSetup, {
+        values$breeding$pen.cost.setup <- input$breeding_CostSetup
+    })
+    observeEvent(input$breeding_CostProj, {
+        values$breeding$pen.cost.proj <- input$breeding_CostProj
+    })
+    observeEvent(input$breeding_CostMaint, {
+        values$breeding$pen.cost.maint <- input$breeding_CostMaint
+    })
+    observeEvent(input$breeding_CostCapt, {
+        values$breeding$pen.cost.capt <- input$breeding_CostCapt
+    })
     ## breeding reduction without penning
     breeding_getF <- reactive({
         req(input$breeding_yrs, input$breeding_ininds, input$breeding_jyrs)

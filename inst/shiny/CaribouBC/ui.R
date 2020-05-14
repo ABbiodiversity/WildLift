@@ -328,6 +328,20 @@ dashboardPage(
               collapsible = TRUE, collapsed = TRUE,
               title = "Demography",
               uiOutput("breeding_demogr_sliders")
+            ),
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = TRUE,
+              title = "Cost (x $1000)",
+              sliderInput("breeding_CostSetup", "Initial set up",
+                min = 0, max = 20000, value = 100*round(inits$breeding$pen.cost.setup/100),
+                step = 1000),
+              sliderInput("breeding_CostProj", "Project manager",
+                min = 0, max = 500, value = inits$breeding$pen.cost.proj, step = 10),
+              sliderInput("breeding_CostMaint", "Maintenance",
+                min = 0, max = 1000, value = inits$breeding$pen.cost.maint, step = 10),
+              sliderInput("breeding_CostCapt", "Capture/monitor",
+                min = 0, max = 500, value = inits$breeding$pen.cost.capt, step = 10)
             )
           )
         )

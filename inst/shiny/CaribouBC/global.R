@@ -39,7 +39,7 @@ inits <- list(
         f.surv.wild=0.801,
         c.surv.capt=0.295,
         c.surv.wild=0.295),
-    breeding = caribou_settings("cons.breed")
+    breeding = caribou_settings("cons.breed", pen.cap=40)
 )
 
 get_settings <- function(x, use_perc=TRUE) {
