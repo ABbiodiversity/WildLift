@@ -992,7 +992,7 @@ server <- function(input, output, session) {
         req(wolf_getF0(),
             wolf_getB0())
         subs <- c("lam.pen", "Nend.pen")
-        Cost <- input$wolf_nremove * input$tmax * (input$wolf_cost1/1000) / 1000
+        Cost <- input$wolf_nremove * input$tmax * input$wolf_cost1 / 1000
         df <- cbind(
             WolfNoPen=get_summary(wolf_getF0(), values$use_perc)[subs],
             NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs])
