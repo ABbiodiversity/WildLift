@@ -155,7 +155,7 @@ dashboardPage(
                 min = 0, max = 1000, value = inits$predator$pen.cost.maint, step = 10),
               sliderInput("predator_CostCapt", "Capture/monitor",
                 min = 0, max = 500, value = inits$predator$pen.cost.capt, step = 10),
-              sliderInput("predator_CostPred", "Removing predators",
+              sliderInput("predator_CostPred", "Predator removal",
                 min = 0, max = 500, value = inits$predator$pen.cost.pred, step = 10)
             )
           )
