@@ -1,5 +1,5 @@
 dashboardPage(
-  dashboardHeader(title = paste("Caribou BC", ver[1])),
+  dashboardHeader(title = paste("WildLift", ver[1])),
   dashboardSidebar(
     tags$script(src = "tips.js"),
     sliderInput("tmax", "Number of years to forecast",
@@ -171,7 +171,7 @@ dashboardPage(
               title = "Population forecast: Moose reduction",
               plotlyOutput("moose_Plot", width = "100%", height = 400),
               bsTooltip("moose_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results.",
                 placement="right")
             ),
             box(
@@ -222,7 +222,7 @@ dashboardPage(
               title = "Population forecast: Wolf reduction",
               plotlyOutput("wolf_Plot", width = "100%", height = 400),
               bsTooltip("wolf_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results.",
                 placement="right")
             ),
             box(
@@ -281,7 +281,7 @@ dashboardPage(
               title = "Population forecast: conservation breeding",
               plotlyOutput("breeding_Plot", width = "100%", height = 400),
               bsTooltip("breeding_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results.",
                 placement="right")
             ),
             box(
@@ -356,7 +356,7 @@ dashboardPage(
               title = "Population forecast: linear feature",
               plotlyOutput("seismic_Plot", width = "100%", height = 400),
               bsTooltip("seismic_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results.",
                 placement="right")
             ),
             box(

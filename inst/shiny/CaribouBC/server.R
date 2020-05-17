@@ -209,7 +209,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (maternity penning)", "&lambda; (no maternity penning)",
             "N (end, maternity penning)", "N (end, no maternity penning)", "N (new)",
-            "Total cost (x $million)", "Cost per new caribou (x $million)")
+            "Total cost (x $million)", "Cost per new individual (x $million)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
                 #NA else unlist(summary(penning_getB0()))
@@ -316,7 +316,7 @@ server <- function(input, output, session) {
         ss <- penning_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$penning_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -529,7 +529,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (predator exclosure)", "&lambda; (no predator exclosure)",
             "N (end, predator exclosure)", "N (end, no predator exclosure)", "N (new)",
-            "Total cost (x $million)", "Cost per new caribou (x $million)")
+            "Total cost (x $million)", "Cost per new individual (x $million)")
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
                 #NA else unlist(summary(predator_getB0()))
@@ -636,7 +636,7 @@ server <- function(input, output, session) {
         ss <- predator_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$predator_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -799,9 +799,9 @@ server <- function(input, output, session) {
             CostPerNew=c(NA, NA, NA, NA))
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
                           "Total cost (x $million)",
-                          "Cost per new caribou (x $million)")
+                          "Cost per new individual (x $million)")
         colnames(df) <- c(
-            "No moose reduction, no pen",
+            "Status quo",
             "No moose reduction, penned",
             "Moose reduction, no pen",
             "Moose reduction, penned")
@@ -838,7 +838,7 @@ server <- function(input, output, session) {
         colnames(df) <- c(
             "Moose reduction, no pen",
             "Moose reduction, penned",
-            "No moose reduction, no pen",
+            "Status quo",
             "No moose reduction, penned")
         df
     })
@@ -855,7 +855,7 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Npen, name = 'Moose reduction, penned', data = dF,
                 mode = 'lines', color=I('blue')) %>%
-            add_trace(y = ~Npen, name = 'No moose reduction, no pen', data = dB0,
+            add_trace(y = ~Npen, name = 'Status quo', data = dB0,
                     line=list(dash = 'dash', color='red')) %>%
             add_trace(y = ~Npen, name = 'No moose reduction, penned', data = dB,
                 line=list(dash = 'dash', color='blue')) %>%
@@ -882,14 +882,14 @@ server <- function(input, output, session) {
         colnames(TS) <- c("Years",
             "N moose reduction, no pen",
             "N moose reduction, penned",
-            "N no moose reduction, no pen",
+            "N status quo",
             "N no moose reduction, penned")
         df <- moose_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- moose_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$moose_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -920,15 +920,15 @@ server <- function(input, output, session) {
         tagList(
             sliderInput("wolf_DemCsw", "Calf survival, wolf reduction",
                 min = 0, max = 1, value = inits$wolf$c.surv.wild, step = 0.001),
-            sliderInput("wolf_DemCsc", "Calf survival, no wolf reduction",
+            sliderInput("wolf_DemCsc", "Calf survival, status quo",
                 min = 0, max = 1, value = inits$wolf0$c.surv.wild, step = 0.001),
             sliderInput("wolf_DemFsw", "Adult female survival, wolf reduction",
                 min = 0, max = 1, value = inits$wolf$f.surv.wild, step = 0.001),
-            sliderInput("wolf_DemFsc", "Adult female survival, no wolf reduction",
+            sliderInput("wolf_DemFsc", "Adult female survival, status quo",
                 min = 0, max = 1, value = inits$wolf0$f.surv.wild, step = 0.001),
             sliderInput("wolf_DemFpw", "Fecundity, wolf reduction",
                 min = 0, max = 1, value = inits$wolf$f.preg.wild, step = 0.001),
-            sliderInput("wolf_DemFpc", "Fecundity, no wolf reduction",
+            sliderInput("wolf_DemFpc", "Fecundity, status quo",
                 min = 0, max = 1, value = inits$wolf0$f.preg.wild, step = 0.001)
         )
     })
@@ -980,7 +980,7 @@ server <- function(input, output, session) {
             pop.start = input$popstart,
             fpen.prop = 0)
     })
-    ## no wolf reduction without penning
+    ## no wolf reduction (status quo) without penning
     wolf_getB0 <- reactive({
         caribou_forecast(values$wolf0,
             tmax = input$tmax,
@@ -1004,10 +1004,10 @@ server <- function(input, output, session) {
             CostPerNew=c(CostPerNew, NA))
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
                           "Total cost (x $million)",
-                          "Cost per new caribou (x $million)")
+                          "Cost per new individual (x $million)")
         colnames(df) <- c(
             "Wolf reduction",
-            "No wolf reduction")
+            "Status quo")
         df
     })
     ## making nice table of the settings
@@ -1035,7 +1035,7 @@ server <- function(input, output, session) {
         rownames(df) <- SNAM
         colnames(df) <- c(
             "Wolf reduction",
-            "No wolf reduction")
+            "Status quo")
         df
     })
     ## plot
@@ -1048,7 +1048,7 @@ server <- function(input, output, session) {
         p <- plot_ly(dF0, x = ~Years, y = ~Individuals,
             name = 'Wolf reduction', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Npen, name = 'No wolf reduction', data = dB0,
+            add_trace(y = ~Npen, name = 'Status quo', data = dB0,
                     mode = 'lines', color=I('blue')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
@@ -1073,7 +1073,7 @@ server <- function(input, output, session) {
         print("TS")
         colnames(TS) <- c("Years",
             "N wolf reduction",
-            "N no wolf reduction")
+            "N status quo")
         df <- wolf_getT()
         print("getT")
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
@@ -1081,7 +1081,7 @@ server <- function(input, output, session) {
         print("getS")
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$wolf_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -1295,7 +1295,7 @@ server <- function(input, output, session) {
             'N (end)'=Ntmax,
             'N (new)'=c(NA, max(0,Nnew),NA),
             "Total cost (x $million)"=c(NA, cost, NA),
-            "Cost per new caribou (x $million)"=c(NA,
+            "Cost per new individual (x $million)"=c(NA,
                 ifelse(Nnew>0,cost/Nnew, NA), NA))
         df
     }, rownames=TRUE, colnames=TRUE,
@@ -1310,7 +1310,7 @@ server <- function(input, output, session) {
         ss <- breeding_getS()
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(dF),
@@ -1419,7 +1419,7 @@ server <- function(input, output, session) {
         req(seismic_all())
         sm <- seismic_all()
         dF <- data.frame(sm$pop)
-        colnames(dF) <- c("Years", "No linear features", "No restoration",
+        colnames(dF) <- c("Years", "No linear features", "Status quo",
             "Deactivation", "Restoration",
             "Linear density, deactivation", "Linear density, restoration",
             "Percent young forest")
@@ -1432,7 +1432,7 @@ server <- function(input, output, session) {
             df,
             "N (new)"=Nnew,
             "Total cost (x $million)"=cost,
-            "Cost per new caribou (x $million)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
+            "Cost per new individual (x $million)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
         df
     })
     output$seismic_Table <- renderTable({
@@ -1447,7 +1447,7 @@ server <- function(input, output, session) {
         req(seismic_all(), seismic_getT())
         sm <- seismic_all()
         dF <- data.frame(sm$pop)
-        colnames(dF) <- c("Years", "No linear features", "No restoration",
+        colnames(dF) <- c("Years", "No linear features", "Status quo",
                           "Deactivation", "Restoration",
         "Linear density, deactivation", "Linear density, restoration",
         "Percent young forest")
@@ -1456,7 +1456,7 @@ server <- function(input, output, session) {
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         out <- list(
             Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou subpopulation: "),
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d")))),
             TimeSeries=as.data.frame(dF),
             Summary=as.data.frame(df))
