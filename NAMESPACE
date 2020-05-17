@@ -1,21 +1,21 @@
-export("caribou_settings",
-       "caribou_forecast",
-       "caribou_breakeven",
-       "caribou_matrix",
-       "caribou_breeding",
+export("wildlift_settings",
+       "wildlift_forecast",
+       "wildlift_breakeven",
+       "wildlift_matrix",
+       "wildlift_breeding",
        "run_app")
 
-S3method("print", "caribou_settings")
+S3method("print", "wildlift_settings")
 
-S3method("print", "caribou_forecast")
-S3method("summary", "caribou_forecast")
-S3method("print", "summary.caribou_forecast")
-S3method("plot", "caribou_forecast")
-S3method("lines", "caribou_forecast")
+S3method("print", "wildlift_forecast")
+S3method("summary", "wildlift_forecast")
+S3method("print", "summary.wildlift_forecast")
+S3method("plot", "wildlift_forecast")
+S3method("lines", "wildlift_forecast")
 
-S3method("print", "caribou_breeding")
-S3method("summary", "caribou_breeding")
-S3method("plot", "caribou_breeding")
+S3method("print", "wildlift_breeding")
+S3method("summary", "wildlift_breeding")
+S3method("plot", "wildlift_breeding")
 
 importFrom("popbio", "eigen.analysis", "pop.projection")
 importFrom("graphics", "lines", "legend")

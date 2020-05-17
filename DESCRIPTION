@@ -1,7 +1,7 @@
-Package: CaribouBC
-Title: An open-source tool to guide decisions for wildlife conservation
-Date: 2020-05-14
-Version: 0.2.77
+Package: WildLift
+Title: An Open-source Tool to Guide Decisions for Wildlife Conservation
+Date: 2020-05-16
+Version: 0.2.78
 Authors@R: 
     c(person(given = "Peter",
              family = "Solymos",
@@ -25,7 +25,10 @@ Authors@R:
              role = "cph"),
       person(given = "Province of British Columbia",
              role = "cph"))
-Description: Caribou population forecasting.
+Description: Compare alternative recovery actions: 
+  Linear Feature Restoration, Linear Feature Deactivation, 
+  Maternal Penning, Conservation Breeding, Predator Exclosure, 
+  Wolf Reduction, and Moose Reduction.
 License: Apache License (== 2.0) | file LICENSE
 Encoding: UTF-8
 LazyData: true

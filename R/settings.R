@@ -196,12 +196,12 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed
     parms
 }
 
-caribou_settings <-
+wildlift_settings <-
 function(
 pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed"),
 herd=NULL,
 ...) {
-    if (inherits(pen.type, "caribou_settings")) {
+    if (inherits(pen.type, "wildlift_settings")) {
         parms <- pen.type
     } else {
         pen.type <- match.arg(pen.type)
@@ -209,7 +209,7 @@ herd=NULL,
         attr(parms, "pen.type") <- pen.type
         if (!is.null(herd))
             attr(parms, "herd") <- herd
-        class(parms) <- "caribou_settings"
+        class(parms) <- "wildlift_settings"
     }
     dots <- list(...)
     if (length(dots) > 0L)

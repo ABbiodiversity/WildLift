@@ -1,6 +1,6 @@
-## methods for caribou_settings
+## methods for wildlift_settings
 
-print.caribou_settings <- function(x, ...) {
+print.wildlift_settings <- function(x, ...) {
     cat("Caribou settings - pen type:", attr(x, "pen.type"),
         "\n\n")
     str(x[names(x) != "call"],
@@ -8,9 +8,9 @@ print.caribou_settings <- function(x, ...) {
     invisible(x)
 }
 
-## methods for caribou_forecast
+## methods for wildlift_forecast
 
-print.caribou_forecast <- function(x, ...) {
+print.wildlift_forecast <- function(x, ...) {
     cat("Caribou forecast - pen type:", attr(x$settings, "pen.type"),
         "\n\n")
     WHAT <- if (is.null(x$fpen.prop)) {
@@ -22,7 +22,7 @@ print.caribou_forecast <- function(x, ...) {
         give.attr=FALSE, give.head=FALSE, comp.str = "- ", no.list=TRUE)
     invisible(x)
 }
-plot.caribou_forecast <- function(x, plot=TRUE, ...) {
+plot.wildlift_forecast <- function(x, plot=TRUE, ...) {
     d0 <- lines(x, pen=FALSE, plot=FALSE)
     d1 <- lines(x, pen=TRUE, plot=FALSE)
     if (plot) {
@@ -31,21 +31,21 @@ plot.caribou_forecast <- function(x, plot=TRUE, ...) {
     }
     invisible(data.frame(Years=d0$Years, Nnopen=d0$N, Npen=d1$N))
 }
-lines.caribou_forecast <- function(x, pen=TRUE, plot=TRUE, ...) {
+lines.wildlift_forecast <- function(x, pen=TRUE, plot=TRUE, ...) {
     d <- data.frame(Years=seq(0, x$tmax),
         N=if (pen) x$Npop$N.pen else x$Npop$N.nopen)
     if (plot)
         lines(N ~ Years, d, ...)
     invisible(d)
 }
-summary.caribou_forecast <- function(object, ...) {
+summary.wildlift_forecast <- function(object, ...) {
     object$Npop <- NULL
     object$call <- NULL
     object$settings$call <- NULL
-    class(object) <- "summary.caribou_forecast"
+    class(object) <- "summary.wildlift_forecast"
     object
 }
-print.summary.caribou_forecast <- function(x, ...) {
+print.summary.wildlift_forecast <- function(x, ...) {
     cat("Caribou forecast - pen type:", attr(x$settings, "pen.type"),
         "\n\n")
     WHAT <- if (is.null(x$fpen.prop)) {
@@ -62,9 +62,9 @@ print.summary.caribou_forecast <- function(x, ...) {
     invisible(x)
 }
 
-## methods for caribou_breeding
+## methods for wildlift_breeding
 
-print.caribou_breeding <- function(x, ...) {
+print.wildlift_breeding <- function(x, ...) {
     cat("Caribou captive breeding:\n\n")
     WHAT <- c("tmax", "pop.start",
         "f.surv.trans", "j.surv.trans", "j.surv.red")
@@ -78,11 +78,11 @@ print.caribou_breeding <- function(x, ...) {
     invisible(x)
 }
 
-summary.caribou_breeding <- function(object, ...) {
+summary.wildlift_breeding <- function(object, ...) {
     object$population
 }
 
-plot.caribou_breeding <- function(x, plot=TRUE, ...) {
+plot.wildlift_breeding <- function(x, plot=TRUE, ...) {
     N <- x$population
     if (plot) {
         plot(N$Year, N$Ncapt, ylim=c(0, max(N[,-1])), type="l",

@@ -1,4 +1,4 @@
-caribou_forecast <-
+wildlift_forecast <-
 function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
 {
     if (tmax < 1)
@@ -248,7 +248,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     } else {
         out$fpen.inds <- fpen.inds
     }
-    class(out) <- "caribou_forecast"
+    class(out) <- "wildlift_forecast"
     out$call <- match.call()
 
     out

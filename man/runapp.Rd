@@ -7,7 +7,7 @@ Run Shiny apps
 Run the Shiny apps that are included in the package.
 }
 \usage{
-run_app(app = "CaribouBC")
+run_app(app = "WildLift")
 }
 \arguments{
   \item{app}{
@@ -15,6 +15,6 @@ character, which app to run.
 }
 }
 \details{
-\code{"CaribouBC"}: the default app.
+\code{"WildLift"}: the default app.
 }
 \keyword{ misc }

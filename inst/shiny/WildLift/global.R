@@ -1,15 +1,15 @@
-#shiny::runApp("inst/shiny/matpen")
+#shiny::runApp("inst/shiny/WildLift")
 
-## install/update CaribouBC package as needed
+## install/update WildLift package as needed
 ## need to install from github for rsconnect to work properly
-#remotes::install_github("psolymos/CaribouBC")
+#remotes::install_github("ABbiodiversity/WildLift")
 
 library(shiny)
 library(shinydashboard)
 library(shinyBS)
 library(plotly)
 library(openxlsx)
-library(CaribouBC)
+library(WildLift)
 
 ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
                 fields="Version")
@@ -19,27 +19,27 @@ inits <- list(
     penning = c(
         fpen.prop = 0.35,
         fpen.inds = 10,
-        caribou_settings("mat.pen")),
+        wildlift_settings("mat.pen")),
     predator = c(
         fpen.prop = 0.35,
         fpen.inds = 10,
-        caribou_settings("pred.excl")),
+        wildlift_settings("pred.excl")),
     moose = c(
         fpen.prop = 0.35,
         fpen.inds = 10,
-        caribou_settings("moose.red")),
+        wildlift_settings("moose.red")),
     moose0 = c(
         fpen.prop = 0.35,
         fpen.inds = 10,
-        caribou_settings("mat.pen")),
-    wolf = caribou_settings("wolf.red"),
+        wildlift_settings("mat.pen")),
+    wolf = wildlift_settings("wolf.red"),
     ## set AFS=0.801 CS=0.295 under no wolf option
-    wolf0 = caribou_settings("mat.pen",
+    wolf0 = wildlift_settings("mat.pen",
         f.surv.capt=0.801,
         f.surv.wild=0.801,
         c.surv.capt=0.295,
         c.surv.wild=0.295),
-    breeding = caribou_settings("cons.breed", pen.cap=40)
+    breeding = wildlift_settings("cons.breed", pen.cap=40)
 )
 
 get_settings <- function(x, use_perc=TRUE) {
@@ -103,7 +103,7 @@ stack_breeding <- function(x) {
     N
 }
 
-caribou_seismic <- function(tmax=20, pop.start=100,
+wildlift_seismic <- function(tmax=20, pop.start=100,
 area=10000, lin=0, seism=0, young=0,
 cost=12, yr_deact=5, yr_restor=15) {
     ld <- lin/area

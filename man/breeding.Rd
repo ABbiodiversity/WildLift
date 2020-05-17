@@ -1,9 +1,9 @@
 \name{breeding}
-\alias{caribou_matrix}
-\alias{caribou_breeding}
-\alias{print.caribou_breeding}
-\alias{summary.caribou_breeding}
-\alias{plot.caribou_breeding}
+\alias{wildlift_matrix}
+\alias{wildlift_breeding}
+\alias{print.wildlift_breeding}
+\alias{summary.wildlift_breeding}
+\alias{plot.wildlift_breeding}
 \title{
 Caribou Conservation Breeding
 }
@@ -11,21 +11,21 @@ Caribou Conservation Breeding
 Functions evaluate different options for conservation breeding.
 }
 \usage{
-caribou_matrix(settings, wild=TRUE,
+wildlift_matrix(settings, wild=TRUE,
     age.cens=3, age.1st.litter=3, age.calf.max=1)
 
-caribou_breeding(settings,
+wildlift_breeding(settings,
     in.inds=10, out.prop=1, f.surv.trans=1,
     j.surv.trans=1, j.surv.red=1,
     tmax=20, pop.start=100)
 
-\method{print}{caribou_breeding}(x, ...)
-\method{summary}{caribou_breeding}(object, ...)
-\method{plot}{caribou_breeding}(x, plot = TRUE, ...)
+\method{print}{wildlift_breeding}(x, ...)
+\method{summary}{wildlift_breeding}(object, ...)
+\method{plot}{wildlift_breeding}(x, plot = TRUE, ...)
 }
 \arguments{
   \item{settings}{
-a settings object returned by \code{\link{caribou_settings}}.
+a settings object returned by \code{\link{wildlift_settings}}.
 }
   \item{wild}{
 logical, whether to use the penned or wild vital \code{settings}.
@@ -89,11 +89,11 @@ additional arguments to functions.
 The conservation breeding functionality is based on vital rates
 provided via the \code{settings} argument.
 These rates are turned into a projection matrix
-using \code{caribou_matrix}. This projection matrix
+using \code{wildlift_matrix}. This projection matrix
 reflects survival and reproduction rates based on
 the settings, tracking females only based on a sex ratio of 0.5.
 
-The \code{caribou_breeding} function tracks changes
+The \code{wildlift_breeding} function tracks changes
 in the conservation population starting with adding
 females to produce offspring.
 
@@ -111,9 +111,9 @@ This status quo population uses the same vital rates as the recipient herd,
 but does not get the extra juvenile females from the penned population.
 }
 \value{
-\code{caribou_matrix} returns a projection matrix.
+\code{wildlift_matrix} returns a projection matrix.
 
-\code{caribou_breeding} returns a conservation breeding object.
+\code{wildlift_breeding} returns a conservation breeding object.
 It contains age specific population sizes for the
 penned, recipient, and status quo populations (females only).
 
@@ -126,17 +126,17 @@ The \code{plot} method return the plotted data invisibly
 and produces a plot as a side effect.
 }
 \seealso{
-\code{\link{caribou_settings}}, \code{\link{caribou_forecast}}
+\code{\link{wildlift_settings}}, \code{\link{wildlift_forecast}}
 }
 \examples{
 ## projection matrix
-s <- caribou_settings()
+s <- wildlift_settings()
 
-caribou_matrix(s, wild=TRUE)  # wild
-caribou_matrix(s, wild=FALSE) # captive
+wildlift_matrix(s, wild=TRUE)  # wild
+wildlift_matrix(s, wild=FALSE) # captive
 
 ## out.prop = 0.5: move half of the juveniles
-x0 <- caribou_breeding(s,
+x0 <- wildlift_breeding(s,
     tmax = 20,        # projection horizon
     in.inds = rep(10, 5),
     out.prop = 0.5)

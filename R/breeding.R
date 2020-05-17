@@ -1,5 +1,5 @@
 ## create projection matrix
-caribou_matrix <- function(settings, wild=TRUE,
+wildlift_matrix <- function(settings, wild=TRUE,
 age.cens=3, age.1st.litter=3, age.calf.max=1) {
     if (wild) {
         surv.c <- settings$c.surv.wild
@@ -31,7 +31,7 @@ age.cens=3, age.1st.litter=3, age.calf.max=1) {
     A
 }
 
-caribou_breeding <- function(settings,
+wildlift_breeding <- function(settings,
 in.inds=10, # number of females added each year
 out.prop=1, # remove all (1) or none (0), recycled
 f.surv.trans=1, # female survival during transportation into captive
@@ -46,11 +46,11 @@ pop.start=100) { # wild / recipient population
     in.age <- 3:4 # ages of females added in each year, matching in.inds
     out.age <- 1 # age of inds pumped out
 
-    Aw <- caribou_matrix(settings, wild=TRUE,
+    Aw <- wildlift_matrix(settings, wild=TRUE,
         age.cens=age.cens,
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max)
-    Ac <- caribou_matrix(settings, wild=FALSE,
+    Ac <- wildlift_matrix(settings, wild=FALSE,
         age.cens=age.cens,
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max)
@@ -176,6 +176,6 @@ pop.start=100) { # wild / recipient population
         Nin=Nin, Nout=Nout, Ncapt=Nc, Nrecip=Nw, Nwild=Nw0)
     out$population <- data.frame(Years=c(0, seq_len(tmax)),
         sapply(out[c("Nin", "Nout", "Ncapt", "Nrecip", "Nwild")], colSums))
-    class(out) <- "caribou_breeding"
+    class(out) <- "wildlift_breeding"
     out
 }

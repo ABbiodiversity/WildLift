@@ -86,7 +86,7 @@ server <- function(input, output, session) {
         values$penning <- c(
             fpen.prop = values$penning$fpen.prop,
             fpen.inds = values$penning$fpen.inds,
-            caribou_settings("mat.pen",
+            wildlift_settings("mat.pen",
                 herd = if (input$penning_herd == "Default")
                     NULL else input$penning_herd))
         if (values$penning_compare) {
@@ -145,7 +145,7 @@ server <- function(input, output, session) {
     })
     ## apply settings and get forecast
     penning_getF <- reactive({
-        caribou_forecast(values$penning,
+        wildlift_forecast(values$penning,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$penning$fpen.prop else NULL,
@@ -155,12 +155,12 @@ server <- function(input, output, session) {
     penning_getB <- reactive({
         req(penning_getF())
         p <- suppressWarnings(
-            caribou_breakeven(penning_getF(),
+            wildlift_breakeven(penning_getF(),
                 type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
-        caribou_forecast(penning_getF()$settings,
+        wildlift_forecast(penning_getF()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) p else NULL,
@@ -170,7 +170,7 @@ server <- function(input, output, session) {
     penning_getF0 <- reactive({
         if (!values$penning_compare)
             return(NULL)
-        caribou_forecast(values$penning0,
+        wildlift_forecast(values$penning0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$penning0$fpen.prop else NULL,
@@ -179,12 +179,12 @@ server <- function(input, output, session) {
     penning_getB0 <- reactive({
         req(penning_getF0())
         p <- suppressWarnings(
-            caribou_breakeven(penning_getF0(),
+            wildlift_breakeven(penning_getF0(),
                 type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
-        caribou_forecast(penning_getF0()$settings,
+        wildlift_forecast(penning_getF0()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) p else NULL,
@@ -315,7 +315,7 @@ server <- function(input, output, session) {
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- penning_getS()
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
+            Info=data.frame(WildLift=paste0(
                 c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$penning_herd))),
             Settings=as.data.frame(ss),
@@ -329,7 +329,7 @@ server <- function(input, output, session) {
     })
     output$penning_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_maternity_pen_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_maternity_pen_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(penning_xlslist(), file=file, overwrite=TRUE)
@@ -404,7 +404,7 @@ server <- function(input, output, session) {
         values$predator <- c(
             fpen.prop = values$predator$fpen.prop,
             fpen.inds = values$predator$fpen.inds,
-            caribou_settings("pred.excl",
+            wildlift_settings("pred.excl",
                 herd = if (input$predator_herd == "Default") NULL else input$predator_herd))
         if (values$predator_compare) {
             values$predator0 <- values$predator
@@ -465,7 +465,7 @@ server <- function(input, output, session) {
     })
     ## apply settings and get forecast
     predator_getF <- reactive({
-        caribou_forecast(values$predator,
+        wildlift_forecast(values$predator,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$predator$fpen.prop else NULL,
@@ -475,12 +475,12 @@ server <- function(input, output, session) {
     predator_getB <- reactive({
         req(predator_getF())
         p <- suppressWarnings(
-            caribou_breakeven(predator_getF(),
+            wildlift_breakeven(predator_getF(),
                 type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
-        caribou_forecast(predator_getF()$settings,
+        wildlift_forecast(predator_getF()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) p else NULL,
@@ -490,7 +490,7 @@ server <- function(input, output, session) {
     predator_getF0 <- reactive({
         if (!values$predator_compare)
             return(NULL)
-        caribou_forecast(values$predator0,
+        wildlift_forecast(values$predator0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$predator0$fpen.prop else NULL,
@@ -499,12 +499,12 @@ server <- function(input, output, session) {
     predator_getB0 <- reactive({
         req(predator_getF0())
         p <- suppressWarnings(
-            caribou_breakeven(predator_getF0(),
+            wildlift_breakeven(predator_getF0(),
                 type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
-        caribou_forecast(predator_getF0()$settings,
+        wildlift_forecast(predator_getF0()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) p else NULL,
@@ -635,7 +635,7 @@ server <- function(input, output, session) {
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- predator_getS()
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
+            Info=data.frame(WildLift=paste0(
                 c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$predator_herd))),
             Settings=as.data.frame(ss),
@@ -649,7 +649,7 @@ server <- function(input, output, session) {
     })
     output$predator_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_predator_exclosure_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_predator_exclosure_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(predator_xlslist(), file=file, overwrite=TRUE)
@@ -712,13 +712,13 @@ server <- function(input, output, session) {
         values$moose <- c(
             fpen.prop = values$moose$fpen.prop,
             fpen.inds = values$moose$fpen.inds,
-            caribou_settings("moose.red",
+            wildlift_settings("moose.red",
                 herd = if (input$moose_herd == "Default")
                     NULL else input$moose_herd))
         values$moose0 <- c(
             fpen.prop = values$moose0$fpen.prop,
             fpen.inds = values$moose0$fpen.inds,
-            caribou_settings("mat.pen",
+            wildlift_settings("mat.pen",
                 herd = if (input$moose_herd == "Default")
                     NULL else input$moose_herd))
     })
@@ -751,7 +751,7 @@ server <- function(input, output, session) {
     })
     ## moose reduction with penning
     moose_getF <- reactive({
-        caribou_forecast(values$moose,
+        wildlift_forecast(values$moose,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$moose$fpen.prop else NULL,
@@ -759,7 +759,7 @@ server <- function(input, output, session) {
     })
     ## no moose reduction with penning
     moose_getB <- reactive({
-        caribou_forecast(values$moose0,
+        wildlift_forecast(values$moose0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$moose0$fpen.prop else NULL,
@@ -767,14 +767,14 @@ server <- function(input, output, session) {
     })
     ## moose reduction without penning
     moose_getF0 <- reactive({
-        caribou_forecast(values$moose,
+        wildlift_forecast(values$moose,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = 0)
     })
     ## no moose reduction without penning
     moose_getB0 <- reactive({
-        caribou_forecast(values$moose0,
+        wildlift_forecast(values$moose0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = 0)
@@ -888,7 +888,7 @@ server <- function(input, output, session) {
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- moose_getS()
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
+            Info=data.frame(WildLift=paste0(
                 c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$moose_herd))),
             Settings=as.data.frame(ss),
@@ -902,7 +902,7 @@ server <- function(input, output, session) {
     })
     output$moose_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_moose_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_moose_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(moose_xlslist(), file=file, overwrite=TRUE)
@@ -943,11 +943,11 @@ server <- function(input, output, session) {
     })
     ## observers
     observeEvent(input$wolf_herd, {
-        values$wolf <- caribou_settings("wolf.red",
+        values$wolf <- wildlift_settings("wolf.red",
                 herd = if (input$wolf_herd == "Default")
                     NULL else input$wolf_herd)
         ## set AFS=0.801 CS=0.295 under no wolf option
-        values$wolf0 <- caribou_settings("mat.pen",
+        values$wolf0 <- wildlift_settings("mat.pen",
                 herd = if (input$wolf_herd == "Default")
                     NULL else input$wolf_herd,
                 f.surv.capt=0.801,
@@ -975,14 +975,14 @@ server <- function(input, output, session) {
     })
     ## wolf reduction without penning
     wolf_getF0 <- reactive({
-        caribou_forecast(values$wolf,
+        wildlift_forecast(values$wolf,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = 0)
     })
     ## no wolf reduction (status quo) without penning
     wolf_getB0 <- reactive({
-        caribou_forecast(values$wolf0,
+        wildlift_forecast(values$wolf0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = 0)
@@ -1080,7 +1080,7 @@ server <- function(input, output, session) {
         ss <- wolf_getS()
         print("getS")
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
+            Info=data.frame(WildLift=paste0(
                 c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$wolf_herd))),
             Settings=as.data.frame(ss),
@@ -1095,7 +1095,7 @@ server <- function(input, output, session) {
     })
     output$wolf_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_wolf_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_wolf_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(wolf_xlslist(), file=file, overwrite=TRUE)
@@ -1156,7 +1156,7 @@ server <- function(input, output, session) {
     })
     ## observers
     observeEvent(input$breeding_herd, {
-        values$breeding <- caribou_settings("cons.breed",
+        values$breeding <- wildlift_settings("cons.breed",
                 herd = if (input$breeding_herd == "Default")
                     NULL else input$breeding_herd)
     })
@@ -1195,7 +1195,7 @@ server <- function(input, output, session) {
         req(input$breeding_yrs, input$breeding_ininds, input$breeding_jyrs)
         nn <- rep(input$breeding_ininds, input$breeding_yrs)
         op <- c(rep(0, input$breeding_jyrs), input$breeding_outprop)
-        caribou_breeding(values$breeding,
+        wildlift_breeding(values$breeding,
             tmax = input$tmax,
             pop.start = input$popstart,
             f.surv.trans = input$breeding_ftrans,
@@ -1309,7 +1309,7 @@ server <- function(input, output, session) {
         dF <- summary(bb)
         ss <- breeding_getS()
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
+            Info=data.frame(WildLift=paste0(
                 c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
             Settings=as.data.frame(ss),
@@ -1321,7 +1321,7 @@ server <- function(input, output, session) {
     })
     output$breeding_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_conservation_breeding_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_conservation_breeding_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(breeding_xlslist(), file=file, overwrite=TRUE)
@@ -1382,7 +1382,7 @@ server <- function(input, output, session) {
                              type="error")
             return(NULL)
         }
-        caribou_seismic(
+        wildlift_seismic(
             tmax=input$tmax,
             pop.start=input$popstart,
             area=input$seismic_area,
@@ -1455,7 +1455,7 @@ server <- function(input, output, session) {
         print("getT")
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
+            Info=data.frame(WildLift=paste0(
                 c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d")))),
             TimeSeries=as.data.frame(dF),
@@ -1466,7 +1466,7 @@ server <- function(input, output, session) {
     })
     output$seismic_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_linear_features_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_linear_features_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(seismic_xlslist(), file=file, overwrite=TRUE)

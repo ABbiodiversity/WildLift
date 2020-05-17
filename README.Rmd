@@ -12,28 +12,20 @@ knitr::opts_chunk$set(
 )
 ```
 
-# CaribouBC
+# WildLift
 
-> Caribou Population Forecasting
+>  An Open-source Tool to Guide Decisions for Wildlife Conservation
 
 [![Linux build status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
 [![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
 Try the [Shiny app](https://psolymos.shinyapps.io/CaribouBC/) or run locally as 
-`shiny::runGitHub("bcgov/CaribouBC", subdir = "inst/shiny/matpen")`.
+`WildLift::run_app()`.
 
 ## Installation
 
-Stable version:
-
 ```{r install,eval=FALSE}
-remotes::install_github("bcgov/CaribouBC")
-```
-
-Development version is available as this fork:
-
-```{r install_dev,eval=FALSE}
-remotes::install_github("psolymos/CaribouBC")
+remotes::install_github("ABbiodiversity/WildLift")
 ```
 
 See user visible changes in the [NEWS](NEWS.md) file.
@@ -41,18 +33,18 @@ See user visible changes in the [NEWS](NEWS.md) file.
 ## Usage
 
 ```{r example}
-library(CaribouBC)
+library(WildLift)
 
 ## Predefined settings
-(s1 <- caribou_settings("mat.pen"))
-(s2 <- caribou_settings("pred.excl"))
+(s1 <- wildlift_settings("mat.pen"))
+(s2 <- wildlift_settings("pred.excl"))
 
 ## Modifying predefined settings
-caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
+wildlift_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
 
 ## Forecast based on settings for 75% females penned
-f1 <- caribou_forecast(s1, fpen.prop = 0.75)
-f2 <- caribou_forecast(s2, fpen.prop = 0.75)
+f1 <- wildlift_forecast(s1, fpen.prop = 0.75)
+f2 <- wildlift_forecast(s2, fpen.prop = 0.75)
 
 ## Most important results summarized
 summary(f1)
@@ -65,10 +57,10 @@ legend("topleft", col = c(1,1,2), lty = c(2,1,1),
     legend = c("No pen", "Mat pen", "Pred excl"))
 
 ## Find 'breakeven' proportion of females penned where lambda=1
-(b1 <- caribou_breakeven(f1, lambda = 1))
-(b2 <- caribou_breakeven(f2, lambda = 1))
-f3 <- caribou_forecast(s1, fpen.prop = b1)
-f4 <- caribou_forecast(s2, fpen.prop = b2)
+(b1 <- wildlift_breakeven(f1, lambda = 1))
+(b2 <- wildlift_breakeven(f2, lambda = 1))
+f3 <- wildlift_forecast(s1, fpen.prop = b1)
+f4 <- wildlift_forecast(s2, fpen.prop = b2)
 ## See that lines are truly flat
 op <- par(mfrow = c(1, 2))
 plot(f3, main = "Mat pen")
@@ -78,13 +70,13 @@ par(op)
 ## Forecast using number of penned females
 ## - it can be an initial number
 ## - or a vector of individuals for subsequent years
-caribou_forecast(s1, fpen.inds = 5)
-caribou_forecast(s2, fpen.inds = c(5, 0, 4, 6))
+wildlift_forecast(s1, fpen.inds = 5)
+wildlift_forecast(s2, fpen.inds = c(5, 0, 4, 6))
 ```
 
 ## Getting Help or Reporting an Issue
 
-To report bugs/issues/feature requests, please file an [issue](https://github.com/bcgov/CaribouBC/issues/).
+To report bugs/issues/feature requests, please file an [issue](https://github.com/Abbiodiversity/WildLift/issues/).
 
 ## How to Contribute
 

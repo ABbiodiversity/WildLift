@@ -1,8 +1,8 @@
 ## parsing *.R files in Shiny apps
 
-library(CaribouBC)
+library(WildLift)
 
-path <- system.file("shiny", package="CaribouBC")
+path <- system.file("shiny", package="WildLift")
 #path <- "inst/shiny"
 apps <- list.files(path)
 
