@@ -1,6 +1,6 @@
-# CaribouBC
+# WildLift
 
-> Caribou Population Forecasting
+>  An Open-source Tool to Guide Decisions for Wildlife Conservation
 
 [![Linux build
 status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)

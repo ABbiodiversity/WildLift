@@ -26,7 +26,7 @@ server <- function(input, output, session) {
     ## dynamically render sliders
     output$penning_demogr_sliders <- renderUI({
         if (input$penning_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("penning_DemCsw", "Calf survival, wild",
                 min = 0, max = 1, value = inits$penning$c.surv.wild, step = 0.001),
@@ -52,11 +52,11 @@ server <- function(input, output, session) {
                     "stop-circle" else "arrows-alt-h"))
         )
     })
-    ## dynamically render herd selector
+    ## dynamically render subpopulation selector
     output$penning_herd <- renderUI({
         tagList(
             selectInput(
-                "penning_herd", "Herd",
+                "penning_herd", "Subpopulation",
                 c("Default (East Side Athabasca)"="Default", Herds, HerdsWolf)
             )
         )
@@ -86,7 +86,7 @@ server <- function(input, output, session) {
         values$penning <- c(
             fpen.prop = values$penning$fpen.prop,
             fpen.inds = values$penning$fpen.inds,
-            caribou_settings("mat.pen",
+            wildlift_settings("mat.pen",
                 herd = if (input$penning_herd == "Default")
                     NULL else input$penning_herd))
         if (values$penning_compare) {
@@ -143,12 +143,9 @@ server <- function(input, output, session) {
     observeEvent(input$penning_CostCapt, {
         values$penning$pen.cost.capt <- input$penning_CostCapt
     })
-    #observeEvent(input$penning_CostPred, {
-    #    values$penning$pen.cost.pred <- input$penning_CostPred
-    #})
     ## apply settings and get forecast
     penning_getF <- reactive({
-        caribou_forecast(values$penning,
+        wildlift_forecast(values$penning,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$penning$fpen.prop else NULL,
@@ -158,12 +155,12 @@ server <- function(input, output, session) {
     penning_getB <- reactive({
         req(penning_getF())
         p <- suppressWarnings(
-            caribou_breakeven(penning_getF(),
+            wildlift_breakeven(penning_getF(),
                 type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
-        caribou_forecast(penning_getF()$settings,
+        wildlift_forecast(penning_getF()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) p else NULL,
@@ -173,7 +170,7 @@ server <- function(input, output, session) {
     penning_getF0 <- reactive({
         if (!values$penning_compare)
             return(NULL)
-        caribou_forecast(values$penning0,
+        wildlift_forecast(values$penning0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$penning0$fpen.prop else NULL,
@@ -182,12 +179,12 @@ server <- function(input, output, session) {
     penning_getB0 <- reactive({
         req(penning_getF0())
         p <- suppressWarnings(
-            caribou_breakeven(penning_getF0(),
+            wildlift_breakeven(penning_getF0(),
                 type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
-        caribou_forecast(penning_getF0()$settings,
+        wildlift_forecast(penning_getF0()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) p else NULL,
@@ -212,7 +209,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (maternity penning)", "&lambda; (no maternity penning)",
             "N (end, maternity penning)", "N (end, no maternity penning)", "N (new)",
-            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+            "Total cost (x $million)", "Cost per new individual (x $million)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
                 #NA else unlist(summary(penning_getB0()))
@@ -318,8 +315,8 @@ server <- function(input, output, session) {
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- penning_getS()
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+            Info=data.frame(WildLift=paste0(
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$penning_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -332,7 +329,7 @@ server <- function(input, output, session) {
     })
     output$penning_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_maternity_pen_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_maternity_pen_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(penning_xlslist(), file=file, overwrite=TRUE)
@@ -346,7 +343,7 @@ server <- function(input, output, session) {
     ## dynamically render sliders
     output$predator_demogr_sliders <- renderUI({
         if (input$predator_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
              sliderInput("predator_DemCsw", "Calf survival, wild",
                 min = 0, max = 1, value = inits$predator$c.surv.wild, step = 0.001),
@@ -373,11 +370,11 @@ server <- function(input, output, session) {
                     "stop-circle" else "arrows-alt-h"))
         )
     })
-    ## dynamically render herd selector
+    ## dynamically render subpopulation selector
     output$predator_herd <- renderUI({
         tagList(
             selectInput(
-                "predator_herd", "Herd",
+                "predator_herd", "Subpopulation",
                 c("Default (East Side Athabasca)"="Default", Herds)
             )
         )
@@ -407,7 +404,7 @@ server <- function(input, output, session) {
         values$predator <- c(
             fpen.prop = values$predator$fpen.prop,
             fpen.inds = values$predator$fpen.inds,
-            caribou_settings("pred.excl",
+            wildlift_settings("pred.excl",
                 herd = if (input$predator_herd == "Default") NULL else input$predator_herd))
         if (values$predator_compare) {
             values$predator0 <- values$predator
@@ -468,7 +465,7 @@ server <- function(input, output, session) {
     })
     ## apply settings and get forecast
     predator_getF <- reactive({
-        caribou_forecast(values$predator,
+        wildlift_forecast(values$predator,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$predator$fpen.prop else NULL,
@@ -478,12 +475,12 @@ server <- function(input, output, session) {
     predator_getB <- reactive({
         req(predator_getF())
         p <- suppressWarnings(
-            caribou_breakeven(predator_getF(),
+            wildlift_breakeven(predator_getF(),
                 type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
-        caribou_forecast(predator_getF()$settings,
+        wildlift_forecast(predator_getF()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) p else NULL,
@@ -493,7 +490,7 @@ server <- function(input, output, session) {
     predator_getF0 <- reactive({
         if (!values$predator_compare)
             return(NULL)
-        caribou_forecast(values$predator0,
+        wildlift_forecast(values$predator0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$predator0$fpen.prop else NULL,
@@ -502,12 +499,12 @@ server <- function(input, output, session) {
     predator_getB0 <- reactive({
         req(predator_getF0())
         p <- suppressWarnings(
-            caribou_breakeven(predator_getF0(),
+            wildlift_breakeven(predator_getF0(),
                 type = if (values$use_perc) "prop" else "inds")
         )
         if (is.na(p))
             return(NULL)
-        caribou_forecast(predator_getF0()$settings,
+        wildlift_forecast(predator_getF0()$settings,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) p else NULL,
@@ -532,7 +529,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (predator exclosure)", "&lambda; (no predator exclosure)",
             "N (end, predator exclosure)", "N (end, no predator exclosure)", "N (new)",
-            "Total cost (x $1000)", "Cost per capita (x $1000 / caribou)")
+            "Total cost (x $million)", "Cost per new individual (x $million)")
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
                 #NA else unlist(summary(predator_getB0()))
@@ -638,8 +635,8 @@ server <- function(input, output, session) {
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- predator_getS()
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+            Info=data.frame(WildLift=paste0(
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$predator_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -652,7 +649,7 @@ server <- function(input, output, session) {
     })
     output$predator_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_predator_exclosure_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_predator_exclosure_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(predator_xlslist(), file=file, overwrite=TRUE)
@@ -666,7 +663,7 @@ server <- function(input, output, session) {
     ## dynamically render sliders
     output$moose_demogr_sliders <- renderUI({
         if (input$moose_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("moose_DemCsw", "Calf survival, moose reduction",
                 min = 0, max = 1, value = inits$moose$c.surv.wild, step = 0.001),
@@ -681,11 +678,11 @@ server <- function(input, output, session) {
             sliderInput("moose_DemFpc", "Fecundity, no moose reduction",
                 min = 0, max = 1, value = inits$moose0$f.preg.wild, step = 0.001)
         )
-    })    ## dynamically render herd selector
+    })    ## dynamically render subpopulation selector
     output$moose_herd <- renderUI({
         tagList(
             selectInput(
-                "moose_herd", "Herd",
+                "moose_herd", "Subpopulation",
                 c("Default (East Side Athabasca)"="Default", Herds)
             )
         )
@@ -715,13 +712,13 @@ server <- function(input, output, session) {
         values$moose <- c(
             fpen.prop = values$moose$fpen.prop,
             fpen.inds = values$moose$fpen.inds,
-            caribou_settings("moose.red",
+            wildlift_settings("moose.red",
                 herd = if (input$moose_herd == "Default")
                     NULL else input$moose_herd))
         values$moose0 <- c(
             fpen.prop = values$moose0$fpen.prop,
             fpen.inds = values$moose0$fpen.inds,
-            caribou_settings("mat.pen",
+            wildlift_settings("mat.pen",
                 herd = if (input$moose_herd == "Default")
                     NULL else input$moose_herd))
     })
@@ -754,7 +751,7 @@ server <- function(input, output, session) {
     })
     ## moose reduction with penning
     moose_getF <- reactive({
-        caribou_forecast(values$moose,
+        wildlift_forecast(values$moose,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$moose$fpen.prop else NULL,
@@ -762,7 +759,7 @@ server <- function(input, output, session) {
     })
     ## no moose reduction with penning
     moose_getB <- reactive({
-        caribou_forecast(values$moose0,
+        wildlift_forecast(values$moose0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = if (values$use_perc) values$moose0$fpen.prop else NULL,
@@ -770,14 +767,14 @@ server <- function(input, output, session) {
     })
     ## moose reduction without penning
     moose_getF0 <- reactive({
-        caribou_forecast(values$moose,
+        wildlift_forecast(values$moose,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = 0)
     })
     ## no moose reduction without penning
     moose_getB0 <- reactive({
-        caribou_forecast(values$moose0,
+        wildlift_forecast(values$moose0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = 0)
@@ -790,21 +787,27 @@ server <- function(input, output, session) {
             moose_getB0())
         subs <- c("lam.pen", "Nend.pen")
         df <- cbind(
-            MooseNoPen=get_summary(moose_getF0(), values$use_perc)[subs],
-            MoosePen=get_summary(moose_getF(), values$use_perc)[subs],
             NoMooseNoPen=get_summary(moose_getB0(), values$use_perc)[subs],
-            NoMoosePen=get_summary(moose_getB(), values$use_perc)[subs]
+            NoMoosePen=get_summary(moose_getB(), values$use_perc)[subs],
+            MooseNoPen=get_summary(moose_getF0(), values$use_perc)[subs],
+            MoosePen=get_summary(moose_getF(), values$use_perc)[subs]
         )
-        #print(str(df))
-        #df <- tab[subs,,drop=FALSE]
-        rownames(df) <- c("&lambda;", "N (end)")
+        Nnew <- pmax(0, df[2,]-df[2,1])
+        df <- rbind(df,
+            Nnew=Nnew,
+            Cost=c(NA, NA, NA, NA),
+            CostPerNew=c(NA, NA, NA, NA))
+        rownames(df) <- c("&lambda;", "N (end)", "N (new)",
+                          "Total cost (x $million)",
+                          "Cost per new individual (x $million)")
         colnames(df) <- c(
+            "Status quo",
+            "No moose reduction, penned",
             "Moose reduction, no pen",
-            "Moose reduction, penned",
-            "No moose reduction, no pen",
-            "No moose reduction, penned")
+            "Moose reduction, penned")
         df
     })
+
     ## making nice table of the settings
     moose_getS <- reactive({
         req(moose_getF(),
@@ -835,7 +838,7 @@ server <- function(input, output, session) {
         colnames(df) <- c(
             "Moose reduction, no pen",
             "Moose reduction, penned",
-            "No moose reduction, no pen",
+            "Status quo",
             "No moose reduction, penned")
         df
     })
@@ -852,7 +855,7 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Npen, name = 'Moose reduction, penned', data = dF,
                 mode = 'lines', color=I('blue')) %>%
-            add_trace(y = ~Npen, name = 'No moose reduction, no pen', data = dB0,
+            add_trace(y = ~Npen, name = 'Status quo', data = dB0,
                     line=list(dash = 'dash', color='red')) %>%
             add_trace(y = ~Npen, name = 'No moose reduction, penned', data = dB,
                 line=list(dash = 'dash', color='blue')) %>%
@@ -879,14 +882,14 @@ server <- function(input, output, session) {
         colnames(TS) <- c("Years",
             "N moose reduction, no pen",
             "N moose reduction, penned",
-            "N no moose reduction, no pen",
+            "N status quo",
             "N no moose reduction, penned")
         df <- moose_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- moose_getS()
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+            Info=data.frame(WildLift=paste0(
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$moose_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -899,7 +902,7 @@ server <- function(input, output, session) {
     })
     output$moose_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_moose_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_moose_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(moose_xlslist(), file=file, overwrite=TRUE)
@@ -913,38 +916,38 @@ server <- function(input, output, session) {
     ## dynamically render sliders
     output$wolf_demogr_sliders <- renderUI({
         if (input$wolf_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("wolf_DemCsw", "Calf survival, wolf reduction",
                 min = 0, max = 1, value = inits$wolf$c.surv.wild, step = 0.001),
-            sliderInput("wolf_DemCsc", "Calf survival, no wolf reduction",
+            sliderInput("wolf_DemCsc", "Calf survival, status quo",
                 min = 0, max = 1, value = inits$wolf0$c.surv.wild, step = 0.001),
             sliderInput("wolf_DemFsw", "Adult female survival, wolf reduction",
                 min = 0, max = 1, value = inits$wolf$f.surv.wild, step = 0.001),
-            sliderInput("wolf_DemFsc", "Adult female survival, no wolf reduction",
+            sliderInput("wolf_DemFsc", "Adult female survival, status quo",
                 min = 0, max = 1, value = inits$wolf0$f.surv.wild, step = 0.001),
             sliderInput("wolf_DemFpw", "Fecundity, wolf reduction",
                 min = 0, max = 1, value = inits$wolf$f.preg.wild, step = 0.001),
-            sliderInput("wolf_DemFpc", "Fecundity, no wolf reduction",
+            sliderInput("wolf_DemFpc", "Fecundity, status quo",
                 min = 0, max = 1, value = inits$wolf0$f.preg.wild, step = 0.001)
         )
     })
-    ## dynamically render herd selector
+    ## dynamically render subpopulation selector
     output$wolf_herd <- renderUI({
         tagList(
             selectInput(
-                "wolf_herd", "Herd",
-                c("Default (Average of all herds)"="Default", HerdsWolf)
+                "wolf_herd", "Subpopulation",
+                c("Default (Average of all subpopulations)"="Default", HerdsWolf)
             )
         )
     })
     ## observers
     observeEvent(input$wolf_herd, {
-        values$wolf <- caribou_settings("wolf.red",
+        values$wolf <- wildlift_settings("wolf.red",
                 herd = if (input$wolf_herd == "Default")
                     NULL else input$wolf_herd)
         ## set AFS=0.801 CS=0.295 under no wolf option
-        values$wolf0 <- caribou_settings("mat.pen",
+        values$wolf0 <- wildlift_settings("mat.pen",
                 herd = if (input$wolf_herd == "Default")
                     NULL else input$wolf_herd,
                 f.surv.capt=0.801,
@@ -972,14 +975,14 @@ server <- function(input, output, session) {
     })
     ## wolf reduction without penning
     wolf_getF0 <- reactive({
-        caribou_forecast(values$wolf,
+        wildlift_forecast(values$wolf,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = 0)
     })
-    ## no wolf reduction without penning
+    ## no wolf reduction (status quo) without penning
     wolf_getB0 <- reactive({
-        caribou_forecast(values$wolf0,
+        wildlift_forecast(values$wolf0,
             tmax = input$tmax,
             pop.start = input$popstart,
             fpen.prop = 0)
@@ -989,15 +992,22 @@ server <- function(input, output, session) {
         req(wolf_getF0(),
             wolf_getB0())
         subs <- c("lam.pen", "Nend.pen")
-        df <- rbind(
+        Cost <- input$wolf_nremove * input$tmax * input$wolf_cost1 / 1000
+        df <- cbind(
             WolfNoPen=get_summary(wolf_getF0(), values$use_perc)[subs],
             NoWolfNoPen=get_summary(wolf_getB0(), values$use_perc)[subs])
-        df <- rbind(df, c(NA, df[1, "Nend.pen"]-df[2, "Nend.pen"]))
-        colnames(df) <- c("&lambda;", "N (end)")
-        rownames(df) <- c(
+        Nnew <- max(0, df[2,1] - df[2,2])
+        CostPerNew <- if (Nnew <= 0) NA else Cost/Nnew
+        df <- rbind(df,
+            Nnew=c(Nnew,NA),
+            Cost=c(Cost, NA),
+            CostPerNew=c(CostPerNew, NA))
+        rownames(df) <- c("&lambda;", "N (end)", "N (new)",
+                          "Total cost (x $million)",
+                          "Cost per new individual (x $million)")
+        colnames(df) <- c(
             "Wolf reduction",
-            "No wolf reduction",
-            "Difference")
+            "Status quo")
         df
     })
     ## making nice table of the settings
@@ -1025,7 +1035,7 @@ server <- function(input, output, session) {
         rownames(df) <- SNAM
         colnames(df) <- c(
             "Wolf reduction",
-            "No wolf reduction")
+            "Status quo")
         df
     })
     ## plot
@@ -1038,7 +1048,7 @@ server <- function(input, output, session) {
         p <- plot_ly(dF0, x = ~Years, y = ~Individuals,
             name = 'Wolf reduction', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Npen, name = 'No wolf reduction', data = dB0,
+            add_trace(y = ~Npen, name = 'Status quo', data = dB0,
                     mode = 'lines', color=I('blue')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
@@ -1063,15 +1073,15 @@ server <- function(input, output, session) {
         print("TS")
         colnames(TS) <- c("Years",
             "N wolf reduction",
-            "N no wolf reduction")
+            "N status quo")
         df <- wolf_getT()
         print("getT")
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- wolf_getS()
         print("getS")
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+            Info=data.frame(WildLift=paste0(
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$wolf_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
@@ -1085,7 +1095,7 @@ server <- function(input, output, session) {
     })
     output$wolf_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_wolf_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_wolf_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(wolf_xlslist(), file=file, overwrite=TRUE)
@@ -1113,7 +1123,7 @@ server <- function(input, output, session) {
     })
     output$breeding_demogr_sliders <- renderUI({
         if (input$breeding_herd != "Default")
-            return(p("Demography settings not available for specific herds."))
+            return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("breeding_DemCsc", "Calf survival in facility",
                 min = 0, max = 1,
@@ -1135,18 +1145,18 @@ server <- function(input, output, session) {
                 value = inits$breeding$f.preg.wild, step = 0.001)
         )
     })
-    ## dynamically render herd selector
+    ## dynamically render subpopulation selector
     output$breeding_herd <- renderUI({
         tagList(
             selectInput(
-                "breeding_herd", "Herd",
+                "breeding_herd", "Subpopulation",
                 c("Default (East Side Athabasca)"="Default", Herds)
             )
         )
     })
     ## observers
     observeEvent(input$breeding_herd, {
-        values$breeding <- caribou_settings("cons.breed",
+        values$breeding <- wildlift_settings("cons.breed",
                 herd = if (input$breeding_herd == "Default")
                     NULL else input$breeding_herd)
     })
@@ -1168,12 +1178,24 @@ server <- function(input, output, session) {
     observeEvent(input$breeding_DemFpc, {
         values$breeding$f.preg.capt <- input$breeding_DemFpc
     })
+    observeEvent(input$breeding_CostSetup, {
+        values$breeding$pen.cost.setup <- input$breeding_CostSetup
+    })
+    observeEvent(input$breeding_CostProj, {
+        values$breeding$pen.cost.proj <- input$breeding_CostProj
+    })
+    observeEvent(input$breeding_CostMaint, {
+        values$breeding$pen.cost.maint <- input$breeding_CostMaint
+    })
+    observeEvent(input$breeding_CostCapt, {
+        values$breeding$pen.cost.capt <- input$breeding_CostCapt
+    })
     ## breeding reduction without penning
     breeding_getF <- reactive({
         req(input$breeding_yrs, input$breeding_ininds, input$breeding_jyrs)
         nn <- rep(input$breeding_ininds, input$breeding_yrs)
         op <- c(rep(0, input$breeding_jyrs), input$breeding_outprop)
-        caribou_breeding(values$breeding,
+        wildlift_breeding(values$breeding,
             tmax = input$tmax,
             pop.start = input$popstart,
             f.surv.trans = input$breeding_ftrans,
@@ -1238,12 +1260,12 @@ server <- function(input, output, session) {
             "pen.cost.capt" = "Capture/monitor (x $1000)",
             "pen.cost.pred" = "Removing predators (x $1000)",
             "f.surv.trans"="Adult female survival during capture/transport to facility",
-            "j.surv.trans"="Juvenile female survival during capture/transport from facility to recipient herd",
-            "j.surv.red"="Relative reduction in survival of juvenile females transported to recipient herd for 1 year after transport")
+            "j.surv.trans"="Juvenile female survival during capture/transport from facility to recipient subpopulation",
+            "j.surv.red"="Relative reduction in survival of juvenile females transported to recipient subpopulation for 1 year after transport")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- "Breeding"
-        print(df)
+        #print(df)
         df
     })
 
@@ -1260,17 +1282,21 @@ server <- function(input, output, session) {
             zz$settings$pen.cost.capt +
             zz$settings$pen.cost.pred
         cost <- (cost1 + zz$tmax * cost2) / 1000
+        #print(c(cost1/1000, cost2/1000, cost))
 
         dF <- summary(zz)[,-(1:3)]
         colnames(dF) <- c("In facility", "Recipient", "Status quo")
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
+        Nnew <- Ntmax[1,"Recipient"] - Ntmax[1,"Status quo"]
         df <- rbind(
-            'N'=Ntmax,
             '&lambda;'=round(Ntmax/Ntmax1, 3),
-            "Total cost (x $1000)"=c(cost, NA, NA))
-        df[2,2] <- round((Ntmax/N0)^(1/nrow(dF)), 3)[2]
+            'N (end)'=Ntmax,
+            'N (new)'=c(NA, max(0,Nnew),NA),
+            "Total cost (x $million)"=c(NA, cost, NA),
+            "Cost per new individual (x $million)"=c(NA,
+                ifelse(Nnew>0,cost/Nnew, NA), NA))
         df
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
@@ -1283,8 +1309,8 @@ server <- function(input, output, session) {
         dF <- summary(bb)
         ss <- breeding_getS()
         out <- list(
-            Info=data.frame(CaribouBC=paste0(
-                c("R package version: ", "Date of analysis: ", "Caribou herd: "),
+            Info=data.frame(WildLift=paste0(
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(dF),
@@ -1295,10 +1321,155 @@ server <- function(input, output, session) {
     })
     output$breeding_download <- downloadHandler(
         filename = function() {
-            paste0("CaribouBC_breeding_reduction_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_conservation_breeding_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
             write.xlsx(breeding_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
+
+    ## >>> linear features <<<=====================================
+
+    output$seismic_sliders <- renderUI({
+        area <- switch(input$seismic_herd,
+            "coldlake"=6726,
+            "esar"=13119,
+            "wsar"=15707)
+        linkm <- switch(input$seismic_herd,
+            "coldlake"=11432,
+            "esar"=26154,
+            "wsar"=26620)
+        lin2d <- switch(input$seismic_herd,
+            "coldlake"=8012,
+            "esar"=21235,
+            "wsar"=21941)
+        yng <- switch(input$seismic_herd,
+            "coldlake"=13.85,
+            "esar"=25.70,
+            "wsar"=6.88)
+        tagList(
+            sliderInput("seismic_area",
+                "Range area (sq km)",
+                min = 0, max = 20000, value = area, step = 1),
+            sliderInput("seismic_linkm",
+                "Linear feature length (km)",
+                min = 0, max = 40000, value = linkm, step = 1),
+            sliderInput("seismic_lin2d",
+                "Conventional seismic length (km)",
+                min = 0, max = 40000, value = lin2d, step = 1),
+            sliderInput("seismic_young",
+                "Percent young forest (<30 yrs; %)",
+                min = 0, max = 100, value = round(yng, 1), step = 0.11),
+#            sliderInput("seismic_cost",
+#                "Cost per km (x $1000)",
+#                min = 0, max = 100, value = 12, step = 1),
+            sliderInput("seismic_deact",
+                "Years for 100% deactivation",
+                min = 0, max = 50, value = 5, step = 1),
+            sliderInput("seismic_restor",
+                "Years for 100% restoration",
+                min = 0, max = 50, value = 15, step = 1)
+        )
+    })
+    seismic_all <- reactive({
+        req(input$seismic_area,
+            input$seismic_linkm,
+            input$seismic_lin2d,
+            input$seismic_young)
+        if (input$seismic_linkm < input$seismic_lin2d) {
+            showNotification("Conventional seismic cannot be more than total linear",
+                             type="error")
+            return(NULL)
+        }
+        wildlift_seismic(
+            tmax=input$tmax,
+            pop.start=input$popstart,
+            area=input$seismic_area,
+            lin=input$seismic_linkm,
+            seism=input$seismic_lin2d,
+            young=input$seismic_young,
+            cost=input$seismic_cost,
+            yr_deact=input$seismic_deact,
+            yr_restor=input$seismic_restor)
+    })
+
+    ## plot
+    output$seismic_Plot <- renderPlotly({
+        req(seismic_all())
+        sm <- seismic_all()
+        #print(sm)
+        dF <- data.frame(sm$pop)
+        colnames(dF)[1:2] <- c("Years", "Individuals")
+        p <- plot_ly(dF, x = ~Years, y = ~Individuals,
+            name = 'No linear features', type = 'scatter', mode = 'lines',
+            color=I('red')) %>%
+            add_trace(y = ~N1, name = 'Status quo', data = dF,
+                    mode = 'lines', color=I('blue')) %>%
+            add_trace(y = ~Ndeact, name = 'Deactivation', data = dF,
+                    mode = 'lines', color=I('black')) %>%
+            add_trace(y = ~Nrestor, name = 'Restoration', data = dF,
+                    mode = 'lines', color=I('orange')) %>%
+            layout(legend = list(x = 100, y = 0)) %>%
+            config(displayModeBar = 'hover', displaylogo = FALSE)
+        p
+    })
+    ## table
+    seismic_getT <- reactive({
+        req(seismic_all())
+        sm <- seismic_all()
+        dF <- data.frame(sm$pop)
+        colnames(dF) <- c("Years", "No linear features", "Status quo",
+            "Deactivation", "Restoration",
+            "Linear density, deactivation", "Linear density, restoration",
+            "Percent young forest")
+        df <- dF[nrow(dF),2:5]
+        rownames(df) <- "N (end)"
+        cost <- c(NA, NA, sm$costdeact, sm$costrestor)
+        Nnew <- c(NA, NA, pmax(0, dF[nrow(dF),4:5]-dF[nrow(dF),3]))
+        df <- rbind(
+            "&lambda;"=dF[nrow(dF),2:5]/dF[nrow(dF)-1,2:5],
+            df,
+            "N (new)"=Nnew,
+            "Total cost (x $million)"=cost,
+            "Cost per new individual (x $million)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
+        df
+    })
+    output$seismic_Table <- renderTable({
+        req(seismic_getT())
+        seismic_getT()
+    }, rownames=TRUE, colnames=TRUE,
+    striped=TRUE, bordered=TRUE, na="n/a",
+    sanitize.text.function = function(x) x)
+
+    ## dowload
+    seismic_xlslist <- reactive({
+        req(seismic_all(), seismic_getT())
+        sm <- seismic_all()
+        dF <- data.frame(sm$pop)
+        colnames(dF) <- c("Years", "No linear features", "Status quo",
+                          "Deactivation", "Restoration",
+        "Linear density, deactivation", "Linear density, restoration",
+        "Percent young forest")
+        df <- seismic_getT()
+        print("getT")
+        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
+        out <- list(
+            Info=data.frame(WildLift=paste0(
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+            TimeSeries=as.data.frame(dF),
+            Summary=as.data.frame(df))
+        out$Summary$Variables <- rownames(df)
+        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
+        out
+    })
+    output$seismic_download <- downloadHandler(
+        filename = function() {
+            paste0("WildLift_linear_features_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(seismic_xlslist(), file=file, overwrite=TRUE)
         },
         contentType="application/octet-stream"
     )

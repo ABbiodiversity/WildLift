@@ -1,5 +1,5 @@
 dashboardPage(
-  dashboardHeader(title = paste("Caribou BC", ver[1])),
+  dashboardHeader(title = paste("WildLift", ver[1])),
   dashboardSidebar(
     tags$script(src = "tips.js"),
     sliderInput("tmax", "Number of years to forecast",
@@ -19,6 +19,7 @@ dashboardPage(
       menuItem("Predator exclosure", tabName = "predator"),
       menuItem("Moose reduction", tabName = "moose"),
       menuItem("Wolf reduction", tabName = "wolf"),
+      menuItem("Linear feature", tabName = "seismic"),
       menuItem("Conservation breeding", tabName = "breeding")
     )
   ),
@@ -59,7 +60,7 @@ dashboardPage(
               title = "Settings",
               uiOutput("penning_herd"),
               bsTooltip("penning_herd",
-                "Select a herd for herd specific demography parameters.",
+                "Select a subpopulation for subpopulation specific demography parameters.",
                 placement="top"),
               uiOutput("penning_perc_or_inds"),
               uiOutput("penning_button"),
@@ -86,7 +87,7 @@ dashboardPage(
               sliderInput("penning_CostMaint", "Maintenance",
                 min = 0, max = 1000, value = inits$penning$pen.cost.maint, step = 10),
               sliderInput("penning_CostCapt", "Capture/monitor",
-                min = 0, max = 500, value = inits$penning$pen.cost.capt, step = 10)#,
+                min = 0, max = 500, value = inits$penning$pen.cost.capt, step = 10)
             )
           )
         )
@@ -126,7 +127,7 @@ dashboardPage(
               title = "Settings",
               uiOutput("predator_herd"),
               bsTooltip("predator_herd",
-                "Select a herd for herd specific demography parameters.",
+                "Select a subpopulation for subpopulation specific demography parameters.",
                 placement="top"),
               uiOutput("predator_perc_or_inds"),
               uiOutput("predator_button"),
@@ -154,7 +155,7 @@ dashboardPage(
                 min = 0, max = 1000, value = inits$predator$pen.cost.maint, step = 10),
               sliderInput("predator_CostCapt", "Capture/monitor",
                 min = 0, max = 500, value = inits$predator$pen.cost.capt, step = 10),
-              sliderInput("predator_CostPred", "Removing predators",
+              sliderInput("predator_CostPred", "Predator removal",
                 min = 0, max = 500, value = inits$predator$pen.cost.pred, step = 10)
             )
           )
@@ -170,7 +171,7 @@ dashboardPage(
               title = "Population forecast: Moose reduction",
               plotlyOutput("moose_Plot", width = "100%", height = 400),
               bsTooltip("moose_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results.",
                 placement="right")
             ),
             box(
@@ -195,7 +196,7 @@ dashboardPage(
               title = "Settings",
               uiOutput("moose_herd"),
               bsTooltip("moose_herd",
-                "Select a herd for herd specific demography parameters.",
+                "Select a subpopulation for subpopulation specific demography parameters.",
                 placement="top"),
               uiOutput("moose_perc_or_inds"),
               uiOutput("moose_button"),
@@ -221,7 +222,7 @@ dashboardPage(
               title = "Population forecast: Wolf reduction",
               plotlyOutput("wolf_Plot", width = "100%", height = 400),
               bsTooltip("wolf_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results.",
                 placement="right")
             ),
             box(
@@ -246,7 +247,7 @@ dashboardPage(
               title = "Settings",
               uiOutput("wolf_herd"),
               bsTooltip("wolf_herd",
-                "Select a herd for herd specific demography parameters.",
+                "Select a subpopulation for subpopulation specific demography parameters.",
                 placement="top")
             ),
             box(
@@ -254,6 +255,18 @@ dashboardPage(
               collapsible = TRUE, collapsed = TRUE,
               title = "Demography",
               uiOutput("wolf_demogr_sliders")
+            ),
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Cost",
+              sliderInput("wolf_cost1", "Cost per wolf to be removed (x $1000)",
+                min = 0, max = 10, value = 5.1, step = 0.1),
+              sliderInput("wolf_nremove", "Number of wolves to be removed per year",
+                min = 0, max = 200, value = 0, step = 1),
+              bsTooltip("wolf_nremove",
+                "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
+                placement="bottom")
             )
           )
         )
@@ -268,7 +281,7 @@ dashboardPage(
               title = "Population forecast: conservation breeding",
               plotlyOutput("breeding_Plot", width = "100%", height = 400),
               bsTooltip("breeding_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results.",
                 placement="right")
             ),
             box(
@@ -293,21 +306,21 @@ dashboardPage(
               title = "Settings",
               uiOutput("breeding_herd"),
               bsTooltip("breeding_herd",
-                "Select a herd for herd specific demographic parameters.",
+                "Select a subpopulation for subpopulation specific demographic parameters.",
                 placement="top"),
               sliderInput("breeding_outprop", "Proportion of juvenile females transferred",
                 min = 0, max = 1, value = 0.5, step = 0.01),
               bsTooltip("breeding_outprop",
-                "The proportion of juvenile females transferred from the facility to the recipient herd."),
+                "The proportion of juvenile females transferred from the facility to the recipient subpopulation."),
               sliderInput("breeding_ininds", "Number of females put into facility each year (max)",
-                min = 0, max = 100, value = 10, step = 1),
+                min = 0, max = 40, value = 10, step = 1),
               uiOutput("breeding_years"),
               sliderInput("breeding_ftrans", "Adult female survival during capture/transport to the facility",
                 min = 0, max = 1, value = 1, step = 0.01),
               uiOutput("breeding_jyears"),
-              sliderInput("breeding_jtrans", "Juvenile female survival during capture/transport from the facility to the recipient herd",
+              sliderInput("breeding_jtrans", "Juvenile female survival during capture/transport from the facility to the recipient subpopulation",
                 min = 0, max = 1, value = 1, step = 0.01),
-              sliderInput("breeding_jsred", "Relative reduction in survival of juvenile females transported to recipient herd for 1 year after transport",
+              sliderInput("breeding_jsred", "Relative reduction in survival of juvenile females transported to recipient subpopulation for 1 year after transport",
                 min = 0, max = 1, value = 1, step = 0.01)
             ),
             box(
@@ -315,6 +328,73 @@ dashboardPage(
               collapsible = TRUE, collapsed = TRUE,
               title = "Demography",
               uiOutput("breeding_demogr_sliders")
+            ),
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = TRUE,
+              title = "Cost (x $1000)",
+              sliderInput("breeding_CostSetup", "Initial set up",
+                min = 0, max = 20000, value = 100*round(inits$breeding$pen.cost.setup/100),
+                step = 1000),
+              sliderInput("breeding_CostProj", "Project manager",
+                min = 0, max = 500, value = inits$breeding$pen.cost.proj, step = 10),
+              sliderInput("breeding_CostMaint", "Maintenance",
+                min = 0, max = 1000, value = inits$breeding$pen.cost.maint, step = 10),
+              sliderInput("breeding_CostCapt", "Capture/monitor",
+                min = 0, max = 500, value = inits$breeding$pen.cost.capt, step = 10)
+            )
+          )
+        )
+      ),
+
+      tabItem("seismic",
+        fluidRow(
+          column(width=8,
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Population forecast: linear feature",
+              plotlyOutput("seismic_Plot", width = "100%", height = 400),
+              bsTooltip("seismic_Plot",
+                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results.",
+                placement="right")
+            ),
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Summary: linear feature",
+              tableOutput("seismic_Table"),
+              downloadButton("seismic_download", "Download results as Excel file"),
+              bsTooltip("seismic_Table",
+                "Table summarizing reports. ",
+                placement="right"),
+              bsTooltip("seismic_download",
+                "Click here to download results.",
+                placement="top")
+            ),
+            HTML(FooterText)
+          ),
+          column(width=4,
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Settings",
+              selectInput(
+                "seismic_herd", "Subpopulation",
+                c("ESAR"="esar", "WSAR"="wsar", "Cold Lake"="coldlake")
+              ),
+              bsTooltip("seismic_herd",
+                "Select a subpopulation for subpopulation range specific parameters.",
+                placement="top"),
+              uiOutput("seismic_sliders")
+            ),
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Cost",
+              sliderInput("seismic_cost",
+                "Cost per km (x $1000)",
+                min = 0, max = 100, value = 12, step = 1),
             )
           )
         )

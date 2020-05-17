@@ -1,15 +1,15 @@
-#shiny::runApp("inst/shiny/matpen")
+#shiny::runApp("inst/shiny/WildLift")
 
-## install/update CaribouBC package as needed
+## install/update WildLift package as needed
 ## need to install from github for rsconnect to work properly
-#remotes::install_github("psolymos/CaribouBC")
+#remotes::install_github("ABbiodiversity/WildLift")
 
 library(shiny)
 library(shinydashboard)
 library(shinyBS)
 library(plotly)
 library(openxlsx)
-library(CaribouBC)
+library(WildLift)
 
 ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
                 fields="Version")
@@ -19,27 +19,27 @@ inits <- list(
     penning = c(
         fpen.prop = 0.35,
         fpen.inds = 10,
-        caribou_settings("mat.pen")),
+        wildlift_settings("mat.pen")),
     predator = c(
         fpen.prop = 0.35,
         fpen.inds = 10,
-        caribou_settings("pred.excl")),
+        wildlift_settings("pred.excl")),
     moose = c(
         fpen.prop = 0.35,
         fpen.inds = 10,
-        caribou_settings("moose.red")),
+        wildlift_settings("moose.red")),
     moose0 = c(
         fpen.prop = 0.35,
         fpen.inds = 10,
-        caribou_settings("mat.pen")),
-    wolf = caribou_settings("wolf.red"),
+        wildlift_settings("mat.pen")),
+    wolf = wildlift_settings("wolf.red"),
     ## set AFS=0.801 CS=0.295 under no wolf option
-    wolf0 = caribou_settings("mat.pen",
+    wolf0 = wildlift_settings("mat.pen",
         f.surv.capt=0.801,
         f.surv.wild=0.801,
         c.surv.capt=0.295,
         c.surv.wild=0.295),
-    breeding = caribou_settings("cons.breed")
+    breeding = wildlift_settings("cons.breed", pen.cap=40)
 )
 
 get_settings <- function(x, use_perc=TRUE) {
@@ -101,4 +101,41 @@ stack_breeding <- function(x) {
         data.frame(What="Nwild", Year=tt, t(x$Nwild)))
     colnames(N) <- c("Part", "Year", rr)
     N
+}
+
+wildlift_seismic <- function(tmax=20, pop.start=100,
+area=10000, lin=0, seism=0, young=0,
+cost=12, yr_deact=5, yr_restor=15) {
+    ld <- lin/area
+    if (seism > lin) # seismic <= linear
+        seism <- lin
+    perm <- lin - seism # permanent linear features
+    ldperm <- perm/area
+    lamfun <- function(ld, young)
+        1.0184-0.0234*ld-0.0021*young
+    cn <- c("year", "N0", "N1", "Ndeact", "Nrestor",
+        "lddeact", "ldrestor", "young", "lam0", "lam1", "lamdeact", "lamrestor")
+    out <- matrix(0, tmax+1L, length(cn))
+    colnames(out) <- cn
+    out[1,c("N0", "N1", "Ndeact", "Nrestor")] <- pop.start
+    out[1,"lddeact"] <- ld
+    out[1,"ldrestor"] <- ld
+    out[,"young"] <- young
+    out[,"lam0"] <- lamfun(0, young)
+    out[,"lam1"] <- lamfun(ld, young)
+    out[1,c("lamdeact", "lamrestor")] <- lamfun(ld, young)
+    for (i in seq_len(tmax)+1L) {
+        out[i, "year"] <- i
+        out[i, "lddeact"] <- max(ldperm, out[i-1L, "lddeact"]-ld/yr_deact)
+        out[i, "ldrestor"] <- max(ldperm, out[i-1L, "ldrestor"]-ld/yr_restor)
+        out[i, "N0"] <- max(0, floor(out[i-1L, "N0"] * out[i,"lam0"]))
+        out[i, "N1"] <- max(0, floor(out[i-1L, "N1"] * out[i,"lam1"]))
+        out[i, "lamdeact"] <- lamfun(out[i, "lddeact"], young)
+        out[i, "Ndeact"] <- max(0, floor(out[i-1L, "Ndeact"] *out[i, "lamdeact"]))
+        out[i, "lamrestor"] <- lamfun(out[i, "ldrestor"], young)
+        out[i, "Nrestor"] <- max(0, floor(out[i-1L, "Nrestor"] * out[i, "lamrestor"]))
+    }
+    list(costdeact=diff(range(out[,"lddeact"]))*area*cost/1000,
+         costrestor=diff(range(out[,"ldrestor"]))*area*cost/1000,
+         pop=out)
 }

@@ -1,26 +1,34 @@
-Package: CaribouBC
-Title: Caribou Population Forecasting
-Date: 2020-03-09
-Version: 0.2.5
+Package: WildLift
+Title: An Open-source Tool to Guide Decisions for Wildlife Conservation
+Date: 2020-05-16
+Version: 0.2.78
 Authors@R: 
     c(person(given = "Peter",
              family = "Solymos",
              comment = c(ORCID = "0000-0001-7337-1740"),
              role = c("aut", "cre"),
              email = "psolymos@gmail.com"),
+      person(given = "Melanie",
+             family = "Dickie",
+             role = c("aut")),
       person(given = "Sophie",
              family = "Gilbert",
              comment = c(ORCID = "0000-0002-9974-5146"),
              role = c("aut")),
+      person(given = "Mariana",
+             family = "Nagy-Reis",
+             role = c("aut")),
       person(given = "Rob",
              family = "Serrouya",
              role = c("aut")),
-      person(given = "Melanie",
-             family = "Dickie",
-             role = c("aut")),
+      person(given = "Alberta Biodiversity Monitoring Institute",
+             role = "cph"),
       person(given = "Province of British Columbia",
              role = "cph"))
-Description: Caribou population forecasting.
+Description: Compare alternative recovery actions: 
+  Linear Feature Restoration, Linear Feature Deactivation, 
+  Maternal Penning, Conservation Breeding, Predator Exclosure, 
+  Wolf Reduction, and Moose Reduction.
 License: Apache License (== 2.0) | file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -31,5 +39,6 @@ Suggests:
     shiny,
     shinydashboard,
     plotly,
-    openxlsx
+    openxlsx,
+    shinyBS
 VignetteBuilder: knitr
