@@ -12,3 +12,4 @@
 .png
 .gif
 ^COMPLIANCE\.yaml$
+^submit\.sh$
