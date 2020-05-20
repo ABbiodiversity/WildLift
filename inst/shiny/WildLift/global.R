@@ -11,7 +11,7 @@ library(plotly)
 library(openxlsx)
 library(WildLift)
 
-ver <- read.dcf(file=system.file("DESCRIPTION", package="CaribouBC"),
+ver <- read.dcf(file=system.file("DESCRIPTION", package="WildLift"),
                 fields="Version")
 
 ## initialize sliders for the different pen types
@@ -76,7 +76,8 @@ HerdsWolf <- c(
     "Klinse-za (Moberly)" = "KlinsezaMoberly",
     "Quintette" = "Quintette")
 
-FooterText <- "<p>Shiny app made by the <a href='https://github.com/bcgov/CaribouBC'>CaribouBC</a> R package.</p>"
+#FooterText <- "<p>Shiny app made by the <a href='https://github.com/bcgov/CaribouBC'>CaribouBC</a> R package.</p>"
+FooterText <- ""
 
 hover <- function(x, d=1) {
     tot <- round(rowSums(x), d)

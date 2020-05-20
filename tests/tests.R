@@ -1,4 +1,4 @@
-#remotes::install_github("psolymos/CaribouBC")
+#remotes::install_github("ABbiodiversity/WildLift")
 
 library(WildLift)
 

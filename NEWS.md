@@ -1,3 +1,7 @@
+# Version 0.2.78
+
+* Package name changed to WildLift.
+
 # Version 0.2.77
 
 * This version is the 0.3.0 release candidate.
