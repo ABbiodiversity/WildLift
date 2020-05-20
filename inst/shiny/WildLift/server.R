@@ -207,8 +207,8 @@ server <- function(input, output, session) {
         if (values$use_perc)
             df[1L,] <- df[1L,]*100
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
-            "# pens", "&lambda; (maternity penning)", "&lambda; (no maternity penning)",
-            "N (end, maternity penning)", "N (end, no maternity penning)", "N (new)",
+            "# pens", "&lambda; (maternity penning)", "&lambda; (status quo)",
+            "N (end, maternity penning)", "N (end, status quo)", "N (new)",
             "Total cost (x $million)", "Cost per new individual (x $million)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
@@ -280,14 +280,14 @@ server <- function(input, output, session) {
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
             name = 'Maternity penning', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Nnopen, name = 'No maternity penning',
+            add_trace(y = ~Nnopen, name = 'Status quo',
                 mode = 'lines', color=I('blue')) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         if (values$penning_compare) {
             df0 <- plot(penning_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Maternity penning, reference', data = df0,
                     line=list(dash = 'dash', color='red')) %>%
-                add_trace(y = ~Nnopen, name = 'No maternity penning, reference', data = df0,
+                add_trace(y = ~Nnopen, name = 'Status quo, reference', data = df0,
                     line=list(dash = 'dash', color='blue'))
         }
         p <- p %>% layout(legend = list(x = 100, y = 0))
@@ -308,8 +308,8 @@ server <- function(input, output, session) {
         if (values$penning_compare) {
             TS <- cbind(plot(penning_getF0(), plot=FALSE), TS[,-1])
             colnames(TS) <- c("Years",
-                "N no maternity penning, reference", "N maternity penning, reference",
-                "N no maternity penning", "N maternity penning")
+                "N status quo, reference", "N maternity penning, reference",
+                "N status quo", "N maternity penning")
         }
         df <- penning_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
@@ -527,8 +527,8 @@ server <- function(input, output, session) {
         if (values$use_perc)
             df[1L,] <- df[1L,]*100
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
-            "# pens", "&lambda; (predator exclosure)", "&lambda; (no predator exclosure)",
-            "N (end, predator exclosure)", "N (end, no predator exclosure)", "N (new)",
+            "# pens", "&lambda; (predator exclosure)", "&lambda; (status quo)",
+            "N (end, predator exclosure)", "N (end, status quo)", "N (new)",
             "Total cost (x $million)", "Cost per new individual (x $million)")
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
@@ -600,14 +600,14 @@ server <- function(input, output, session) {
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
             name = 'Predator exclosure', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Nnopen, name = 'No predator exclosure',
+            add_trace(y = ~Nnopen, name = 'Status quo',
                 mode = 'lines', color=I('blue')) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         if (values$predator_compare) {
             df0 <- plot(predator_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Predator exclosure, reference', data = df0,
                     line=list(dash = 'dash', color='red')) %>%
-                add_trace(y = ~Nnopen, name = 'No predator exclosure, reference', data = df0,
+                add_trace(y = ~Nnopen, name = 'Status quo, reference', data = df0,
                     line=list(dash = 'dash', color='blue'))
         }
         p <- p %>% layout(legend = list(x = 100, y = 0))
@@ -628,8 +628,8 @@ server <- function(input, output, session) {
         if (values$predator_compare) {
             TS <- cbind(plot(predator_getF0(), plot=FALSE), TS[,-1])
             colnames(TS) <- c("Years",
-                "N no predator exclosure, reference", "N predator exclosure, reference",
-                "N no predator exclosure", "N predator exclosure")
+                "N status quo, reference", "N predator exclosure, reference",
+                "N status quo", "N predator exclosure")
         }
         df <- predator_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
