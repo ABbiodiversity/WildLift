@@ -38,9 +38,11 @@ f.surv.trans=1, # female survival during transportation into captive
 j.surv.trans=1, # juv survival during transportation into recipient
 j.surv.red=1, # transported juv survival reduction for 1 yr
 tmax=20,
-pop.start=100) { # wild / recipient population
+pop.start=100, # wild / recipient population
+breed.early=FALSE) { # reproduce at age 2 if well fed
 
-    age.1st.litter <- 3
+    age.1st.litter <- if (breed.early)
+        2 else 3 # reproduce at age 2 or 3 depending on conditions
     age.calf.max <- 1
     age.cens <- 4
     in.age <- 3:4 # ages of females added in each year, matching in.inds

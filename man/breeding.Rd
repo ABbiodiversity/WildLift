@@ -17,7 +17,7 @@ wildlift_matrix(settings, wild=TRUE,
 wildlift_breeding(settings,
     in.inds=10, out.prop=1, f.surv.trans=1,
     j.surv.trans=1, j.surv.red=1,
-    tmax=20, pop.start=100)
+    tmax=20, pop.start=100, breed.early=FALSE)
 
 \method{print}{wildlift_breeding}(x, ...)
 \method{summary}{wildlift_breeding}(object, ...)
@@ -74,6 +74,10 @@ positive integer, number of years to forecast after initial year 0.
   \item{pop.start}{
 positive integer, initial population size in year 0 for the
 recipient and status quo populations (wild not receiving females).
+}
+  \item{breed.early}{
+logical, allow females to reproduce at a younger age (2) if they are well fed.
+Defaults to \code{FALSE} which means reproduction at age 3.
 }
   \item{x, object}{
 an object to print, summarize, plot, etc.
