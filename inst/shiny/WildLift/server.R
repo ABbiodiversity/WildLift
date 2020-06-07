@@ -1192,7 +1192,10 @@ server <- function(input, output, session) {
     })
     ## breeding reduction without penning
     breeding_getF <- reactive({
-        req(input$breeding_yrs, input$breeding_ininds, input$breeding_jyrs)
+        if (is.null(input$breeding_breedearly))
+            return(NULL)
+        req(input$breeding_yrs, input$breeding_ininds,
+            input$breeding_jyrs)
         nn <- rep(input$breeding_ininds, input$breeding_yrs)
         op <- c(rep(0, input$breeding_jyrs), input$breeding_outprop)
         wildlift_breeding(values$breeding,
@@ -1202,7 +1205,9 @@ server <- function(input, output, session) {
             j.surv.trans = input$breeding_jtrans,
             j.surv.red = input$breeding_jsred,
             in.inds = nn,
-            out.prop = op)
+            out.prop = op,
+            #breed.early = TRUE)
+            breed.early = input$breeding_breedearly)
     })
     ## plot
     output$breeding_Plot <- renderPlotly({
