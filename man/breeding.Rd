@@ -76,7 +76,8 @@ positive integer, initial population size in year 0 for the
 recipient and status quo populations (wild not receiving females).
 }
   \item{breed.early}{
-logical, allow females to reproduce at a younger age (2) if they are well fed.
+logical, allow females in the facility (not in the wild)
+to reproduce at a younger age (2) if they are well fed.
 Defaults to \code{FALSE} which means reproduction at age 3.
 }
   \item{x, object}{

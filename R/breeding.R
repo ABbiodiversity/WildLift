@@ -41,20 +41,23 @@ tmax=20,
 pop.start=100, # wild / recipient population
 breed.early=FALSE) { # reproduce at age 2 if well fed
 
-    age.1st.litter <- if (breed.early)
-        2 else 3 # reproduce at age 2 or 3 depending on conditions
+    ## reproduce at age 2 or 3 depending on conditions
+    ## only inside facility
+    age.1st.litter.facility <- if (breed.early)
+        2 else 3
+    age.1st.litter <- 3
     age.calf.max <- 1
     age.cens <- 4
     in.age <- 3:4 # ages of females added in each year, matching in.inds
     out.age <- 1 # age of inds pumped out
 
-    Aw <- wildlift_matrix(settings, wild=TRUE,
+    Aw <- wildlift_matrix(settings, wild=TRUE, # wild
         age.cens=age.cens,
         age.1st.litter=age.1st.litter,
         age.calf.max=age.calf.max)
-    Ac <- wildlift_matrix(settings, wild=FALSE,
+    Ac <- wildlift_matrix(settings, wild=FALSE, # in facility
         age.cens=age.cens,
-        age.1st.litter=age.1st.litter,
+        age.1st.litter=age.1st.litter.facility,
         age.calf.max=age.calf.max)
     if (f.surv.trans < 0 || f.surv.trans > 1)
         stop("f.surv.trans must be a value between 0 and 1")
@@ -174,6 +177,7 @@ breed.early=FALSE) { # reproduce at age 2 if well fed
         tmax=tmax,
         pop.start=pop.start,
         age.1st.litter=age.1st.litter,
+        breed.early=breed.early,
         age.calf.max=age.calf.max,
         Nin=Nin, Nout=Nout, Ncapt=Nc, Nrecip=Nw, Nwild=Nw0)
     out$population <- data.frame(Years=c(0, seq_len(tmax)),
