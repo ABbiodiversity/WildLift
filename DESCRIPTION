@@ -1,7 +1,7 @@
 Package: WildLift
 Title: An Open-source Tool to Guide Decisions for Wildlife Conservation
-Date: 2020-05-16
-Version: 0.2.78
+Date: 2020-06-06
+Version: 0.2.80
 Authors@R: 
     c(person(given = "Peter",
              family = "Solymos",

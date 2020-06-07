@@ -1,6 +1,12 @@
+# Version 0.2.80
+
+* Added `breed.early` argument to `wildlift_breeding` which allows
+  females in the facility to reproduce at a younger age.
+
 # Version 0.2.78
 
 * Package name changed to WildLift.
+* Manuscript describing the package and app submitted.
 
 # Version 0.2.77
 
