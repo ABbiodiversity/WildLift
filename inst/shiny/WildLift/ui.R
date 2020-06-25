@@ -322,7 +322,7 @@ dashboardPage(
                 min = 0, max = 1, value = 1, step = 0.01),
               sliderInput("breeding_jsred", "Relative reduction in survival of juvenile females transported to recipient subpopulation for 1 year after transport",
                 min = 0, max = 1, value = 1, step = 0.01),
-              checkboxInput("breeding_breedearly", "Females inside the facility reproduce at 2 yrs age",
+              checkboxInput("breeding_breedearly", "Females inside the facility reproduce at 2 yrs age with fecundity rate 0.57",
                 value = FALSE),
 
             ),
