@@ -17,7 +17,8 @@ wildlift_matrix(settings, wild=TRUE,
 wildlift_breeding(settings,
     in.inds=10, out.prop=1, f.surv.trans=1,
     j.surv.trans=1, j.surv.red=1,
-    tmax=20, pop.start=100, breed.early=FALSE)
+    tmax=20, pop.start=100,
+    breed.early=FALSE, f.preg.capt.2=0.57)
 
 \method{print}{wildlift_breeding}(x, ...)
 \method{summary}{wildlift_breeding}(object, ...)
@@ -79,6 +80,10 @@ recipient and status quo populations (wild not receiving females).
 logical, allow females in the facility (not in the wild)
 to reproduce at a younger age (2) if they are well fed.
 Defaults to \code{FALSE} which means reproduction at age 3.
+}
+  \item{f.preg.capt.2}{
+numeric, fecundity rate for the 2 yrs old (default is 0.57
+based on Adam et al. 2019). Only applies when \code{breed.early = TRUE}.
 }
   \item{x, object}{
 an object to print, summarize, plot, etc.

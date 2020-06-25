@@ -39,12 +39,10 @@ j.surv.trans=1, # juv survival during transportation into recipient
 j.surv.red=1, # transported juv survival reduction for 1 yr
 tmax=20,
 pop.start=100, # wild / recipient population
-breed.early=FALSE) { # reproduce at age 2 if well fed
+breed.early=FALSE, # reproduce at age 2 if well fed
+f.preg.capt.2 = 0.57) { # fecundity rate for the 2 yrs old
 
-    ## reproduce at age 2 or 3 depending on conditions
-    ## only inside facility
-    age.1st.litter.facility <- if (breed.early)
-        2 else 3
+    age.1st.litter.facility <- 3
     age.1st.litter <- 3
     age.calf.max <- 1
     age.cens <- 4
@@ -59,6 +57,11 @@ breed.early=FALSE) { # reproduce at age 2 if well fed
         age.cens=age.cens,
         age.1st.litter=age.1st.litter.facility,
         age.calf.max=age.calf.max)
+    ## reproduce at age 2 or 3 depending on conditions
+    ## only inside facility
+    ## fecundity rate for the 2 yrs old should be 0.57 (Adam et al. 2019)
+    if (breed.early)
+        Ac["[0,1)", "[2,3)"] <- 0.5 * f.preg.capt.2 * settings$f.surv.capt
     if (f.surv.trans < 0 || f.surv.trans > 1)
         stop("f.surv.trans must be a value between 0 and 1")
     if (j.surv.trans < 0 || j.surv.trans > 1)
@@ -178,6 +181,7 @@ breed.early=FALSE) { # reproduce at age 2 if well fed
         pop.start=pop.start,
         age.1st.litter=age.1st.litter,
         breed.early=breed.early,
+        f.preg.capt.2=f.preg.capt.2,
         age.calf.max=age.calf.max,
         Nin=Nin, Nout=Nout, Ncapt=Nc, Nrecip=Nw, Nwild=Nw0)
     out$population <- data.frame(Years=c(0, seq_len(tmax)),
