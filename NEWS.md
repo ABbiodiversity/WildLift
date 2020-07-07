@@ -1,3 +1,7 @@
+# Version 0.2.81
+
+* Added multiple levers.
+
 # Version 0.2.80
 
 * Added `breed.early` argument to `wildlift_breeding` which allows
