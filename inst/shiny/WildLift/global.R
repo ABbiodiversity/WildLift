@@ -10,6 +10,7 @@ library(shinyBS)
 library(plotly)
 library(openxlsx)
 library(WildLift)
+library(knitr)
 
 ver <- read.dcf(file=system.file("DESCRIPTION", package="WildLift"),
                 fields="Version")

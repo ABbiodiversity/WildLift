@@ -14,20 +14,55 @@ dashboardPage(
       "Number of caribou in the starting population. Default set, but the user can change the value by slider."),
     radioButtons("use_perc", "How to provide females penned",
       list("Percent"="perc", "Number of individuals"="inds")),
+    hr(),
     sidebarMenu(
-      menuItem("Maternity penning", tabName = "penning"),
-      menuItem("Predator exclosure", tabName = "predator"),
-      menuItem("Moose reduction", tabName = "moose"),
-      menuItem("Wolf reduction", tabName = "wolf"),
-      menuItem("Linear feature", tabName = "seismic"),
-      menuItem("Conservation breeding", tabName = "breeding")
+      menuItem("Home", tabName = "home", icon=icon("home")),
+      menuItem("Single lever", tabName = "single",
+               startExpanded=FALSE, icon=icon("dice-one"),
+        menuSubItem("Maternity penning", tabName = "penning"),
+        menuSubItem("Predator exclosure", tabName = "predator"),
+        menuSubItem("Moose reduction", tabName = "moose"),
+        menuSubItem("Wolf reduction", tabName = "wolf"),
+        menuSubItem("Linear feature", tabName = "seismic"),
+        menuSubItem("Conservation breeding", tabName = "breeding")
+      ),
+      menuItem("Multiple levers", tabName = "multiple", icon=icon("dice-two")),
+      menuItem("Documentation", tabName = "docs", icon=icon("book"))
     )
   ),
   dashboardBody(
     tabItems(
 
+      tabItem("home",
+        fluidRow(
+          column(width=12,
+                 includeMarkdown("intro.md")
+          ),
+        )
+      ),
+
+
+      tabItem("docs",
+        fluidRow(
+          column(width=12,
+                 includeMarkdown("docs.md")
+          ),
+        )
+      ),
+
+
+      tabItem("multiple",
+        fluidRow(
+          column(width=12,
+          column(width=12, h2("Multiple levers")),
+          ),
+        )
+      ),
+
+
       tabItem("penning",
         fluidRow(
+          column(width=12, h2("Single lever / Maternity penning")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -95,6 +130,7 @@ dashboardPage(
 
       tabItem("predator",
         fluidRow(
+          column(width=12, h2("Single lever / Predator exclosure")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -164,6 +200,7 @@ dashboardPage(
 
       tabItem("moose",
         fluidRow(
+          column(width=12, h2("Single lever / Moose reduction")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -215,6 +252,7 @@ dashboardPage(
 
       tabItem("wolf",
         fluidRow(
+          column(width=12, h2("Single lever / Wolf reduction")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -274,6 +312,7 @@ dashboardPage(
 
       tabItem("breeding",
         fluidRow(
+          column(width=12, h2("Single lever / Conservation breeding")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -352,6 +391,7 @@ dashboardPage(
 
       tabItem("seismic",
         fluidRow(
+          column(width=12, h2("Single lever / Linear feature")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
