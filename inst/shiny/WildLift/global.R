@@ -141,3 +141,111 @@ cost=12, yr_deact=5, yr_restor=15) {
          costrestor=diff(range(out[,"ldrestor"]))*area*cost/1000,
          pop=out)
 }
+
+
+if (FALSE) {
+
+## status quo settings
+HERD <- NULL
+USE_PROP <- TRUE
+TMAX <- 20
+POP_START <- 100
+VAL <- 0.3
+
+
+Settings <- list(
+    mp    = wildlift_settings("mat.pen", HERD),
+    mp_mr = wildlift_settings("mat.pen", HERD,
+        f.surv.wild = 0.879),
+    mp_wr = wildlift_settings("mat.pen", HERD,
+        f.surv.wild = 0.912, c.surv.wild = 0.513),
+    pe    = wildlift_settings("pred.excl", HERD),
+    pe_mr = wildlift_settings("pred.excl", HERD,
+        f.surv.wild = 0.879),
+    pe_wr = wildlift_settings("pred.excl", HERD,
+        f.surv.wild = 0.912, c.surv.wild = 0.513))
+
+Forecast <- lapply(Settings, function(s) {
+    wildlift_forecast(s,
+            tmax = TMAX,
+            pop.start = POP_START,
+            fpen.prop = if (USE_PROP) VAL else NULL,
+            fpen.inds = if (USE_PROP) NULL else VAL)
+
+})
+
+Summary <- sapply(Forecast, get_summary, USE_PROP)
+Traces <- lapply(Forecast, plot, plot=FALSE)
+
+NAM <- list(
+    c("None", "MatPen", "PredExcl"),
+    c("None", "MooseRed", "WolfRed"),
+    c("lam", "Nend", "CostEnd", "Nnew", "CostNew"))
+OUT <- array(0, sapply(NAM, length), NAM)
+
+OUT["None", "None", c("lam", "Nend")] <-
+    Summary[c("lam.nopen", "Nend.nopen"), "mp"]
+OUT["MatPen", "None", c("lam", "Nend", "CostEnd")] <-
+    Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp"]
+OUT["PredExcl", "None", c("lam", "Nend", "CostEnd")] <-
+    Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe"]
+
+## no extra cost
+OUT["None", "MooseRed", c("lam", "Nend")] <-
+    Summary[c("lam.nopen", "Nend.nopen"), "mp_mr"]
+OUT["MatPen", "MooseRed", c("lam", "Nend", "CostEnd")] <-
+    Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_mr"]
+OUT["PredExcl", "MooseRed", c("lam", "Nend", "CostEnd")] <-
+    Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe_mr"]
+
+## add extra cost
+# Cost <- input$wolf_nremove * input$tmax * input$wolf_cost1 / 1000
+OUT["None", "WolfRed", c("lam", "Nend")] <-
+    Summary[c("lam.nopen", "Nend.nopen"), "mp_wr"]
+OUT["MatPen", "WolfRed", c("lam", "Nend", "CostEnd")] <-
+    Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_wr"]
+OUT["PredExcl", "WolfRed", c("lam", "Nend", "CostEnd")] <-
+    Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe_wr"]
+
+OUT[,,"Nnew"] <- pmax(0, OUT[,,"Nend"] - OUT["None", "None", "Nend"])
+OUT[,,"CostNew"] <- OUT[,,"CostEnd"] / OUT[,,"Nnew"]
+
+PL <- rbind(
+    data.frame(Demogr="None", Manage="None", Years=0:TMAX,
+        N=Traces$mp$Nnopen, stringsAsFactors = FALSE),
+    data.frame(Demogr="MP", Manage="None", Years=0:TMAX,
+        N=Traces$mp$Npen, stringsAsFactors = FALSE),
+    data.frame(Demogr="PE", Manage="None", Years=0:TMAX,
+        N=Traces$pe$Npen, stringsAsFactors = FALSE),
+    data.frame(Demogr="None", Manage="MR", Years=0:TMAX,
+        N=Traces$mp_mr$Nnopen, stringsAsFactors = FALSE),
+    PL_MP_MR <- data.frame(Demogr="MP", Manage="MR", Years=0:TMAX,
+        N=Traces$mp_mr$Npen, stringsAsFactors = FALSE),
+    PL_PE_MR <- data.frame(Demogr="PE", Manage="MR", Years=0:TMAX,
+        N=Traces$pe_mr$Npen, stringsAsFactors = FALSE),
+    PL_SQ_WR <- data.frame(Demogr="None", Manage="WR", Years=0:TMAX,
+        N=Traces$mp_wr$Nnopen, stringsAsFactors = FALSE),
+    data.frame(Demogr="MP", Manage="WR", Years=0:TMAX,
+        N=Traces$mp_wr$Npen, stringsAsFactors = FALSE),
+    data.frame(Demogr="PE", Manage="WR", Years=0:TMAX,
+        N=Traces$pe_wr$Npen, stringsAsFactors = FALSE))
+PL$N <- floor(PL$N)
+PL$Two <- paste0(PL$Demogr, "+", PL$Manage)
+PL$Manage <- factor(PL$Manage, c("None", "MR", "WR"))
+PL$Demogr <- factor(PL$Demogr, c("None", "MP", "PE"))
+PL$lty <- as.integer(PL$Manage)
+
+p <- ggplot(PL, aes(x=Years, y=N)) +
+    geom_line(aes(color=Demogr, linetype=Manage)) +
+    geom_hline(yintercept=POP_START, col="grey") +
+    facet_grid(rows=vars(Demogr), cols=vars(Manage)) +
+#    facet_grid(cols=vars(Demogr)) +
+#    facet_grid(cols=vars(Manage)) +
+    theme_minimal() +
+    NULL
+
+p
+ggplotly(p)
+
+
+}
