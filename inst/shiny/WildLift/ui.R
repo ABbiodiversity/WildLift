@@ -26,7 +26,10 @@ dashboardPage(
         menuSubItem("Linear feature", tabName = "seismic"),
         menuSubItem("Conservation breeding", tabName = "breeding")
       ),
-      menuItem("Multiple levers", tabName = "multiple", icon=icon("dice-two")),
+      menuItem("Multiple levers", tabName = "multiple", icon=icon("dice-two"),
+        menuSubItem("Habitat", tabName = "multi1"),
+        menuSubItem("Breeding", tabName = "multi2")
+      ),
       menuItem("Documentation", tabName = "docs", icon=icon("book"))
     )
   ),
@@ -51,11 +54,16 @@ dashboardPage(
       ),
 
 
-      tabItem("multiple",
+      tabItem("multi1",
         fluidRow(
-          column(width=12,
-          column(width=12, h2("Multiple levers")),
-          ),
+          column(width=12, h2("Multiple levers / Habitat x Penning"))
+        )
+      ),
+
+
+      tabItem("multi2",
+        fluidRow(
+          column(width=12, h2("Multiple levers / Breeding x Habitat"))
         )
       ),
 
