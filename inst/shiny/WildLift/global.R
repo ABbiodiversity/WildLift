@@ -145,6 +145,11 @@ cost=12, yr_deact=5, yr_restor=15) {
 
 if (FALSE) {
 
+library(ggplot2)
+library(plotly)
+library(ggplotly)
+library(WildLift)
+
 ## status quo settings
 HERD <- NULL
 USE_PROP <- TRUE
@@ -209,6 +214,16 @@ OUT["PredExcl", "WolfRed", c("lam", "Nend", "CostEnd")] <-
 
 OUT[,,"Nnew"] <- pmax(0, OUT[,,"Nend"] - OUT["None", "None", "Nend"])
 OUT[,,"CostNew"] <- OUT[,,"CostEnd"] / OUT[,,"Nnew"]
+OUT[,,"CostNew"][is.na(OUT[,,"CostNew"])] <- 0
+
+TB <- data.frame(
+    Demogr = factor(rep(c("None", "MP", "PE"), 3), c("None", "MP", "PE")),
+    Manage = factor(rep(c("None", "MR", "WR"), each=3), c("None", "MR", "WR")))
+TB$lambda <- as.numeric(OUT[,,"lam"])
+TB$Nend <- as.numeric(OUT[,,"Nend"])
+TB$Nnew <- as.numeric(OUT[,,"Nnew"])
+TB$Cend <- as.numeric(OUT[,,"CostEnd"])
+TB$Cnew <- as.numeric(OUT[,,"CostNew"])
 
 PL <- rbind(
     data.frame(Demogr="None", Manage="None", Years=0:TMAX,
