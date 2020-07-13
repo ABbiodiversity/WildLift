@@ -56,14 +56,145 @@ dashboardPage(
 
       tabItem("multi1",
         fluidRow(
-          column(width=12, h2("Multiple levers / Habitat x Penning"))
+          column(width=12,
+            h2("Multiple levers / Habitat x Penning")
+          ),
+          column(width=4,
+            uiOutput("multi1_herd"),
+            bsTooltip("multi1_herd",
+              "Select a subpopulation for subpopulation specific demography parameters.",
+              placement="top")
+          ),
+          column(width=4,
+            uiOutput("multi1_perc_or_inds")
+          ),
+          column(width=4,
+            radioButtons("multi1_plot_type", "Plot design",
+                         choices=c("Single"="all",
+                                   "By demography"="dem",
+                                   "By management"="man",
+                                   "Facets"="fac"))
+          )
+        ),
+        fluidRow(
+          column(width=12,
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Population forecast: Multiple levers",
+              plotlyOutput("multi1_Plot", width = "100%", height = 400),
+              bsTooltip("multi1_Plot",
+                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results.",
+                placement="bottom")
+            ),
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Summary: Multiple levers",
+              #tableOutput("multi1_Table"),
+              reactableOutput("multi1_Table"),
+              downloadButton("multi1_download", "Download results as Excel file"),
+              bsTooltip("multi1_Table",
+                "Table summarizing reports, click on the headings to sort the table. Click below to download the full summary.",
+                placement="top"),
+              bsTooltip("multi1_download",
+                "Click here to download results.",
+                placement="top")
+            ),
+          )
+        ),
+        fluidRow(
+          column(width=12,
+            box(
+              width = 4, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Demography",
+              uiOutput("multi1_demogr_wild")
+            ),
+            box(
+              width = 4, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Demography",
+              uiOutput("multi1_demogr_captive")
+            ),
+            box(
+              width = 4, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Moose / Wolf",
+              p("Moose reduction"),
+              sliderInput("multi1_DemFsw_MR", "Adult female survival, wild",
+                  min = 0, max = 1,
+                  value = inits$multi1$f.surv.wild.mr, step = 0.001),
+              p("Wolf reduction"),
+              sliderInput("multi1_DemCsw_WR", "Calf survival, wild",
+                  min = 0, max = 1,
+                  value = inits$multi1$c.surv.wild.wr, step = 0.001),
+              sliderInput("multi1_DemFsw_WR", "Adult female survival, wild",
+                  min = 0, max = 1,
+                  value = inits$multi1$f.surv.wild.wr, step = 0.001)
+            )
+          )
+        ),
+        fluidRow(
+          column(width=12,
+            box(
+              width = 4, status = "warning", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = TRUE,
+              title = "Cost: Penning",
+              p("All costs: x $1000"),
+              sliderInput("multi1_CostPencap_MP", "Max in a single pen",
+                min = 1, max = 100, value = inits$penning$pen.cap, step = 1),
+              sliderInput("multi1_CostSetup_MP", "Initial set up",
+                min = 0, max = 2000, value = 100*round(inits$penning$pen.cost.setup/100),
+                step = 100),
+              sliderInput("multi1_CostProj_MP", "Project manager",
+                min = 0, max = 500, value = inits$penning$pen.cost.proj, step = 10),
+              sliderInput("multi1_CostMaint_MP", "Maintenance",
+                min = 0, max = 1000, value = inits$penning$pen.cost.maint, step = 10),
+              sliderInput("multi1_CostCapt_MP", "Capture/monitor",
+                min = 0, max = 500, value = inits$penning$pen.cost.capt, step = 10)
+            ),
+            box(
+              width = 4L, status = "warning", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = TRUE,
+              title = "Cost: Exclosure",
+              p("All costs: x $1000"),
+              sliderInput("multi1_CostPencap_PE", "Max in a single pen",
+                min = 1, max = 100, value = inits$predator$pen.cap, step = 1),
+              sliderInput("multi1_CostSetup_PE", "Initial set up",
+                min = 0, max = 2000, value = 100*round(inits$predator$pen.cost.setup/100),
+                step = 100),
+              sliderInput("multi1_CostProj_PE", "Project manager",
+                min = 0, max = 500, value = inits$predator$pen.cost.proj, step = 10),
+              sliderInput("multi1_CostMaint_PE", "Maintenance",
+                min = 0, max = 1000, value = inits$predator$pen.cost.maint, step = 10),
+              sliderInput("multi1_CostCapt_PE", "Capture/monitor",
+                min = 0, max = 500, value = inits$predator$pen.cost.capt, step = 10),
+              sliderInput("multi1_CostPred_PE", "Predator removal",
+                min = 0, max = 500, value = inits$predator$pen.cost.pred, step = 10)
+            ),
+            box(
+              width = 4, status = "warning", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = TRUE,
+              title = "Cost: Wolf",
+              p("All costs: x $1000"),
+              sliderInput("multi1_cost1", "Cost per wolf to be removed",
+                min = 0, max = 10, value = 5.1, step = 0.1),
+              sliderInput("multi1_nremove", "Number of wolves to be removed per year",
+                min = 0, max = 200, value = 0, step = 1),
+              bsTooltip("multi1_nremove",
+                "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
+                placement="bottom")
+            )
+          )
         )
       ),
 
 
       tabItem("multi2",
         fluidRow(
-          column(width=12, h2("Multiple levers / Breeding x Habitat"))
+          column(width=12, h2("Multiple levers / Breeding x Habitat"),
+                 p("This part is under development..."))
         )
       ),
 
@@ -117,7 +248,7 @@ dashboardPage(
               uiOutput("penning_demogr_sliders")
             ),
             box(
-              width = NULL, status = "info", solidHeader = TRUE,
+              width = NULL, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
               title = "Cost (x $1000)",
               sliderInput("penning_CostPencap", "Max in a single pen",
@@ -185,7 +316,7 @@ dashboardPage(
               uiOutput("predator_demogr_sliders")
             ),
             box(
-              width = NULL, status = "info", solidHeader = TRUE,
+              width = NULL, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
               title = "Cost (x $1000)",
               sliderInput("predator_CostPencap", "Max in a single pen",
@@ -303,7 +434,7 @@ dashboardPage(
               uiOutput("wolf_demogr_sliders")
             ),
             box(
-              width = NULL, status = "info", solidHeader = TRUE,
+              width = NULL, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
               title = "Cost",
               sliderInput("wolf_cost1", "Cost per wolf to be removed (x $1000)",
@@ -380,7 +511,7 @@ dashboardPage(
               uiOutput("breeding_demogr_sliders")
             ),
             box(
-              width = NULL, status = "info", solidHeader = TRUE,
+              width = NULL, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
               title = "Cost (x $1000)",
               sliderInput("breeding_CostSetup", "Initial set up",
@@ -440,7 +571,7 @@ dashboardPage(
               uiOutput("seismic_sliders")
             ),
             box(
-              width = NULL, status = "info", solidHeader = TRUE,
+              width = NULL, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
               title = "Cost",
               sliderInput("seismic_cost",

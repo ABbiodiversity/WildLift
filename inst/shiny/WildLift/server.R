@@ -15,11 +15,296 @@ server <- function(input, output, session) {
         moose0 = inits$moose0,
         wolf = inits$wolf,
         wolf0 = inits$wolf0,
-        breeding = inits$breeding)
+        breeding = inits$breeding,
+        multi1 = inits$multi1)
     ## set perc/inds
     observeEvent(input$use_perc, {
         values$use_perc <- input$use_perc == "perc"
     })
+
+    ## >>> multi1 tab <<<=====================================
+
+    ## dynamically render sliders
+    output$multi1_demogr_wild <- renderUI({
+        req(input$multi1_herd)
+        tagList(
+            sliderInput("multi1_DemCsw", "Calf survival, wild",
+                min = 0, max = 1, value = values$multi1$c.surv.wild, step = 0.001),
+            sliderInput("multi1_DemFsw", "Adult female survival, wild",
+                min = 0, max = 1, value = values$multi1$f.surv.wild, step = 0.001),
+            sliderInput("multi1_DemFpw", "Fecundity, wild",
+                min = 0, max = 1, value = values$multi1$f.preg.wild, step = 0.001)
+        )
+    })
+    output$multi1_demogr_captive <- renderUI({
+        req(input$multi1_herd)
+        tagList(
+            sliderInput("multi1_DemCsc", "Calf survival, captive",
+                min = 0, max = 1, value = values$multi1$c.surv.capt, step = 0.001),
+            sliderInput("multi1_DemFsc", "Adult female survival, captive",
+                min = 0, max = 1, value = values$multi1$f.surv.capt, step = 0.001),
+            sliderInput("multi1_DemFpc", "Fecundity, captive",
+                min = 0, max = 1, value = values$multi1$f.preg.capt, step = 0.001)
+        )
+    })
+    ## dynamically render subpopulation selector
+    output$multi1_herd <- renderUI({
+        tagList(
+            selectInput(
+                "multi1_herd", "Subpopulation",
+                c("Default (East Side Athabasca)"="Default", Herds, HerdsWolf)
+            )
+        )
+    })
+    ## dynamically render perc or inds slider
+    output$multi1_perc_or_inds <- renderUI({
+        if (values$use_perc) {
+            tagList(
+                sliderInput("multi1_Fpen", "Percent of females penned",
+                    min = 0, max = 100, value = round(100*inits$multi1$fpen.prop),
+                    step = 1),
+                bsTooltip("multi1_Fpen",
+                    "Change the percent of female population in maternity penning. Default set, but the user can toggle.")
+            )
+        } else {
+            tagList(
+                sliderInput("multi1_Fpen", "Number of females penned",
+                    min = 0, max = input$popstart, value = inits$multi1$fpen.inds,
+                    step = 1),
+                bsTooltip("multi1_Fpen",
+                    "Change the number of females in maternity penning. Default set, but the user can toggle.")
+            )
+        }
+    })
+    ## observers
+    observeEvent(input$multi1_herd, {
+        values$multi1 <- c(
+            fpen.prop = values$multi1$fpen.prop,
+            fpen.inds = values$multi1$fpen.inds,
+            f.surv.wild.mr = values$multi1$f.surv.wild.mr,
+            c.surv.wild.wr = values$multi1$c.surv.wild.wr,
+            f.surv.wild.wr = values$multi1$f.surv.wild.wr,
+            wildlift_settings("mat.pen",
+                herd = if (input$multi1_herd == "Default")
+                    NULL else input$multi1_herd))
+    })
+    observeEvent(input$multi1_Fpen, {
+        if (values$use_perc) {
+            values$multi1$fpen.prop <- input$multi1_Fpen / 100
+        } else {
+            values$multi1$fpen.inds <- input$multi1_Fpen
+        }
+    })
+    ## multi1 extras
+    observeEvent(input$multi1_DemFsw_MR, {
+        values$multi1$f.surv.wild.mr <- input$multi1_DemFsw_MR
+    })
+    observeEvent(input$multi1_DemCsw_WR, {
+        values$multi1$c.surv.wild.wr <- input$multi1_DemCsw_WR
+    })
+    observeEvent(input$multi1_DemFsw_WR, {
+        values$multi1$f.surv.wild.wr <- input$multi1_DemFsw_WR
+    })
+    ## plain
+    observeEvent(input$multi1_DemCsw, {
+        values$multi1$c.surv.wild <- input$multi1_DemCsw
+    })
+    observeEvent(input$multi1_DemCsc, {
+        values$multi1$c.surv.capt <- input$multi1_DemCsc
+    })
+    observeEvent(input$multi1_DemFsw, {
+        values$multi1$f.surv.wild <- input$multi1_DemFsw
+    })
+    observeEvent(input$multi1_DemFsc, {
+        values$multi1$f.surv.capt <- input$multi1_DemFsc
+    })
+    observeEvent(input$multi1_DemFpw, {
+        values$multi1$f.preg.wild <- input$multi1_DemFpw
+    })
+    observeEvent(input$multi1_DemFpc, {
+        values$multi1$f.preg.capt <- input$multi1_DemFpc
+    })
+    observeEvent(input$multi1_CostPencap, {
+        values$multi1$pen.cap <- input$multi1_CostPencap
+    })
+    observeEvent(input$multi1_CostSetup, {
+        values$multi1$pen.cost.setup <- input$multi1_CostSetup
+    })
+    observeEvent(input$multi1_CostProj, {
+        values$multi1$pen.cost.proj <- input$multi1_CostProj
+    })
+    observeEvent(input$multi1_CostMaint, {
+        values$multi1$pen.cost.maint <- input$multi1_CostMaint
+    })
+    observeEvent(input$multi1_CostCapt, {
+        values$multi1$pen.cost.capt <- input$multi1_CostCapt
+    })
+
+    ## get multi1 settings
+    multi1_settings <- reactive({
+        req(input$multi1_DemCsw, input$multi1_DemFsw_MR,
+            input$multi1_CostProj_MP, input$multi1_CostProj_PE)
+        HERD <- NULL
+        Settings <- list(
+            mp    = wildlift_settings("mat.pen", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_MP,
+                pen.cost.setup = input$multi1_CostSetup_MP,
+                pen.cost.proj = input$multi1_CostProj_MP,
+                pen.cost.maint = input$multi1_CostMaint_MP,
+                pen.cost.capt = input$multi1_CostCapt_MP,
+                pen.cost.pred = 0
+            ),
+            mp_mr = wildlift_settings("mat.pen", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw_MR,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_MP,
+                pen.cost.setup = input$multi1_CostSetup_MP,
+                pen.cost.proj = input$multi1_CostProj_MP,
+                pen.cost.maint = input$multi1_CostMaint_MP,
+                pen.cost.capt = input$multi1_CostCapt_MP,
+                pen.cost.pred = 0
+            ),
+            mp_wr = wildlift_settings("mat.pen", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw_WR,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw_WR,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_MP,
+                pen.cost.setup = input$multi1_CostSetup_MP,
+                pen.cost.proj = input$multi1_CostProj_MP,
+                pen.cost.maint = input$multi1_CostMaint_MP,
+                pen.cost.capt = input$multi1_CostCapt_MP,
+                pen.cost.pred = 0
+            ),
+            pe    = wildlift_settings("pred.excl", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_PE,
+                pen.cost.setup = input$multi1_CostSetup_PE,
+                pen.cost.proj = input$multi1_CostProj_PE,
+                pen.cost.maint = input$multi1_CostMaint_PE,
+                pen.cost.capt = input$multi1_CostCapt_PE,
+                pen.cost.pred = input$multi1_CostPred_PE
+            ),
+            pe_mr = wildlift_settings("pred.excl", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw_MR,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_PE,
+                pen.cost.setup = input$multi1_CostSetup_PE,
+                pen.cost.proj = input$multi1_CostProj_PE,
+                pen.cost.maint = input$multi1_CostMaint_PE,
+                pen.cost.capt = input$multi1_CostCapt_PE,
+                pen.cost.pred = input$multi1_CostPred_PE
+            ),
+            pe_wr = wildlift_settings("pred.excl", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw_WR,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw_WR,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_PE,
+                pen.cost.setup = input$multi1_CostSetup_PE,
+                pen.cost.proj = input$multi1_CostProj_PE,
+                pen.cost.maint = input$multi1_CostMaint_PE,
+                pen.cost.capt = input$multi1_CostCapt_PE,
+                pen.cost.pred = input$multi1_CostPred_PE
+            )
+        )
+        Settings
+    })
+    ## Use inputs and get summary & traces
+    multi1_getF <- reactive({
+        req(multi1_settings())
+        ML <- wildlift_multilever(multi1_settings(),
+            TMAX = input$tmax,
+            POP_START = input$popstart,
+            VAL = if (values$use_perc)
+                values$multi1$fpen.prop else values$multi1$fpen.inds,
+            USE_PROP = values$use_perc)
+
+        Cwolf <- input$multi1_nremove * input$tmax * input$multi1_cost1 / 1000
+        sw <- ML$summary$Manage == "WR"
+        ML$summary[sw, "Cend"] <- ML$summary[sw, "Cend"] + Cwolf
+        ML$summary[sw, "Cnew"] <- ML$summary[sw, "Cend"] / ML$summary[sw, "Nnew"]
+        ML$summary$Cend[is.na(ML$summary$Cend)] <- 0
+        ML
+    })
+
+    ## plot
+    output$multi1_Plot <- renderPlotly({
+        req(multi1_getF())
+        p <- plot_multilever(multi1_getF(), input$multi1_plot_type)
+        config(ggplotly(p), displaylogo = FALSE)
+    })
+    ## table
+    output$multi1_Table <- renderReactable({
+        req(multi1_getF())
+        TB <- multi1_getF()$summary
+        TB$Demogr <- NULL
+        TB$Manage <- NULL
+        colnames(TB) <- c("lambda", "N (end)", "N (new)", "Cost",
+                          "$M / new ind.")
+        reactable(round(TB, 3),
+            highlight = TRUE,
+            fullWidth = FALSE)
+    })
+    ## dowload
+    multi1_xlslist <- reactive({
+        req(multi1_getF())
+        ML <- multi1_getF()
+        Settings <- multi1_settings()
+        ss <- do.call(rbind, lapply(seq_along(Settings), function(i) {
+            z <- Settings[[i]]
+            z$call <- NULL
+            data.frame(Combination=names(Settings)[i],
+                       Parameter=names(z),
+                       Value=unlist(z))
+        }))
+        rownames(ss) <- NULL
+        TS <- do.call(rbind, lapply(seq_along(ML$traces), function(i) {
+            data.frame(Combination=names(ML$traces)[i], ML$traces[[i]])
+        }))
+        rownames(TS) <- NULL
+
+        out <- list(
+            Info=data.frame(WildLift=paste0(
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$multi1_herd))),
+            Settings=ss,
+            TimeSeries=TS,
+            Summary=ML$summary)
+        out
+    })
+    output$multi1_download <- downloadHandler(
+        filename = function() {
+            paste0("WildLift_multilever_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(multi1_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
 
     ## >>> penning tab <<<=====================================
 
