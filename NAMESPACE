@@ -3,6 +3,7 @@ export("wildlift_settings",
        "wildlift_breakeven",
        "wildlift_matrix",
        "wildlift_breeding",
+       "wildlift_linear",
        "run_app")
 
 S3method("print", "wildlift_settings")

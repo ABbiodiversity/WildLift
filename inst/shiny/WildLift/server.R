@@ -1672,7 +1672,7 @@ server <- function(input, output, session) {
                              type="error")
             return(NULL)
         }
-        wildlift_seismic(
+        wildlift_linear(
             tmax=input$tmax,
             pop.start=input$popstart,
             area=input$seismic_area,
