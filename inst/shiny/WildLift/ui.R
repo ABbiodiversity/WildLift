@@ -2,6 +2,24 @@ dashboardPage(
   dashboardHeader(title = paste("WildLift", ver[1])),
   dashboardSidebar(
     tags$script(src = "tips.js"),
+    sidebarMenu(
+      menuItem("Home", tabName = "home", icon=icon("home")),
+      menuItem("Single lever", tabName = "single",
+               startExpanded=FALSE, icon=icon("dice-one"),
+        menuSubItem("Maternity penning", tabName = "penning"),
+        menuSubItem("Predator exclosure", tabName = "predator"),
+        menuSubItem("Moose reduction", tabName = "moose"),
+        menuSubItem("Wolf reduction", tabName = "wolf"),
+        menuSubItem("Linear feature", tabName = "seismic")#,
+#        menuSubItem("Conservation breeding", tabName = "breeding")
+      ),
+      menuItem("Multiple levers", tabName = "multiple", icon=icon("dice-two"),
+        menuSubItem("Augmentation & habitat", tabName = "multi1"),
+        menuSubItem("Conservation breeding", tabName = "breeding")
+      ),
+      menuItem("Documentation", tabName = "docs", icon=icon("book"))
+    ),
+    hr(),
     sliderInput("tmax", "Number of years to forecast",
       min = 1, max = 50, value = 20, step = 1
     ),
@@ -13,25 +31,7 @@ dashboardPage(
     bsTooltip("popstart",
       "Number of caribou in the starting population. Default set, but the user can change the value by slider."),
     radioButtons("use_perc", "How to provide females penned",
-      list("Percent"="perc", "Number of individuals"="inds")),
-    hr(),
-    sidebarMenu(
-      menuItem("Home", tabName = "home", icon=icon("home")),
-      menuItem("Single lever", tabName = "single",
-               startExpanded=FALSE, icon=icon("dice-one"),
-        menuSubItem("Maternity penning", tabName = "penning"),
-        menuSubItem("Predator exclosure", tabName = "predator"),
-        menuSubItem("Moose reduction", tabName = "moose"),
-        menuSubItem("Wolf reduction", tabName = "wolf"),
-        menuSubItem("Linear feature", tabName = "seismic"),
-        menuSubItem("Conservation breeding", tabName = "breeding")
-      ),
-      menuItem("Multiple levers", tabName = "multiple", icon=icon("dice-two"),
-        menuSubItem("Habitat", tabName = "multi1"),
-        menuSubItem("Breeding", tabName = "multi2")
-      ),
-      menuItem("Documentation", tabName = "docs", icon=icon("book"))
-    )
+      list("Percent"="perc", "Number of individuals"="inds"))
   ),
   dashboardBody(
     tabItems(
@@ -57,7 +57,8 @@ dashboardPage(
       tabItem("multi1",
         fluidRow(
           column(width=12,
-            h2("Multiple levers / Habitat x Penning")
+            h2("Multiple levers / Habitat x Penning"),
+            HTML("<br/><p><strong>Limitations</strong> &mdash; Results using multiple levers are extrapolated based on knowledge from locations where single levers were studied. Some combinations of these levers might not have documented examples and need to be treated with caution.</p><br/>"),
           ),
           column(width=4,
             uiOutput("multi1_herd"),
@@ -191,12 +192,12 @@ dashboardPage(
       ),
 
 
-      tabItem("multi2",
-        fluidRow(
-          column(width=12, h2("Multiple levers / Breeding x Habitat"),
-                 p("This part is under development..."))
-        )
-      ),
+#      tabItem("multi2",
+#        fluidRow(
+#          column(width=12, h2("Multiple levers / Breeding x Habitat"),
+#                 p("This part is under development..."))
+#        )
+#      ),
 
 
       tabItem("penning",

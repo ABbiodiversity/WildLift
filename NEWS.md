@@ -1,6 +1,9 @@
 # Version 0.2.81
 
-* Added multiple levers.
+* Added multiple levers (augmentation, predator/prey, habitat).
+* Restructured the user interface.
+* Added predator/prey & habitat options to conservation breeding.
+
 
 # Version 0.2.80
 
