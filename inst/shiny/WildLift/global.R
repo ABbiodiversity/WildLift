@@ -42,7 +42,11 @@ inits <- list(
         f.surv.wild=0.801,
         c.surv.capt=0.295,
         c.surv.wild=0.295),
-    breeding = wildlift_settings("cons.breed", pen.cap=40),
+    breeding = c(
+        f.surv.wild.mr = 0.879,
+        c.surv.wild.wr = 0.513,
+        f.surv.wild.wr = 0.912,
+        wildlift_settings("cons.breed", pen.cap=40)),
     multi1 = c(
         fpen.prop = 0.35,
         fpen.inds = 10,

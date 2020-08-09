@@ -1407,6 +1407,7 @@ server <- function(input, output, session) {
         )
     })
     output$breeding_demogr_sliders <- renderUI({
+        req(input$breeding_herd)
         if (input$breeding_herd != "Default")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
@@ -1427,7 +1428,19 @@ server <- function(input, output, session) {
                 value = inits$breeding$f.preg.capt, step = 0.001),
             sliderInput("breeding_DemFpw", "Fecundity, recipient & status quo",
                 min = 0, max = 1,
-                value = inits$breeding$f.preg.wild, step = 0.001)
+                value = inits$breeding$f.preg.wild, step = 0.001),
+            hr(),
+            p("Moose reduction"),
+            sliderInput("breeding_DemFsw_MR", "Adult female survival, wild",
+                  min = 0, max = 1,
+                  value = inits$breeding$f.surv.wild.mr, step = 0.001),
+            p("Wolf reduction"),
+            sliderInput("breeding_DemCsw_WR", "Calf survival, wild",
+                  min = 0, max = 1,
+                  value = inits$breeding$c.surv.wild.wr, step = 0.001),
+            sliderInput("breeding_DemFsw_WR", "Adult female survival, wild",
+                  min = 0, max = 1,
+                  value = inits$breeding$f.surv.wild.wr, step = 0.001)
         )
     })
     ## dynamically render subpopulation selector
@@ -1441,10 +1454,15 @@ server <- function(input, output, session) {
     })
     ## observers
     observeEvent(input$breeding_herd, {
-        values$breeding <- wildlift_settings("cons.breed",
+        values$breeding <- c(
+            f.surv.wild.mr = values$breeding$f.surv.wild.mr,
+            c.surv.wild.wr = values$breeding$c.surv.wild.wr,
+            f.surv.wild.wr = values$breeding$f.surv.wild.wr,
+            wildlift_settings("cons.breed",
                 herd = if (input$breeding_herd == "Default")
-                    NULL else input$breeding_herd)
+                    NULL else input$breeding_herd))
     })
+    ## plain
     observeEvent(input$breeding_DemCsw, {
         values$breeding$c.surv.wild <- input$breeding_DemCsw
     })
@@ -1475,15 +1493,26 @@ server <- function(input, output, session) {
     observeEvent(input$breeding_CostCapt, {
         values$breeding$pen.cost.capt <- input$breeding_CostCapt
     })
+    ## multi extras
+    observeEvent(input$breeding_DemFsw_MR, {
+        values$breeding$f.surv.wild.mr <- input$breeding_DemFsw_MR
+    })
+    observeEvent(input$breeding_DemCsw_WR, {
+        values$breeding$c.surv.wild.wr <- input$breeding_DemCsw_WR
+    })
+    observeEvent(input$breeding_DemFsw_WR, {
+        values$breeding$f.surv.wild.wr <- input$breeding_DemFsw_WR
+    })
     ## breeding reduction without penning
     breeding_getF <- reactive({
+        req(input$breeding_herd, input$breeding_DemFsw_MR)
         if (is.null(input$breeding_breedearly))
             return(NULL)
         req(input$breeding_yrs, input$breeding_ininds,
             input$breeding_jyrs)
         nn <- rep(input$breeding_ininds, input$breeding_yrs)
         op <- c(rep(0, input$breeding_jyrs), input$breeding_outprop)
-        wildlift_breeding(values$breeding,
+        out <- wildlift_breeding(values$breeding,
             tmax = input$tmax,
             pop.start = input$popstart,
             f.surv.trans = input$breeding_ftrans,
@@ -1491,8 +1520,38 @@ server <- function(input, output, session) {
             j.surv.red = input$breeding_jsred,
             in.inds = nn,
             out.prop = op,
-            #breed.early = TRUE)
             breed.early = input$breeding_breedearly)
+        ## edit out$population: add MR
+        s_mr <- out$settings
+        s_mr$f.surv.wild <- input$breeding_DemFsw_MR
+        out_mr <- wildlift_breeding(s_mr,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            f.surv.trans = input$breeding_ftrans,
+            j.surv.trans = input$breeding_jtrans,
+            j.surv.red = input$breeding_jsred,
+            in.inds = nn,
+            out.prop = op,
+            breed.early = input$breeding_breedearly)
+        out$population$Nwild_MR <- out_mr$population$Nwild
+        ## edit out$population: add WR
+        s_wr <- out$settings
+        s_wr$c.surv.wild <- input$breeding_DemCsw_WR
+        s_wr$f.surv.wild <- input$breeding_DemFsw_WR
+        out_wr <- wildlift_breeding(s_wr,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            f.surv.trans = input$breeding_ftrans,
+            j.surv.trans = input$breeding_jtrans,
+            j.surv.red = input$breeding_jsred,
+            in.inds = nn,
+            out.prop = op,
+            breed.early = input$breeding_breedearly)
+        out$population$Nwild_WR <- out_wr$population$Nwild
+        print(out$population)
+        out$population$Nwild_MR <- out$population$Nwild_WR <- NULL
+
+        out
     })
     ## plot
     output$breeding_Plot <- renderPlotly({
