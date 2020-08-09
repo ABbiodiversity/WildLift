@@ -35,7 +35,8 @@ to be restored or deactivated.
 numeric between 0 and 100, percent of young (<30 yrs) forest.
 }
   \item{cost}{
-non-negative numeric, yearly cost of management action (in canadian dollars).
+non-negative numeric, cost of management action (in canadian dollars) per km
+linear feature restored/deactivated.
 }
   \item{yr_deact}{
 non-negative numeric, years it takes for deactivation to reach a level where
