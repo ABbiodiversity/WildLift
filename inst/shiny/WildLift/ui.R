@@ -107,19 +107,19 @@ dashboardPage(
         fluidRow(
           column(width=12,
             box(
-              width = 4, status = "info", solidHeader = TRUE,
+              width = 3, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
               title = "Demography",
               uiOutput("multi1_demogr_wild")
             ),
             box(
-              width = 4, status = "info", solidHeader = TRUE,
+              width = 3, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
               title = "Demography",
               uiOutput("multi1_demogr_captive")
             ),
             box(
-              width = 4, status = "info", solidHeader = TRUE,
+              width = 3, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
               title = "Moose / Wolf",
               p("Moose reduction"),
@@ -133,13 +133,36 @@ dashboardPage(
               sliderInput("multi1_DemFsw_WR", "Adult female survival, wild",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.wild.wr, step = 0.001)
+            ),
+            box(
+              width = 3, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Linear",
+              sliderInput("multi1_seismic_area",
+                  "Range area (sq km)",
+                  min = 0, max = 20000, value = 13119, step = 1),
+              sliderInput("multi1_seismic_linkm",
+                  "Linear feature length (km)",
+                  min = 0, max = 40000, value = 26154, step = 1),
+              sliderInput("multi1_seismic_lin2d",
+                  "Conventional seismic length (km)",
+                  min = 0, max = 40000, value = 21235, step = 1),
+              sliderInput("multi1_seismic_young",
+                  "Percent young forest (<30 yrs; %)",
+                  min = 0, max = 100, value = 25.7, step = 0.1),
+              sliderInput("multi1_seismic_deact",
+                  "Years for 100% deactivation",
+                  min = 0, max = 50, value = 5, step = 1),
+              sliderInput("multi1_seismic_restor",
+                  "Years for 100% restoration",
+                  min = 0, max = 50, value = 15, step = 1)
             )
           )
         ),
         fluidRow(
           column(width=12,
             box(
-              width = 4, status = "warning", solidHeader = TRUE,
+              width = 3, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
               title = "Cost: Penning",
               p("All costs: x $1000"),
@@ -156,7 +179,7 @@ dashboardPage(
                 min = 0, max = 500, value = inits$penning$pen.cost.capt, step = 10)
             ),
             box(
-              width = 4L, status = "warning", solidHeader = TRUE,
+              width = 3, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
               title = "Cost: Exclosure",
               p("All costs: x $1000"),
@@ -175,7 +198,7 @@ dashboardPage(
                 min = 0, max = 500, value = inits$predator$pen.cost.pred, step = 10)
             ),
             box(
-              width = 4, status = "warning", solidHeader = TRUE,
+              width = 3, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
               title = "Cost: Wolf",
               p("All costs: x $1000"),
@@ -186,6 +209,15 @@ dashboardPage(
               bsTooltip("multi1_nremove",
                 "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
                 placement="bottom")
+            ),
+            box(
+              width = 3, status = "warning", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = TRUE,
+              title = "Cost: Linear",
+              p("All costs: x $1000"),
+              sliderInput("multi1_seismic_cost",
+                "Cost per km",
+                min = 0, max = 100, value = 12, step = 1)
             )
           )
         )

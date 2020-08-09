@@ -188,6 +188,34 @@ server <- function(input, output, session) {
                 pen.cost.capt = input$multi1_CostCapt_MP,
                 pen.cost.pred = 0
             ),
+            mp_ld    = wildlift_settings("mat.pen", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_MP,
+                pen.cost.setup = input$multi1_CostSetup_MP,
+                pen.cost.proj = input$multi1_CostProj_MP,
+                pen.cost.maint = input$multi1_CostMaint_MP,
+                pen.cost.capt = input$multi1_CostCapt_MP,
+                pen.cost.pred = 0
+            ),
+            mp_lr    = wildlift_settings("mat.pen", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_MP,
+                pen.cost.setup = input$multi1_CostSetup_MP,
+                pen.cost.proj = input$multi1_CostProj_MP,
+                pen.cost.maint = input$multi1_CostMaint_MP,
+                pen.cost.capt = input$multi1_CostCapt_MP,
+                pen.cost.pred = 0
+            ),
             pe    = wildlift_settings("pred.excl", herd=HERD,
                 c.surv.wild = input$multi1_DemCsw,
                 c.surv.capt = input$multi1_DemCsc,
@@ -229,6 +257,34 @@ server <- function(input, output, session) {
                 pen.cost.maint = input$multi1_CostMaint_PE,
                 pen.cost.capt = input$multi1_CostCapt_PE,
                 pen.cost.pred = input$multi1_CostPred_PE
+            ),
+            pe_ld    = wildlift_settings("pred.excl", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_PE,
+                pen.cost.setup = input$multi1_CostSetup_PE,
+                pen.cost.proj = input$multi1_CostProj_PE,
+                pen.cost.maint = input$multi1_CostMaint_PE,
+                pen.cost.capt = input$multi1_CostCapt_PE,
+                pen.cost.pred = input$multi1_CostPred_PE
+            ),
+            pe_lr    = wildlift_settings("pred.excl", herd=HERD,
+                c.surv.wild = input$multi1_DemCsw,
+                c.surv.capt = input$multi1_DemCsc,
+                f.surv.wild = input$multi1_DemFsw,
+                f.surv.capt = input$multi1_DemFsc,
+                f.preg.wild = input$multi1_DemFpw,
+                f.preg.capt = input$multi1_DemFpc,
+                pen.cap = input$multi1_CostPencap_PE,
+                pen.cost.setup = input$multi1_CostSetup_PE,
+                pen.cost.proj = input$multi1_CostProj_PE,
+                pen.cost.maint = input$multi1_CostMaint_PE,
+                pen.cost.capt = input$multi1_CostCapt_PE,
+                pen.cost.pred = input$multi1_CostPred_PE
             )
         )
         Settings
@@ -241,7 +297,14 @@ server <- function(input, output, session) {
             POP_START = input$popstart,
             VAL = if (values$use_perc)
                 values$multi1$fpen.prop else values$multi1$fpen.inds,
-            USE_PROP = values$use_perc)
+            USE_PROP = values$use_perc,
+            area=input$multi1_seismic_area,
+            lin=input$multi1_seismic_linkm,
+            seism=input$multi1_seismic_lin2d,
+            young=input$multi1_seismic_young,
+            cost=input$multi1_seismic_cost,
+            yr_deact=input$multi1_seismic_deact,
+            yr_restor=input$multi1_seismic_restor)
 
         Cwolf <- input$multi1_nremove * input$tmax * input$multi1_cost1 / 1000
         sw <- ML$summary$Manage == "WR"
@@ -267,7 +330,8 @@ server <- function(input, output, session) {
                           "$M / new ind.")
         reactable(round(TB, 3),
             highlight = TRUE,
-            fullWidth = FALSE)
+            fullWidth = FALSE,
+            pagination=FALSE)
     })
     ## dowload
     multi1_xlslist <- reactive({
@@ -1650,10 +1714,7 @@ server <- function(input, output, session) {
                 min = 0, max = 40000, value = lin2d, step = 1),
             sliderInput("seismic_young",
                 "Percent young forest (<30 yrs; %)",
-                min = 0, max = 100, value = round(yng, 1), step = 0.11),
-#            sliderInput("seismic_cost",
-#                "Cost per km (x $1000)",
-#                min = 0, max = 100, value = 12, step = 1),
+                min = 0, max = 100, value = round(yng, 1), step = 0.1),
             sliderInput("seismic_deact",
                 "Years for 100% deactivation",
                 min = 0, max = 50, value = 5, step = 1),

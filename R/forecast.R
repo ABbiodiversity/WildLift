@@ -10,8 +10,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
 
 ## lambdaw is the adjustment for linear feature piece
 .wildlift_forecast <-
-function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, lambdaw=1)
-{
+function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds,
+linear=list(), deact=TRUE) {
     if (tmax < 1)
         stop("Argument tmax must be >= 1.")
     if (abs(round(tmax) - tmax) > 0.0001)
@@ -96,6 +96,21 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, lambdaw=1)
     # starting populations for time loop
     N1 <- N2 <- Nstart
 
+    ## linear deactivation/restoration added here
+    ## not costs, just demogr adjustment
+    dolin <- FALSE
+    if (length(linear) > 0) {
+        dolin <- TRUE
+        LIN <- wildlift_linear(tmax, pop.start,
+            area=linear$area,
+            lin=linear$lin,
+            seism=linear$seism,
+            young=linear$young,
+            cost=linear$cost,
+            yr_deact=linear$yr_deact,
+            yr_restor=linear$yr_restor)
+    }
+
     # loop through time to project population
     for(i in seq_len(tmax)) {
         ## reset prop for later years (divide by rep.adult.pen)
@@ -126,12 +141,28 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, lambdaw=1)
             0,   surv.f2, 0,   0,
             0,   0,  surv.f2, surv.f2),
             nrow=4, byrow=TRUE)
-        # performance of pen pop if pen removed, at  t
-        pen.removed <- A2 %*% N1
-        # project population (w/pen) to t
-        N1 <- A1 %*% N1
-        # project population (no pen) to t
-        N2 <- A2 %*% N2
+
+        ## linear feature adjustment (totally ad hoc stuff!!!)
+        if (dolin) {
+            lam0 <- LIN$pop[1,"lam0"]
+            lam1 <- if (deact) # LD or LR
+                LIN$pop[i+1L,"lamdeact"] else LIN$pop[i+1L,"lamrestor"]
+            lam <- fpen.prop*lam0 + (1-fpen.prop)*lam1
+            # performance of pen pop if pen removed, at  t
+            pen.removed <- lam1 * N1
+            # project population (w/pen) to t
+            N1 <- lam * N1
+            # project population (no pen) to t
+            N2 <- lam1 * N2
+        } else {
+            # performance of pen pop if pen removed, at  t
+            pen.removed <- A2 %*% N1
+            # project population (w/pen) to t
+            N1 <- A1 %*% N1
+            # project population (no pen) to t
+            N2 <- A2 %*% N2
+        }
+
         # eigen analysis of each population
         eigs.A1 <- eigen.analysis(A1)
         eigs.A2 <- eigen.analysis(A2)
@@ -259,6 +290,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, lambdaw=1)
     } else {
         out$fpen.inds <- fpen.inds
     }
+    if (dolin)
+        out$linear <- LIN
 
     out
 }

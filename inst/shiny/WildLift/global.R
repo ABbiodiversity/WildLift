@@ -115,7 +115,9 @@ stack_breeding <- function(x) {
 }
 
 wildlift_multilever <- function(Settings,
-TMAX, POP_START, VAL, USE_PROP) {
+TMAX, POP_START, VAL, USE_PROP,
+area=10000, lin=0, seism=0, young=0,
+cost=12, yr_deact=5, yr_restor=15) {
 
     Forecast <- lapply(Settings, function(s) {
         wildlift_forecast(s,
@@ -124,13 +126,60 @@ TMAX, POP_START, VAL, USE_PROP) {
             fpen.prop = if (USE_PROP) VAL else NULL,
             fpen.inds = if (USE_PROP) NULL else VAL)
     })
+    ## linear deactivation (ld) and restoration (lr)
+    Forecast$mp_ld <- WildLift:::.wildlift_forecast(
+        Settings$mp_ld,
+        tmax = TMAX,
+        pop.start = POP_START,
+        fpen.prop = if (USE_PROP) VAL else NULL,
+        fpen.inds = if (USE_PROP) NULL else VAL,
+        linear=list(area=area, lin=lin, seism=seism, young=young,
+            cost=cost, yr_deact=yr_deact, yr_restor=yr_restor),
+        deact=TRUE)
+    Forecast$mp_lr <- WildLift:::.wildlift_forecast(
+        Settings$mp_lr,
+        tmax = TMAX,
+        pop.start = POP_START,
+        fpen.prop = if (USE_PROP) VAL else NULL,
+        fpen.inds = if (USE_PROP) NULL else VAL,
+        linear=list(area=area, lin=lin, seism=seism, young=young,
+            cost=cost, yr_deact=yr_deact, yr_restor=yr_restor),
+        deact=FALSE)
+    Forecast$pe_ld <- WildLift:::.wildlift_forecast(
+        Settings$pe_ld,
+        tmax = TMAX,
+        pop.start = POP_START,
+        fpen.prop = if (USE_PROP) VAL else NULL,
+        fpen.inds = if (USE_PROP) NULL else VAL,
+        linear=list(area=area, lin=lin, seism=seism, young=young,
+            cost=cost, yr_deact=yr_deact, yr_restor=yr_restor),
+        deact=TRUE)
+    Forecast$pe_lr <- WildLift:::.wildlift_forecast(
+        Settings$pe_lr,
+        tmax = TMAX,
+        pop.start = POP_START,
+        fpen.prop = if (USE_PROP) VAL else NULL,
+        fpen.inds = if (USE_PROP) NULL else VAL,
+        linear=list(area=area, lin=lin, seism=seism, young=young,
+            cost=cost, yr_deact=yr_deact, yr_restor=yr_restor),
+        deact=FALSE)
+    class(Forecast$mp_ld) <- "wildlift_forecast"
+    class(Forecast$mp_lr) <- "wildlift_forecast"
+    class(Forecast$pe_ld) <- "wildlift_forecast"
+    class(Forecast$pe_lr) <- "wildlift_forecast"
+    cost_ld <- Forecast$mp_ld$linear$costdeact # mp/pe are the same
+    cost_lr <- Forecast$mp_ld$linear$costrestor
+    Forecast$mp_ld$linear <- NULL
+    Forecast$mp_lr$linear <- NULL
+    Forecast$pe_ld$linear <- NULL
+    Forecast$pe_lr$linear <- NULL
 
     Summary <- sapply(Forecast, get_summary, USE_PROP)
     Traces <- lapply(Forecast, plot, plot=FALSE)
 
     NAM <- list(
         c("None", "MatPen", "PredExcl"),
-        c("None", "MooseRed", "WolfRed"),
+        c("None", "MooseRed", "WolfRed", "LinDeact", "LinRest"),
         c("lam", "Nend", "CostEnd", "Nnew", "CostNew"))
     OUT <- array(0, sapply(NAM, length), NAM)
 
@@ -158,13 +207,41 @@ TMAX, POP_START, VAL, USE_PROP) {
     OUT["PredExcl", "WolfRed", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe_wr"]
 
+    ## add LD cost!
+    OUT["None", "LinDeact", c("lam", "Nend")] <-
+        Summary[c("lam.nopen", "Nend.nopen"), "mp_ld"]
+    OUT["MatPen", "LinDeact", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_ld"]
+    OUT["PredExcl", "LinDeact", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe_ld"]
+    OUT["None","LinDeact","CostEnd"] <- cost_ld
+    OUT["MatPen","LinDeact","CostEnd"] <-
+        OUT["MatPen","LinDeact","CostEnd"] + cost_ld
+    OUT["PredExcl","LinDeact","CostEnd"] <-
+        OUT["PredExcl","LinDeact","CostEnd"] + cost_ld
+
+    ## add LR cost!
+    OUT["None", "LinRest", c("lam", "Nend")] <-
+        Summary[c("lam.nopen", "Nend.nopen"), "mp_lr"]
+    OUT["MatPen", "LinRest", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_lr"]
+    OUT["PredExcl", "LinRest", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe_lr"]
+    OUT["None","LinRest","CostEnd"] <- cost_lr
+    OUT["MatPen","LinRest","CostEnd"] <-
+        OUT["MatPen","LinRest","CostEnd"] + cost_lr
+    OUT["PredExcl","LinRest","CostEnd"] <-
+        OUT["PredExcl","LinRest","CostEnd"] + cost_lr
+
     OUT[,,"Nnew"] <- pmax(0, OUT[,,"Nend"] - OUT["None", "None", "Nend"])
     OUT[,,"CostNew"] <- OUT[,,"CostEnd"] / OUT[,,"Nnew"]
     OUT[,,"CostNew"][is.na(OUT[,,"CostNew"])] <- 0
 
     TB <- data.frame(
-        Demogr = factor(rep(c("None", "MP", "PE"), 3), c("None", "MP", "PE")),
-        Manage = factor(rep(c("None", "MR", "WR"), each=3), c("None", "MR", "WR")))
+        Demogr = factor(rep(c("None", "MP", "PE"), dim(OUT)[2]),
+                        c("None", "MP", "PE")),
+        Manage = factor(rep(c("None", "MR", "WR", "LD", "LR"), each=dim(OUT)[1]),
+                        c("None", "MR", "WR", "LD", "LR")))
     TB$lambda <- as.numeric(OUT[,,"lam"])
     TB$Nend <- as.numeric(OUT[,,"Nend"])
     TB$Nnew <- as.numeric(OUT[,,"Nnew"])
@@ -229,3 +306,54 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
     p
 }
 
+
+if (FALSE) {
+        HERD <- NULL
+        Settings <- list(
+            mp    = wildlift_settings("mat.pen", herd=HERD
+            ),
+            mp_mr = wildlift_settings("mat.pen", herd=HERD
+            ),
+            mp_wr = wildlift_settings("mat.pen", herd=HERD
+            ),
+            mp_ld    = wildlift_settings("mat.pen", herd=HERD
+            ),
+            mp_lr    = wildlift_settings("mat.pen", herd=HERD
+            ),
+            pe    = wildlift_settings("pred.excl", herd=HERD
+            ),
+            pe_mr = wildlift_settings("pred.excl", herd=HERD
+            ),
+            pe_wr = wildlift_settings("pred.excl", herd=HERD
+            ),
+            pe_ld    = wildlift_settings("pred.excl", herd=HERD
+            ),
+            pe_lr    = wildlift_settings("pred.excl", herd=HERD
+            )
+        )
+
+l <- list(area= 13119,
+            lin=26154,
+            seism=21235,
+            young=25.7,
+            cost=12,
+            yr_deact=5,
+            yr_restor=15)
+wildlift_linear(area= 13119,
+            lin=26154,
+            seism=21235,
+            young=25.7,
+            cost=12,
+            yr_deact=5,
+            yr_restor=15)$pop
+w=.wildlift_forecast(wildlift_settings(),
+    tmax=20, pop.start=100, 0.35,
+    linear=list(), deact=TRUE)
+ww=.wildlift_forecast(wildlift_settings(),
+    tmax=20, pop.start=100, 0.35,
+    linear=l, deact=TRUE)
+class(w) <- "wildlift_forecast"
+class(ww) <- "wildlift_forecast"
+summary(w)
+summary(ww)
+}
