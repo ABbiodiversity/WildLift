@@ -10,6 +10,9 @@ library(shinyBS)
 library(plotly)
 library(openxlsx)
 library(WildLift)
+library(knitr)
+library(ggplot2)
+library(reactable)
 
 ver <- read.dcf(file=system.file("DESCRIPTION", package="WildLift"),
                 fields="Version")
@@ -39,7 +42,18 @@ inits <- list(
         f.surv.wild=0.801,
         c.surv.capt=0.295,
         c.surv.wild=0.295),
-    breeding = wildlift_settings("cons.breed", pen.cap=40)
+    breeding = c(
+        f.surv.wild.mr = 0.879,
+        c.surv.wild.wr = 0.513,
+        f.surv.wild.wr = 0.912,
+        wildlift_settings("cons.breed", pen.cap=40)),
+    multi1 = c(
+        fpen.prop = 0.35,
+        fpen.inds = 10,
+        f.surv.wild.mr = 0.879,
+        c.surv.wild.wr = 0.513,
+        f.surv.wild.wr = 0.912,
+        wildlift_settings("mat.pen"))
 )
 
 get_settings <- function(x, use_perc=TRUE) {
@@ -104,39 +118,123 @@ stack_breeding <- function(x) {
     N
 }
 
-wildlift_seismic <- function(tmax=20, pop.start=100,
-area=10000, lin=0, seism=0, young=0,
-cost=12, yr_deact=5, yr_restor=15) {
-    ld <- lin/area
-    if (seism > lin) # seismic <= linear
-        seism <- lin
-    perm <- lin - seism # permanent linear features
-    ldperm <- perm/area
-    lamfun <- function(ld, young)
-        1.0184-0.0234*ld-0.0021*young
-    cn <- c("year", "N0", "N1", "Ndeact", "Nrestor",
-        "lddeact", "ldrestor", "young", "lam0", "lam1", "lamdeact", "lamrestor")
-    out <- matrix(0, tmax+1L, length(cn))
-    colnames(out) <- cn
-    out[1,c("N0", "N1", "Ndeact", "Nrestor")] <- pop.start
-    out[1,"lddeact"] <- ld
-    out[1,"ldrestor"] <- ld
-    out[,"young"] <- young
-    out[,"lam0"] <- lamfun(0, young)
-    out[,"lam1"] <- lamfun(ld, young)
-    out[1,c("lamdeact", "lamrestor")] <- lamfun(ld, young)
-    for (i in seq_len(tmax)+1L) {
-        out[i, "year"] <- i
-        out[i, "lddeact"] <- max(ldperm, out[i-1L, "lddeact"]-ld/yr_deact)
-        out[i, "ldrestor"] <- max(ldperm, out[i-1L, "ldrestor"]-ld/yr_restor)
-        out[i, "N0"] <- max(0, floor(out[i-1L, "N0"] * out[i,"lam0"]))
-        out[i, "N1"] <- max(0, floor(out[i-1L, "N1"] * out[i,"lam1"]))
-        out[i, "lamdeact"] <- lamfun(out[i, "lddeact"], young)
-        out[i, "Ndeact"] <- max(0, floor(out[i-1L, "Ndeact"] *out[i, "lamdeact"]))
-        out[i, "lamrestor"] <- lamfun(out[i, "ldrestor"], young)
-        out[i, "Nrestor"] <- max(0, floor(out[i-1L, "Nrestor"] * out[i, "lamrestor"]))
-    }
-    list(costdeact=diff(range(out[,"lddeact"]))*area*cost/1000,
-         costrestor=diff(range(out[,"ldrestor"]))*area*cost/1000,
-         pop=out)
+wildlift_multilever <- function(Settings,
+TMAX, POP_START, VAL, USE_PROP) {
+
+    Forecast <- lapply(Settings, function(s) {
+        wildlift_forecast(s,
+            tmax = TMAX,
+            pop.start = POP_START,
+            fpen.prop = if (USE_PROP) VAL else NULL,
+            fpen.inds = if (USE_PROP) NULL else VAL)
+    })
+
+    Summary <- sapply(Forecast, get_summary, USE_PROP)
+    Traces <- lapply(Forecast, plot, plot=FALSE)
+
+    NAM <- list(
+        c("None", "MatPen", "PredExcl"),
+        c("None", "MooseRed", "WolfRed"),
+        c("lam", "Nend", "CostEnd", "Nnew", "CostNew"))
+    OUT <- array(0, sapply(NAM, length), NAM)
+
+    OUT["None", "None", c("lam", "Nend")] <-
+        Summary[c("lam.nopen", "Nend.nopen"), "mp"]
+    OUT["MatPen", "None", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp"]
+    OUT["PredExcl", "None", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe"]
+
+    ## no extra cost
+    OUT["None", "MooseRed", c("lam", "Nend")] <-
+        Summary[c("lam.nopen", "Nend.nopen"), "mp_mr"]
+    OUT["MatPen", "MooseRed", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_mr"]
+    OUT["PredExcl", "MooseRed", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe_mr"]
+
+    ## add extra cost
+    # Cost <- input$wolf_nremove * input$tmax * input$wolf_cost1 / 1000
+    OUT["None", "WolfRed", c("lam", "Nend")] <-
+        Summary[c("lam.nopen", "Nend.nopen"), "mp_wr"]
+    OUT["MatPen", "WolfRed", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_wr"]
+    OUT["PredExcl", "WolfRed", c("lam", "Nend", "CostEnd")] <-
+        Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe_wr"]
+
+    OUT[,,"Nnew"] <- pmax(0, OUT[,,"Nend"] - OUT["None", "None", "Nend"])
+    OUT[,,"CostNew"] <- OUT[,,"CostEnd"] / OUT[,,"Nnew"]
+    OUT[,,"CostNew"][is.na(OUT[,,"CostNew"])] <- 0
+
+    TB <- data.frame(
+        Demogr = factor(rep(c("None", "MP", "PE"), 3), c("None", "MP", "PE")),
+        Manage = factor(rep(c("None", "MR", "WR"), each=3), c("None", "MR", "WR")))
+    TB$lambda <- as.numeric(OUT[,,"lam"])
+    TB$Nend <- as.numeric(OUT[,,"Nend"])
+    TB$Nnew <- as.numeric(OUT[,,"Nnew"])
+    TB$Cend <- as.numeric(OUT[,,"CostEnd"])
+    TB$Cnew <- as.numeric(OUT[,,"CostNew"])
+    TB$Demogr <- as.character(TB$Demogr)
+    TB$Manage <- as.character(TB$Manage)
+    rownames(TB) <- paste0(
+        ifelse(TB$Demogr == "None", "", TB$Demogr),
+        ifelse(TB$Demogr != "None" & TB$Manage != "None", "+", ""),
+        ifelse(TB$Manage == "None", "", TB$Manage))
+    rownames(TB)[1] <- "Status quo"
+
+    list(summary=TB, traces=Traces)
+}
+
+plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
+
+    type <- match.arg(type)
+    Traces <- ML$traces
+    TMAX <- nrow(ML$traces[[1]])-1L
+    POP_START <- ML$traces[[1]][1,2]
+
+    PL <- rbind(
+        data.frame(Demogr="None", Manage="None", Years=0:TMAX,
+            N=Traces$mp$Nnopen, stringsAsFactors = FALSE),
+        data.frame(Demogr="MP", Manage="None", Years=0:TMAX,
+            N=Traces$mp$Npen, stringsAsFactors = FALSE),
+        data.frame(Demogr="PE", Manage="None", Years=0:TMAX,
+            N=Traces$pe$Npen, stringsAsFactors = FALSE),
+        data.frame(Demogr="None", Manage="MR", Years=0:TMAX,
+            N=Traces$mp_mr$Nnopen, stringsAsFactors = FALSE),
+        PL_MP_MR <- data.frame(Demogr="MP", Manage="MR", Years=0:TMAX,
+            N=Traces$mp_mr$Npen, stringsAsFactors = FALSE),
+        PL_PE_MR <- data.frame(Demogr="PE", Manage="MR", Years=0:TMAX,
+            N=Traces$pe_mr$Npen, stringsAsFactors = FALSE),
+        PL_SQ_WR <- data.frame(Demogr="None", Manage="WR", Years=0:TMAX,
+            N=Traces$mp_wr$Nnopen, stringsAsFactors = FALSE),
+        data.frame(Demogr="MP", Manage="WR", Years=0:TMAX,
+            N=Traces$mp_wr$Npen, stringsAsFactors = FALSE),
+        data.frame(Demogr="PE", Manage="WR", Years=0:TMAX,
+            N=Traces$pe_wr$Npen, stringsAsFactors = FALSE))
+
+    PL$N <- floor(PL$N)
+    PL$Two <- paste0(PL$Demogr, "+", PL$Manage)
+    PL$Manage <- factor(PL$Manage, c("None", "MR", "WR"))
+    PL$Demogr <- factor(PL$Demogr, c("None", "MP", "PE"))
+    PL$lty <- as.integer(PL$Manage)
+
+    p <- ggplot(PL, aes(x=Years, y=N)) +
+        geom_line(aes(color=Demogr, linetype=Manage)) +
+        theme_minimal() +
+        geom_hline(yintercept=POP_START, col="grey")
+
+    if (type == "fac")
+        p <- p + facet_grid(rows=vars(Demogr), cols=vars(Manage))
+    if (type == "man")
+        p <- p + facet_grid(cols=vars(Manage))
+    if (type == "dem")
+        p <- p + facet_grid(cols=vars(Demogr))
+
+    p
+}
+
+revrt <- function(out) {
+    out$population$Nwild_MR <- out$population$Nwild_WR <- NULL
+    out$population$Nrecip_MR <- out$population$Nrecip_WR <- NULL
+    out
 }

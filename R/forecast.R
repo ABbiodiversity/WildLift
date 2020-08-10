@@ -1,6 +1,17 @@
 wildlift_forecast <-
 function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
 {
+    out <- .wildlift_forecast(settings,
+        tmax, pop.start, fpen.prop, fpen.inds)
+    class(out) <- "wildlift_forecast"
+    out$call <- match.call()
+    out
+}
+
+## lambdaw is the adjustment for linear feature piece
+.wildlift_forecast <-
+function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, lambdaw=1)
+{
     if (tmax < 1)
         stop("Argument tmax must be >= 1.")
     if (abs(round(tmax) - tmax) > 0.0001)
@@ -248,8 +259,6 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     } else {
         out$fpen.inds <- fpen.inds
     }
-    class(out) <- "wildlift_forecast"
-    out$call <- match.call()
 
     out
 }

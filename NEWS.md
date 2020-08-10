@@ -1,3 +1,10 @@
+# Version 0.2.81
+
+* Added multiple levers (augmentation, predator/prey).
+* Restructured the user interface.
+* Added predator/prey options to conservation breeding.
+* `wildlift_linear` is now exported (forecasting linear feature effects).
+
 # Version 0.2.80
 
 * Added `breed.early` argument to `wildlift_breeding` which allows
