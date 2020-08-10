@@ -1,10 +1,9 @@
 # Version 0.2.81
 
-* Added multiple levers (augmentation, predator/prey, habitat).
+* Added multiple levers (augmentation, predator/prey).
 * Restructured the user interface.
-* Added predator/prey & habitat options to conservation breeding.
+* Added predator/prey options to conservation breeding.
 * `wildlift_linear` is now exported (forecasting linear feature effects).
-* CB tab moved to Multi leve group, added CB, CB + MR, CB + WR options to app.
 
 # Version 0.2.80
 
