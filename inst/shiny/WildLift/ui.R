@@ -460,7 +460,12 @@ dashboardPage(
               plotlyOutput("breeding_Plot", width = "100%", height = 400),
               bsTooltip("breeding_Plot",
                 "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results.",
-                placement="bottom")
+                placement="bottom"),
+              checkboxGroupInput("breeding_plot_show", NULL,
+                  choices=list(
+                    "CB + moose reduction (MR)"="mr",
+                    "CB + wolf reduction (WR)"="wr"
+                  ), selected=c("mr", "wr"), inline=TRUE)
             ),
             box(
               width = NULL, status = "success", solidHeader = TRUE,

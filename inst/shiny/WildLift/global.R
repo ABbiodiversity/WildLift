@@ -233,3 +233,8 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
     p
 }
 
+revrt <- function(out) {
+    out$population$Nwild_MR <- out$population$Nwild_WR <- NULL
+    out$population$Nrecip_MR <- out$population$Nrecip_WR <- NULL
+    out
+}

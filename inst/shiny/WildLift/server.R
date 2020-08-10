@@ -1420,7 +1420,8 @@ server <- function(input, output, session) {
             sliderInput("breeding_DemFsc", "Adult female survival in facility",
                 min = 0, max = 1,
                 value = inits$breeding$f.surv.capt, step = 0.001),
-            sliderInput("breeding_DemFsw", "Adult female survival, recipient & status quo",
+            sliderInput("breeding_DemFsw",
+                        "Adult female survival, recipient & status quo",
                 min = 0, max = 1,
                 value = inits$breeding$f.surv.wild, step = 0.001),
             sliderInput("breeding_DemFpc", "Fecundity in facility",
@@ -1431,14 +1432,17 @@ server <- function(input, output, session) {
                 value = inits$breeding$f.preg.wild, step = 0.001),
             hr(),
             p("Moose reduction"),
-            sliderInput("breeding_DemFsw_MR", "Adult female survival, wild",
+            sliderInput("breeding_DemFsw_MR",
+                        "Adult female survival, recipient & status quo",
                   min = 0, max = 1,
                   value = inits$breeding$f.surv.wild.mr, step = 0.001),
             p("Wolf reduction"),
-            sliderInput("breeding_DemCsw_WR", "Calf survival, wild",
+            sliderInput("breeding_DemCsw_WR",
+                        "Calf survival, recipient & status quo",
                   min = 0, max = 1,
                   value = inits$breeding$c.surv.wild.wr, step = 0.001),
-            sliderInput("breeding_DemFsw_WR", "Adult female survival, wild",
+            sliderInput("breeding_DemFsw_WR",
+                        "Adult female survival, recipient & status quo",
                   min = 0, max = 1,
                   value = inits$breeding$f.surv.wild.wr, step = 0.001)
         )
@@ -1534,6 +1538,11 @@ server <- function(input, output, session) {
             out.prop = op,
             breed.early = input$breeding_breedearly)
         out$population$Nwild_MR <- out_mr$population$Nwild
+        out$population$Nrecip_MR <- out_mr$population$Nrecip
+        out$mr <- list(
+            cost_extra = 0,
+            settings=s_mr,
+            output=out_mr)
         ## edit out$population: add WR
         s_wr <- out$settings
         s_wr$c.surv.wild <- input$breeding_DemCsw_WR
@@ -1548,8 +1557,12 @@ server <- function(input, output, session) {
             out.prop = op,
             breed.early = input$breeding_breedearly)
         out$population$Nwild_WR <- out_wr$population$Nwild
-        print(out$population)
-        out$population$Nwild_MR <- out$population$Nwild_WR <- NULL
+        out$population$Nrecip_WR <- out_wr$population$Nrecip
+        out$wr <- list(
+            cost_extra = input$breeding_nremove * input$tmax *
+                input$breeding_costwolf / 1000,
+            settings=s_wr,
+            output=out_wr)
 
         out
     })
@@ -1578,6 +1591,29 @@ server <- function(input, output, session) {
                 text = hover(t(bb$Nin))) %>%
             layout(legend = list(x = 100, y = 0)) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
+        if ("mr" %in% input$breeding_plot_show)
+            p <- p %>% add_trace(y = ~Nrecip_MR, name = 'Recipient MR', data = dF,
+                    mode = 'lines', type='scatter',
+                    text = hover(t(bb$mr$output$Nrecip)),
+                    hoverinfo = 'text',
+                    color=I('red'), line=list(dash='dash')) %>%
+                add_trace(y = ~Nwild_MR, name = 'Status quo MR', data = dF,
+                    mode = 'lines', type='scatter',
+                    text = hover(t(bb$mr$output$Nwild)),
+                    hoverinfo = 'text',
+                    color=I('blue'), line=list(dash='dash'))
+        if ("wr" %in% input$breeding_plot_show)
+            p <- p %>% add_trace(y = ~Nrecip_WR, name = 'Recipient WR', data = dF,
+                    mode = 'lines', type='scatter',
+                    text = hover(t(bb$wr$output$Nrecip)),
+                    hoverinfo = 'text',
+                    color=I('red'), line=list(dash='dot')) %>%
+                add_trace(y = ~Nwild_WR, name = 'Status quo WR', data = dF,
+                    mode = 'lines', type='scatter',
+                    text = hover(t(bb$wr$output$Nwild)),
+                    hoverinfo = 'text',
+                    color=I('blue'), line=list(dash='dot'))
+
         p
     })
     ## making nice table of the settings
@@ -1592,13 +1628,19 @@ server <- function(input, output, session) {
             f.surv.trans=x$f.surv.trans,
             j.surv.trans=x$j.surv.trans,
             j.surv.red=x$j.surv.red,
+            f.surv.wild.mr=x$mr$f.surv.wild,
+            f.surv.wild.wr=x$wr$f.surv.wild,
+            c.surv.wild.wr=x$wr$c.surv.wild,
             unlist(s)))
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
             "c.surv.wild" = "Calf survival, wild",
+            "c.surv.wild.wr" = "Calf survival, wild with wolf reduction",
             "c.surv.capt" = "Calf survival in facility",
             "f.surv.wild" = "Adult female survival, wild",
+            "f.surv.wild.wr" = "Adult female survival, wild with wolf reduction",
+            "f.surv.wild.mr" = "Adult female survival, wild with moose reduction",
             "f.surv.capt" = "Adult female survival in facility",
             "f.preg.wild" = "Fecundity, wild",
             "f.preg.capt" = "Fecundity in facility",
@@ -1622,6 +1664,7 @@ server <- function(input, output, session) {
     output$breeding_Table <- renderTable({
         req(breeding_getF())
         zz <- breeding_getF()
+        #zz <- revrt(zz)
 
         ## one time cost
         cost1 <- zz$settings$pen.cost.setup
@@ -1631,21 +1674,34 @@ server <- function(input, output, session) {
             zz$settings$pen.cost.capt +
             zz$settings$pen.cost.pred
         cost <- (cost1 + zz$tmax * cost2) / 1000
+        costWR <- cost + zz$wr$cost_extra
         #print(c(cost1/1000, cost2/1000, cost))
 
-        dF <- summary(zz)[,-(1:3)]
-        colnames(dF) <- c("In facility", "Recipient", "Status quo")
+        Pick <- c(Ncapt="In facility", Nrecip="Recipient", Nwild="Status quo",
+                  Nrecip_MR="Recipient MR", Nwild_MR="Status quo MR",
+                  Nrecip_WR="Recipient WR", Nwild_WR="Status quo WR")
+        dF <- summary(zz)[,names(Pick)]
+        colnames(dF) <- Pick
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
         Nnew <- Ntmax[1,"Recipient"] - Ntmax[1,"Status quo"]
+        NnewMR <- Ntmax[1,"Recipient MR"] - Ntmax[1,"Status quo MR"]
+        NnewWR <- Ntmax[1,"Recipient WR"] - Ntmax[1,"Status quo WR"]
         df <- rbind(
             '&lambda;'=round(Ntmax/Ntmax1, 3),
             'N (end)'=Ntmax,
-            'N (new)'=c(NA, max(0,Nnew),NA),
-            "Total cost (x $million)"=c(NA, cost, NA),
+            'N (new)'=c(NA, max(0,Nnew),NA, max(0,NnewMR),NA, max(0,NnewWR),NA),
+            "Total cost (x $million)"=c(NA, cost, NA, cost, NA, costWR, NA),
             "Cost per new individual (x $million)"=c(NA,
-                ifelse(Nnew>0,cost/Nnew, NA), NA))
+                ifelse(Nnew>0,cost/Nnew, NA), NA,
+                ifelse(NnewMR>0,cost/NnewMR, NA), NA,
+                ifelse(NnewWR>0,costWR/NnewWR, NA), NA))
+        if (!("mr" %in% input$breeding_plot_show))
+            df <- df[,!(colnames(df) %in% c("Recipient MR", "Status quo MR"))]
+        if (!("wr" %in% input$breeding_plot_show))
+            df <- df[,!(colnames(df) %in% c("Recipient WR", "Status quo WR"))]
+
         df
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
@@ -1655,6 +1711,7 @@ server <- function(input, output, session) {
     breeding_xlslist <- reactive({
         req(breeding_getF())
         bb <- breeding_getF()
+        #bb <- revrt(bb)
         dF <- summary(bb)
         ss <- breeding_getS()
         out <- list(
@@ -1663,7 +1720,9 @@ server <- function(input, output, session) {
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(dF),
-            AgeClasses=stack_breeding(bb))
+            AgeClasses=stack_breeding(bb),
+            AgeClasses_MR=stack_breeding(bb$mr$output),
+            AgeClasses_WR=stack_breeding(bb$wr$output))
         out$Settings$Parameters <- rownames(ss)
         out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
         out
