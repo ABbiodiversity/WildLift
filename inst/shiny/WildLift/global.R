@@ -133,20 +133,20 @@ TMAX, POP_START, VAL, USE_PROP) {
     Traces <- lapply(Forecast, plot, plot=FALSE)
 
     NAM <- list(
-        c("None", "MatPen", "PredExcl"),
-        c("None", "MooseRed", "WolfRed"),
+        c("Status quo", "MatPen", "PredExcl"),
+        c("Status quo", "MooseRed", "WolfRed"),
         c("lam", "Nend", "CostEnd", "Nnew", "CostNew"))
     OUT <- array(0, sapply(NAM, length), NAM)
 
-    OUT["None", "None", c("lam", "Nend")] <-
+    OUT["Status quo", "Status quo", c("lam", "Nend")] <-
         Summary[c("lam.nopen", "Nend.nopen"), "mp"]
-    OUT["MatPen", "None", c("lam", "Nend", "CostEnd")] <-
+    OUT["MatPen", "Status quo", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp"]
-    OUT["PredExcl", "None", c("lam", "Nend", "CostEnd")] <-
+    OUT["PredExcl", "Status quo", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe"]
 
     ## no extra cost
-    OUT["None", "MooseRed", c("lam", "Nend")] <-
+    OUT["Status quo", "MooseRed", c("lam", "Nend")] <-
         Summary[c("lam.nopen", "Nend.nopen"), "mp_mr"]
     OUT["MatPen", "MooseRed", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_mr"]
@@ -155,20 +155,20 @@ TMAX, POP_START, VAL, USE_PROP) {
 
     ## add extra cost
     # Cost <- input$wolf_nremove * input$tmax * input$wolf_cost1 / 1000
-    OUT["None", "WolfRed", c("lam", "Nend")] <-
+    OUT["Status quo", "WolfRed", c("lam", "Nend")] <-
         Summary[c("lam.nopen", "Nend.nopen"), "mp_wr"]
     OUT["MatPen", "WolfRed", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_wr"]
     OUT["PredExcl", "WolfRed", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe_wr"]
 
-    OUT[,,"Nnew"] <- pmax(0, OUT[,,"Nend"] - OUT["None", "None", "Nend"])
+    OUT[,,"Nnew"] <- pmax(0, OUT[,,"Nend"] - OUT["Status quo", "Status quo", "Nend"])
     OUT[,,"CostNew"] <- OUT[,,"CostEnd"] / OUT[,,"Nnew"]
     OUT[,,"CostNew"][is.na(OUT[,,"CostNew"])] <- 0
 
     TB <- data.frame(
-        Demogr = factor(rep(c("None", "MP", "PE"), 3), c("None", "MP", "PE")),
-        Manage = factor(rep(c("None", "MR", "WR"), each=3), c("None", "MR", "WR")))
+        Demogr = factor(rep(c("Status quo", "MP", "PE"), 3), c("Status quo", "MP", "PE")),
+        Manage = factor(rep(c("Status quo", "MR", "WR"), each=3), c("Status quo", "MR", "WR")))
     TB$lambda <- as.numeric(OUT[,,"lam"])
     TB$Nend <- as.numeric(OUT[,,"Nend"])
     TB$Nnew <- as.numeric(OUT[,,"Nnew"])
@@ -177,9 +177,9 @@ TMAX, POP_START, VAL, USE_PROP) {
     TB$Demogr <- as.character(TB$Demogr)
     TB$Manage <- as.character(TB$Manage)
     rownames(TB) <- paste0(
-        ifelse(TB$Demogr == "None", "", TB$Demogr),
-        ifelse(TB$Demogr != "None" & TB$Manage != "None", "+", ""),
-        ifelse(TB$Manage == "None", "", TB$Manage))
+        ifelse(TB$Demogr == "Status quo", "", TB$Demogr),
+        ifelse(TB$Demogr != "Status quo" & TB$Manage != "Status quo", "+", ""),
+        ifelse(TB$Manage == "Status quo", "", TB$Manage))
     rownames(TB)[1] <- "Status quo"
 
     list(summary=TB, traces=Traces)
@@ -193,19 +193,19 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
     POP_START <- ML$traces[[1]][1,2]
 
     PL <- rbind(
-        data.frame(Demogr="None", Manage="None", Years=0:TMAX,
+        data.frame(Demogr="Status quo", Manage="Status quo", Years=0:TMAX,
             N=Traces$mp$Nnopen, stringsAsFactors = FALSE),
-        data.frame(Demogr="MP", Manage="None", Years=0:TMAX,
+        data.frame(Demogr="MP", Manage="Status quo", Years=0:TMAX,
             N=Traces$mp$Npen, stringsAsFactors = FALSE),
-        data.frame(Demogr="PE", Manage="None", Years=0:TMAX,
+        data.frame(Demogr="PE", Manage="Status quo", Years=0:TMAX,
             N=Traces$pe$Npen, stringsAsFactors = FALSE),
-        data.frame(Demogr="None", Manage="MR", Years=0:TMAX,
+        data.frame(Demogr="Status quo", Manage="MR", Years=0:TMAX,
             N=Traces$mp_mr$Nnopen, stringsAsFactors = FALSE),
         PL_MP_MR <- data.frame(Demogr="MP", Manage="MR", Years=0:TMAX,
             N=Traces$mp_mr$Npen, stringsAsFactors = FALSE),
         PL_PE_MR <- data.frame(Demogr="PE", Manage="MR", Years=0:TMAX,
             N=Traces$pe_mr$Npen, stringsAsFactors = FALSE),
-        PL_SQ_WR <- data.frame(Demogr="None", Manage="WR", Years=0:TMAX,
+        PL_SQ_WR <- data.frame(Demogr="Status quo", Manage="WR", Years=0:TMAX,
             N=Traces$mp_wr$Nnopen, stringsAsFactors = FALSE),
         data.frame(Demogr="MP", Manage="WR", Years=0:TMAX,
             N=Traces$mp_wr$Npen, stringsAsFactors = FALSE),
@@ -214,8 +214,8 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
 
     PL$N <- floor(PL$N)
     PL$Two <- paste0(PL$Demogr, "+", PL$Manage)
-    PL$Manage <- factor(PL$Manage, c("None", "MR", "WR"))
-    PL$Demogr <- factor(PL$Demogr, c("None", "MP", "PE"))
+    PL$Manage <- factor(PL$Manage, c("Status quo", "MR", "WR"))
+    PL$Demogr <- factor(PL$Demogr, c("Status quo", "MP", "PE"))
     PL$lty <- as.integer(PL$Manage)
 
     p <- ggplot(PL, aes(x=Years, y=N)) +

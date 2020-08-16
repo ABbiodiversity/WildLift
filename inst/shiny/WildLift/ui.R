@@ -11,10 +11,10 @@ dashboardPage(
         menuSubItem("Moose reduction", tabName = "moose"),
         menuSubItem("Wolf reduction", tabName = "wolf"),
         menuSubItem("Linear feature", tabName = "seismic")#,
-#        menuSubItem("Conservation breeding", tabName = "breeding")
+#        menuSubItem("Conservation breeding", tabName = "breeding1")
       ),
       menuItem("Multiple levers", tabName = "multiple", icon=icon("dice-two"),
-        menuSubItem("Augmentation & habitat", tabName = "multi1"),
+        menuSubItem("Augmentation", tabName = "multi1"),
         menuSubItem("Conservation breeding", tabName = "breeding")
       ),
       menuItem("Documentation", tabName = "docs", icon=icon("book"))
@@ -57,8 +57,8 @@ dashboardPage(
       tabItem("multi1",
         fluidRow(
           column(width=12,
-            h2("Multiple levers / Habitat x Penning"),
-            HTML("<br/><p><strong>Limitations</strong> &mdash; Results using multiple levers are extrapolated based on knowledge from locations where single levers were studied. Some combinations of these levers might not have documented examples and need to be treated with caution.</p><br/>"),
+            h2("Demographic Augmentation and Predator/Prey Management"),
+            HTML("<br/><p><strong>Limitations</strong> &mdash; Results using multiple levers are extrapolated based on knowledge from locations where single levers were studied. Some combinations of these levers might not have documented examples and need to be treated with caution.</p><p>MP = Maternity Penning; PE = Predator Exclosure; MR = Moose Reduction; WR = Wolf Reduction</p><br/>"),
           ),
           column(width=4,
             uiOutput("multi1_herd"),
@@ -109,28 +109,29 @@ dashboardPage(
             box(
               width = 4, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Demography",
+              title = "Wild",
               uiOutput("multi1_demogr_wild")
             ),
             box(
               width = 4, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Demography",
+              title = "Captive",
               uiOutput("multi1_demogr_captive")
             ),
             box(
               width = 4, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Moose / Wolf",
-              p("Moose reduction"),
-              sliderInput("multi1_DemFsw_MR", "Adult female survival, wild",
+              title = "MR and WR",
+              #p("Moose reduction"),
+              sliderInput("multi1_DemFsw_MR", "Adult female survival, wild, MR",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.wild.mr, step = 0.001),
-              p("Wolf reduction"),
-              sliderInput("multi1_DemCsw_WR", "Calf survival, wild",
+              hr(),
+              #p("Wolf reduction"),
+              sliderInput("multi1_DemCsw_WR", "Calf survival, wild, WR",
                   min = 0, max = 1,
                   value = inits$multi1$c.surv.wild.wr, step = 0.001),
-              sliderInput("multi1_DemFsw_WR", "Adult female survival, wild",
+              sliderInput("multi1_DemFsw_WR", "Adult female survival, wild, WR",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.wild.wr, step = 0.001)
             )
@@ -141,7 +142,7 @@ dashboardPage(
             box(
               width = 4, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
-              title = "Cost: Penning",
+              title = "Cost: MP",
               p("All costs: x $1000"),
               sliderInput("multi1_CostPencap_MP", "Max in a single pen",
                 min = 1, max = 100, value = inits$penning$pen.cap, step = 1),
@@ -158,7 +159,7 @@ dashboardPage(
             box(
               width = 4L, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
-              title = "Cost: Exclosure",
+              title = "Cost: PE",
               p("All costs: x $1000"),
               sliderInput("multi1_CostPencap_PE", "Max in a single pen",
                 min = 1, max = 100, value = inits$predator$pen.cap, step = 1),
@@ -177,7 +178,7 @@ dashboardPage(
             box(
               width = 4, status = "warning", solidHeader = TRUE,
               collapsible = TRUE, collapsed = TRUE,
-              title = "Cost: Wolf",
+              title = "Cost: WR",
               p("All costs: x $1000"),
               sliderInput("multi1_cost1", "Cost per wolf to be removed",
                 min = 0, max = 10, value = 5.1, step = 0.1),
@@ -202,7 +203,7 @@ dashboardPage(
 
       tabItem("penning",
         fluidRow(
-          column(width=12, h2("Single lever / Maternity penning")),
+          column(width=12, h2("Maternity Penning")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -270,7 +271,7 @@ dashboardPage(
 
       tabItem("predator",
         fluidRow(
-          column(width=12, h2("Single lever / Predator exclosure")),
+          column(width=12, h2("Predator Exclosure")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -340,7 +341,7 @@ dashboardPage(
 
       tabItem("moose",
         fluidRow(
-          column(width=12, h2("Single lever / Moose reduction")),
+          column(width=12, h2("Moose Reduction")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -388,7 +389,7 @@ dashboardPage(
 
       tabItem("wolf",
         fluidRow(
-          column(width=12, h2("Single lever / Wolf reduction")),
+          column(width=12, h2("Wolf Reduction")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -448,7 +449,9 @@ dashboardPage(
 
       tabItem("breeding",
         fluidRow(
-          column(width=12, h2("Multiple levers / Conservation breeding"),
+          column(width=12,
+            h2("Conservation Breeding and Predator/Prey Management"),
+            HTML("<br/><p><strong>Limitations</strong> &mdash; Results using multiple levers are extrapolated based on knowledge from locations where single levers were studied. Some combinations of these levers might not have documented examples and need to be treated with caution.</p><p>CB = Conservation Breeding; MR = Moose Reduction; WR = Wolf Reduction</p><br/>"),
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
@@ -540,7 +543,7 @@ dashboardPage(
 
       tabItem("seismic",
         fluidRow(
-          column(width=12, h2("Single lever / Linear feature")),
+          column(width=12, h2("Linear Reature Deactivation and Restoration")),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
