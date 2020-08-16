@@ -374,11 +374,7 @@ dashboardPage(
               uiOutput("moose_herd"),
               bsTooltip("moose_herd",
                 "Select a subpopulation for subpopulation specific demography parameters.",
-                placement="top"),
-              uiOutput("moose_perc_or_inds"),
-              uiOutput("moose_button"),
-              bsTooltip("moose_button",
-                "Click here to create a reference scenario, and see how changing penning or demography parameters affect results.")
+                placement="top")
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,

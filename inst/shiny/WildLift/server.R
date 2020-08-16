@@ -948,7 +948,8 @@ server <- function(input, output, session) {
     ## dynamically render sliders
     output$moose_demogr_sliders <- renderUI({
         if (input$moose_herd != "Default")
-            return(p("Demography settings not available for specific subpopulations."))
+            return(p("Demography settings not available for specific subpopulations."
+                     ))
         tagList(
             sliderInput("moose_DemCsw", "Calf survival, moose reduction",
                 min = 0, max = 1, value = inits$moose$c.surv.wild, step = 0.001),
@@ -972,37 +973,17 @@ server <- function(input, output, session) {
             )
         )
     })
-    ## dynamically render perc or inds slider
-    output$moose_perc_or_inds <- renderUI({
-        if (values$use_perc) {
-            tagList(
-                sliderInput("moose_Fpen", "Percent of females penned",
-                    min = 0, max = 100, value = round(100*inits$moose$fpen.prop),
-                    step = 1),
-                bsTooltip("moose_Fpen",
-                    "Change the percent of female population in maternity penning. Default set, but the user can toggle.")
-            )
-        } else {
-            tagList(
-                sliderInput("moose_Fpen", "Number of females penned",
-                    min = 0, max = input$popstart, value = inits$moose$fpen.inds,
-                    step = 1),
-                bsTooltip("moose_Fpen",
-                    "Change the number of females in maternity penning. Default set, but the user can toggle.")
-            )
-        }
-    })
     ## observers
     observeEvent(input$moose_herd, {
         values$moose <- c(
-            fpen.prop = values$moose$fpen.prop,
-            fpen.inds = values$moose$fpen.inds,
+            fpen.prop = 0.35,
+            fpen.inds = 10,
             wildlift_settings("moose.red",
                 herd = if (input$moose_herd == "Default")
                     NULL else input$moose_herd))
         values$moose0 <- c(
-            fpen.prop = values$moose0$fpen.prop,
-            fpen.inds = values$moose0$fpen.inds,
+            fpen.prop = 0.35,
+            fpen.inds = 10,
             wildlift_settings("mat.pen",
                 herd = if (input$moose_herd == "Default")
                     NULL else input$moose_herd))
@@ -1025,31 +1006,6 @@ server <- function(input, output, session) {
     observeEvent(input$moose_DemFpc, {
         values$moose0$f.preg.wild <- input$moose_DemFpc
     })
-    observeEvent(input$moose_Fpen, {
-        if (values$use_perc) {
-            values$moose$fpen.prop <- input$moose_Fpen / 100
-            values$moose0$fpen.prop <- input$moose_Fpen / 100
-        } else {
-            values$moose$fpen.inds <- input$moose_Fpen
-            values$moose0$fpen.inds <- input$moose_Fpen
-        }
-    })
-    ## moose reduction with penning
-    moose_getF <- reactive({
-        wildlift_forecast(values$moose,
-            tmax = input$tmax,
-            pop.start = input$popstart,
-            fpen.prop = if (values$use_perc) values$moose$fpen.prop else NULL,
-            fpen.inds = if (values$use_perc) NULL else values$moose$fpen.inds)
-    })
-    ## no moose reduction with penning
-    moose_getB <- reactive({
-        wildlift_forecast(values$moose0,
-            tmax = input$tmax,
-            pop.start = input$popstart,
-            fpen.prop = if (values$use_perc) values$moose0$fpen.prop else NULL,
-            fpen.inds = if (values$use_perc) NULL else values$moose0$fpen.inds)
-    })
     ## moose reduction without penning
     moose_getF0 <- reactive({
         wildlift_forecast(values$moose,
@@ -1066,84 +1022,57 @@ server <- function(input, output, session) {
     })
     ## making nice table of the results
     moose_getT <- reactive({
-        req(moose_getF(),
-            moose_getB(),
-            moose_getF0(),
-            moose_getB0())
+        req(moose_getF0(), moose_getB0())
         subs <- c("lam.pen", "Nend.pen")
         df <- cbind(
             NoMooseNoPen=get_summary(moose_getB0(), values$use_perc)[subs],
-            NoMoosePen=get_summary(moose_getB(), values$use_perc)[subs],
-            MooseNoPen=get_summary(moose_getF0(), values$use_perc)[subs],
-            MoosePen=get_summary(moose_getF(), values$use_perc)[subs]
+            MooseNoPen=get_summary(moose_getF0(), values$use_perc)[subs]
         )
         Nnew <- pmax(0, df[2,]-df[2,1])
         df <- rbind(df,
             Nnew=Nnew,
-            Cost=c(NA, NA, NA, NA),
-            CostPerNew=c(NA, NA, NA, NA))
+            Cost=c(NA, NA),
+            CostPerNew=c(NA, NA))
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
                           "Total cost (x $million)",
                           "Cost per new individual (x $million)")
         colnames(df) <- c(
             "Status quo",
-            "No moose reduction, penned",
-            "Moose reduction, no pen",
-            "Moose reduction, penned")
+            "Moose reduction, no pen")
         df
     })
 
     ## making nice table of the settings
     moose_getS <- reactive({
-        req(moose_getF(),
-            moose_getB(),
-            moose_getF0(),
-            moose_getB0())
+        req(moose_getF0(), moose_getB0())
         tab <- cbind(
             MooseNoPen=get_settings(moose_getF0(), values$use_perc),
-            MoosePen=get_settings(moose_getF(), values$use_perc),
-            NoMooseNoPen=get_settings(moose_getB0(), values$use_perc),
-            NoMoosePen=get_settings(moose_getB(), values$use_perc)
+            NoMooseNoPen=get_settings(moose_getB0(), values$use_perc)
         )
         SNAM <- c(
             "tmax" = "T max",
             "pop.start" = "N start",
-            #"fpen.prop" = "% females penned",
-            "fpen" = if (values$use_perc)
-                "% females penned" else "# females penned",
             "c.surv.wild" = "Calf survival, wild",
-            "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
-            "f.surv.capt" = "Adult female survival, captive",
-            "f.preg.wild" = "Fecundity, wild",
-            "f.preg.capt" = "Fecundity, captive",
-            "pen.cap" = "Max in a single pen")
+            "f.preg.wild" = "Fecundity, wild")
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- c(
             "Moose reduction, no pen",
-            "Moose reduction, penned",
-            "Status quo",
-            "No moose reduction, penned")
+            "Status quo")
         df
     })
     ## plot
     output$moose_Plot <- renderPlotly({
-        req(moose_getF())
+        req(moose_getF0(), moose_getB0())
         dF0 <- plot(moose_getF0(), plot=FALSE)
-        dF <- plot(moose_getF(), plot=FALSE)
         dB0 <- plot(moose_getB0(), plot=FALSE)
-        dB <- plot(moose_getB(), plot=FALSE)
         colnames(dF0)[colnames(dF0) == "Npen"] <- "Individuals"
         p <- plot_ly(dF0, x = ~Years, y = ~Individuals,
             name = 'Moose reduction, no pen', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
-            add_trace(y = ~Npen, name = 'Moose reduction, penned', data = dF,
-                mode = 'lines', color=I('blue')) %>%
             add_trace(y = ~Npen, name = 'Status quo', data = dB0,
                     line=list(dash = 'dash', color='red')) %>%
-            add_trace(y = ~Npen, name = 'No moose reduction, penned', data = dB,
-                line=list(dash = 'dash', color='blue')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         p
@@ -1157,18 +1086,14 @@ server <- function(input, output, session) {
     sanitize.text.function = function(x) x)
     ## dowload
     moose_xlslist <- reactive({
-        req(moose_getF(), moose_getF0(), moose_getB(), moose_getB0())
+        req(moose_getF0(), moose_getB0())
         req(moose_getT())
         TS <- cbind(
             plot(moose_getF0(), plot=FALSE)[,c("Years", "Npen")],
-            plot(moose_getF(), plot=FALSE)[,"Npen"],
-            plot(moose_getB0(), plot=FALSE)[,"Npen"],
-            plot(moose_getB(), plot=FALSE)[,"Npen"])
+            plot(moose_getB0(), plot=FALSE)[,"Npen"])
         colnames(TS) <- c("Years",
             "N moose reduction, no pen",
-            "N moose reduction, penned",
-            "N status quo",
-            "N no moose reduction, penned")
+            "N status quo")
         df <- moose_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         ss <- moose_getS()
