@@ -25,9 +25,10 @@ herd=NULL) {
     # default is based on Boreal/East Side Athabasca
     if (pen.type != "pred.excl") {
         parms$c.surv.wild <- 0.163       # calf survival rate in the wild, annual
-        c.surv1.capt <- 0.9       # calf survival rate when captive, 0-1 month
-        c.surv2.capt <- 0.6       # calf survival rate when captive, 1-12 months
-        parms$c.surv.capt <- c.surv1.capt*c.surv2.capt # calf survival rate when captive, annual
+        #c.surv1.capt <- 0.9       # calf survival rate when captive, 0-1 month
+        #c.surv2.capt <- 0.6       # calf survival rate when captive, 1-12 months
+        #parms$c.surv.capt <- c.surv1.capt*c.surv2.capt # calf survival rate when captive, annual
+        parms$c.surv.capt <- 0.598
         parms$f.surv.wild <- 0.853       # maternal survival when wild, annual
         parms$f.surv.capt <- 0.903      # maternal survival when captive higher than wild
         parms$f.preg.wild <- 0.92         # pregnancy rate, same for captive and wild
@@ -171,7 +172,8 @@ function(pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed
         parms$pen.cost.setup <- (77*24) + 20 # cost in thousands to set up pen
         parms$pen.cost.proj <- 80 # costs of project manager
         parms$pen.cost.maint <- 600 # cost in thousands for patrolling and repairing fence + contingencies
-        parms$pen.cost.capt <- 200-80 # cost in thousands to capture cows, monitor, survey, calf collar - minus PM costs
+#        parms$pen.cost.capt <- 200-80 # cost in thousands to capture cows, monitor, survey, calf collar - minus PM costs
+        parms$pen.cost.capt <- 200 # cost in thousands to capture cows, monitor, survey, calf collar
         parms$pen.cost.pred <- 80 # cost in thousands for removing predators annually
     }
 
