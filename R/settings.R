@@ -1,5 +1,95 @@
 ## preset demography parameters
-.get_demography <-
+.get_demography <- function(
+pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed"),
+herd=NULL) {
+
+    df <- structure(list(RecoveryAction = c("MP", "MP", "MP", "MP", "MP",
+        "MP", "MP", "MP", "MP", "MP", "MP", "PE", "PE", "PE", "PE", "PE",
+        "PE", "PE", "PE", "CB", "CB", "CB", "CB", "CB", "CB", "CB", "CB",
+        "MR", "MR", "MR", "MR", "MR", "MR", "MR", "MR", "WR", "WR", "WR",
+        "WR"), PenType = c("mat.pen", "mat.pen", "mat.pen", "mat.pen",
+        "mat.pen", "mat.pen", "mat.pen", "mat.pen", "mat.pen", "mat.pen",
+        "mat.pen", "pred.excl", "pred.excl", "pred.excl", "pred.excl",
+        "pred.excl", "pred.excl", "pred.excl", "pred.excl", "cons.breed",
+        "cons.breed", "cons.breed", "cons.breed", "cons.breed", "cons.breed",
+        "cons.breed", "cons.breed", "moose.red", "moose.red", "moose.red",
+        "moose.red", "moose.red", "moose.red", "moose.red", "moose.red",
+        "wolf.red", "wolf.red", "wolf.red", "wolf.red"), PopID = c("EastSideAthabasca",
+        "ColumbiaNorth", "ColumbiaSouth", "FrisbyQueest", "WellsGreySouth",
+        "Groundhog", "Parsnip", "KennedySiding", "KlinsezaMoberly", "Quintette",
+        "AverageSubpop", "EastSideAthabasca", "ColumbiaNorth", "ColumbiaSouth",
+        "FrisbyQueest", "WellsGreySouth", "Groundhog", "Parsnip", "AverageSubpop",
+        "EastSideAthabasca", "ColumbiaNorth", "ColumbiaSouth", "FrisbyQueest",
+        "WellsGreySouth", "Groundhog", "Parsnip", "AverageSubpop", "EastSideAthabasca",
+        "ColumbiaNorth", "ColumbiaSouth", "FrisbyQueest", "WellsGreySouth",
+        "Groundhog", "Parsnip", "AverageSubpop", "KennedySiding", "KlinsezaMoberly",
+        "Quintette", "AverageSubpop"), Subpopulation = c("East Side Athabasca",
+        "Columbia North", "Columbia South", "Frisby-Queest", "Wells Grey South",
+        "Groundhog", "Parsnip", "Kennedy Siding", "Klinse-za (Moberly)",
+        "Quintette", "Average subpopulation", "East Side Athabasca",
+        "Columbia North", "Columbia South", "Frisby-Queest", "Wells Grey South",
+        "Groundhog", "Parsnip", "Average subpopulation", "East Side Athabasca",
+        "Columbia North", "Columbia South", "Frisby-Queest", "Wells Grey South",
+        "Groundhog", "Parsnip", "Average subpopulation", "East Side Athabasca",
+        "Columbia North", "Columbia South", "Frisby-Queest", "Wells Grey South",
+        "Groundhog", "Parsnip", "Average subpopulation", "Kennedy Siding",
+        "Klinse-za (Moberly)", "Quintette", "Average subpopulation"),
+            Scw = c(0.163, 0.217, 0.285, 0.363, 0.239, 0.234, 0.163,
+            0.283, 0.308, 0.294, 0.259, 0.163, 0.217, 0.285, 0.363, 0.239,
+            0.234, 0.163, 0.259, 0.163, 0.217, 0.285, 0.363, 0.239, 0.234,
+            0.163, 0.259, 0.163, 0.217, 0.285, 0.363, 0.239, 0.234, 0.163,
+            0.259, 0.283, 0.308, 0.294, 0.259), Scm = c(0.598, 0.598,
+            0.598, 0.598, 0.598, 0.598, 0.598, 0.598, 0.598, 0.598, 0.598,
+            0.72, 0.72, 0.72, 0.72, 0.72, 0.72, 0.72, 0.72, 0.72, 0.72,
+            0.72, 0.72, 0.72, 0.72, 0.72, 0.72, 0.163, 0.233, 0.266,
+            0.227, 0.313, 0.434, 0.163, 0.257, 0.554, 0.506, 0.489, 0.513
+            ), Saw = c(0.853, 0.784, 0.767, 0.853, 0.868, 0.853, 0.875,
+            0.844, 0.748, 0.81, 0.823, 0.853, 0.784, 0.767, 0.853, 0.868,
+            0.853, 0.875, 0.823, 0.853, 0.784, 0.767, 0.853, 0.868, 0.853,
+            0.875, 0.823, 0.853, 0.784, 0.767, 0.853, 0.868, 0.853, 0.875,
+            0.823, 0.844, 0.748, 0.81, 0.823), Sam = c(0.903, 0.834,
+            0.817, 0.903, 0.918, 0.903, 0.925, 0.894, 0.798, 0.86, 0.876,
+            0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95,
+            0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.879, 0.879, 0.879,
+            0.879, 0.879, 0.879, 0.879, 0.879, 0.962, 0.86, 0.917, 0.912
+            ), Fw = c(0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92,
+            0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92,
+            0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92,
+            0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92,
+            0.92), Fm = c(0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92,
+            0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92,
+            0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92,
+            0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92,
+            0.92)), row.names = c("EastSideAthabasca_MP", "ColumbiaNorth_MP",
+        "ColumbiaSouth_MP", "FrisbyQueest_MP", "WellsGreySouth_MP", "Groundhog_MP",
+        "Parsnip_MP", "KennedySiding_MP", "KlinsezaMoberly_MP", "Quintette_MP",
+        "AverageSubpop_MP", "EastSideAthabasca_PE", "ColumbiaNorth_PE",
+        "ColumbiaSouth_PE", "FrisbyQueest_PE", "WellsGreySouth_PE", "Groundhog_PE",
+        "Parsnip_PE", "AverageSubpop_PE", "EastSideAthabasca_CB", "ColumbiaNorth_CB",
+        "ColumbiaSouth_CB", "FrisbyQueest_CB", "WellsGreySouth_CB", "Groundhog_CB",
+        "Parsnip_CB", "AverageSubpop_CB", "EastSideAthabasca_MR", "ColumbiaNorth_MR",
+        "ColumbiaSouth_MR", "FrisbyQueest_MR", "WellsGreySouth_MR", "Groundhog_MR",
+        "Parsnip_MR", "AverageSubpop_MR", "KennedySiding_WR", "KlinsezaMoberly_WR",
+        "Quintette_WR", "AverageSubpop_WR"), class = "data.frame")
+    pen.type <- match.arg(pen.type)
+    Herd <- if (is.null(herd))
+        "AverageSubpop" else as.character(herd)
+    Herd <- match.arg(Herd, unique(df$PopID))
+    df1 <- df[df$PenType==pen.type & df$PopID == Herd,]
+    if (nrow(df1) < 1)
+        stop(sprintf("%s recovery action is not avilable for %s", pen.type, Herd))
+    list(
+        c.surv.wild = df1$Scw,
+        c.surv.capt = df1$Scm,
+        f.surv.wild = df1$Saw,
+        f.surv.capt = df1$Sam,
+        f.preg.wild = df1$Fw,
+        f.preg.capt =df1$Fm
+    )
+}
+
+
+.get_demography_old <-
 function(
 pen.type=c("mat.pen", "pred.excl", "moose.red", "wolf.red", "cons.breed"),
 herd=NULL) {
@@ -206,7 +296,6 @@ herd=NULL,
     if (inherits(pen.type, "wildlift_settings")) {
         parms <- pen.type
     } else {
-        pen.type <- match.arg(pen.type)
         parms <- c(.get_demography(pen.type, herd), .get_cost(pen.type))
         attr(parms, "pen.type") <- pen.type
         if (!is.null(herd))

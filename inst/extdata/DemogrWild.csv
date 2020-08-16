@@ -1,0 +1,13 @@
+PopID,Subpopulation,CaribouEcotype,Scw,Saw,MP,PE,CB,MR,WR
+EastSideAthabasca,East Side Athabasca,Boreal,0.163,0.853,TRUE,TRUE,TRUE,TRUE,FALSE
+ColumbiaNorth,Columbia North,Southern Mountain,0.217,0.784,TRUE,TRUE,TRUE,TRUE,FALSE
+ColumbiaSouth,Columbia South,Southern Mountain,0.285,0.767,TRUE,TRUE,TRUE,TRUE,FALSE
+FrisbyQueest,Frisby-Queest,Southern Mountain,0.363,0.853,TRUE,TRUE,TRUE,TRUE,FALSE
+WellsGreySouth,Wells Grey South,Southern Mountain,0.239,0.868,TRUE,TRUE,TRUE,TRUE,FALSE
+Groundhog,Groundhog,Southern Mountain,0.234,0.853,TRUE,TRUE,TRUE,TRUE,FALSE
+Parsnip,Parsnip,Southern Mountain,0.163,0.875,TRUE,TRUE,TRUE,TRUE,FALSE
+KennedySiding,Kennedy Siding,Southern Mountain,0.283,0.844,TRUE,FALSE,FALSE,FALSE,TRUE
+KlinsezaMoberly,Klinse-za (Moberly),Southern Mountain,0.308,0.748,TRUE,FALSE,FALSE,FALSE,TRUE
+Quintette,Quintette,Southern Mountain,0.294,0.81,TRUE,FALSE,FALSE,FALSE,TRUE
+DefaultWR,Default WR,Southern Mountain,0.295,0.801,FALSE,FALSE,FALSE,FALSE,TRUE
+AverageSubpop,Average subpopulation,NA,0.259,0.823,TRUE,TRUE,TRUE,TRUE,TRUE

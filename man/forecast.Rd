@@ -41,12 +41,14 @@ wolf reduction, or conservation breeding.
 It can also be a settings object.
 }
   \item{herd}{
-\code{NULL} (default, East Side Athabasca, Boreal ecotype) or character.
-The following herds (Southern Mountain ecotype) are available:
+\code{NULL} (default, average subpopulation) or character.
+The following herds are available:
+\code{"EastSideAthabasca"} (Boreal ecotype)
 \code{"ColumbiaNorth"}, \code{"ColumbiaSouth"},
 \code{"FrisbyQueest"}, \code{"WellsGreySouth"},
 \code{"Groundhog"}, \code{"Parsnip"},
-\code{"KennedySiding"}, \code{"KlinsezaMoberly"}, \code{"Quintette"}.
+\code{"KennedySiding"}, \code{"KlinsezaMoberly"}, \code{"Quintette"}
+(Southern Mountain ecotype).
 Note: only \code{"KennedySiding"}, \code{"KlinsezaMoberly"},
 or \code{"Quintette"} can be selected when \code{pen.type = "wolf.red"},
 beside a generic herd setting when herd is \code{NULL} that is

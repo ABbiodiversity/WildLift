@@ -1147,7 +1147,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "wolf_herd", "Subpopulation",
-                c("Default (Average of all subpopulations)"="Default", HerdsWolf)
+                c("Average subpopulation"="Default", HerdsWolf)
             )
         )
     })
