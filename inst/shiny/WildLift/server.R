@@ -39,12 +39,22 @@ server <- function(input, output, session) {
     output$multi1_demogr_captive <- renderUI({
         req(input$multi1_herd)
         tagList(
-            sliderInput("multi1_DemCsc", "Calf survival, captive",
+            sliderInput("multi1_DemCsc", "Calf survival, MP",
                 min = 0, max = 1, value = values$multi1$c.surv.capt, step = 0.001),
-            sliderInput("multi1_DemFsc", "Adult female survival, captive",
+            sliderInput("multi1_DemFsc", "Adult female survival, MP",
                 min = 0, max = 1, value = values$multi1$f.surv.capt, step = 0.001),
-            sliderInput("multi1_DemFpc", "Fecundity, captive",
-                min = 0, max = 1, value = values$multi1$f.preg.capt, step = 0.001)
+            sliderInput("multi1_DemFpc", "Fecundity, MP",
+                min = 0, max = 1, value = values$multi1$f.preg.capt, step = 0.001),
+            hr(),
+            sliderInput("multi1_DemCsc_PE", "Calf survival, PE",
+                min = 0, max = 1, value = values$multi1$c.surv.capt.pe,
+                step = 0.001),
+            sliderInput("multi1_DemFsc_PE", "Adult female survival, PE",
+                min = 0, max = 1, value = values$multi1$f.surv.capt.pe,
+                step = 0.001),
+            sliderInput("multi1_DemFpc_PE", "Fecundity, PE",
+                min = 0, max = 1, value = values$multi1$f.preg.capt.pe,
+                step = 0.001)
         )
     })
     ## dynamically render subpopulation selector
@@ -84,9 +94,18 @@ server <- function(input, output, session) {
             f.surv.wild.mr = values$multi1$f.surv.wild.mr,
             c.surv.wild.wr = values$multi1$c.surv.wild.wr,
             f.surv.wild.wr = values$multi1$f.surv.wild.wr,
-            wildlift_settings("mat.pen",
-                herd = if (input$multi1_herd == "Default")
-                    NULL else input$multi1_herd))
+            c.surv.capt.pe = wildlift_settings("pred.excl",
+                herd = input$multi1_herd)$c.surv.capt,
+            f.surv.capt.pe = wildlift_settings("pred.excl",
+                herd = input$multi1_herd)$f.surv.capt,
+            f.preg.capt.pe = wildlift_settings("pred.excl",
+                herd = input$multi1_herd)$f.preg.capt,
+            pen.cost.setup.pe = values$multi1$pen.cost.setup.pe,
+            pen.cost.proj.pe = values$multi1$pen.cost.proj.pe,
+            pen.cost.maint.pe = values$multi1$pen.cost.maint.pe,
+            pen.cost.capt.pe = values$multi1$pen.cost.capt.pe,
+            pen.cost.pred.pe = values$multi1$pen.cost.pred.pe,
+            wildlift_settings("mat.pen", herd = input$multi1_herd))
     })
     observeEvent(input$multi1_Fpen, {
         if (values$use_perc) {
@@ -104,6 +123,15 @@ server <- function(input, output, session) {
     })
     observeEvent(input$multi1_DemFsw_WR, {
         values$multi1$f.surv.wild.wr <- input$multi1_DemFsw_WR
+    })
+    observeEvent(input$multi1_DemCsc_PE, {
+        values$multi1$c.surv.capt.pe <- input$multi1_DemCsc_PE
+    })
+    observeEvent(input$multi1_DemFsc_PE, {
+        values$multi1$f.surv.capt.pe <- input$multi1_DemFsc_PE
+    })
+    observeEvent(input$multi1_DemFpc_PE, {
+        values$multi1$f.preg.capt.pe <- input$multi1_DemFpc_PE
     })
     ## plain
     observeEvent(input$multi1_DemCsw, {
@@ -124,21 +152,42 @@ server <- function(input, output, session) {
     observeEvent(input$multi1_DemFpc, {
         values$multi1$f.preg.capt <- input$multi1_DemFpc
     })
-    observeEvent(input$multi1_CostPencap, {
-        values$multi1$pen.cap <- input$multi1_CostPencap
+    ## MP costs
+    observeEvent(input$multi1_CostPencap_MP, {
+        values$multi1$pen.cap <- input$multi1_CostPencap_MP
     })
-    observeEvent(input$multi1_CostSetup, {
-        values$multi1$pen.cost.setup <- input$multi1_CostSetup
+    observeEvent(input$multi1_CostSetup_MP, {
+        values$multi1$pen.cost.setup <- input$multi1_CostSetup_MP
     })
-    observeEvent(input$multi1_CostProj, {
-        values$multi1$pen.cost.proj <- input$multi1_CostProj
+    observeEvent(input$multi1_CostProj_MP, {
+        values$multi1$pen.cost.proj <- input$multi1_CostProj_MP
     })
-    observeEvent(input$multi1_CostMaint, {
-        values$multi1$pen.cost.maint <- input$multi1_CostMaint
+    observeEvent(input$multi1_CostMaint_MP, {
+        values$multi1$pen.cost.maint <- input$multi1_CostMaint_MP
     })
-    observeEvent(input$multi1_CostCapt, {
-        values$multi1$pen.cost.capt <- input$multi1_CostCapt
+    observeEvent(input$multi1_CostCapt_MP, {
+        values$multi1$pen.cost.capt <- input$multi1_CostCapt_MP
     })
+    ## PE costs
+    observeEvent(input$multi1_CostPencap_PE, {
+        values$multi1$pen.cap.pe <- input$multi1_CostPencap_PE
+    })
+    observeEvent(input$multi1_CostSetup_PE, {
+        values$multi1$pen.cost.setup.pe <- input$multi1_CostSetup_PE
+    })
+    observeEvent(input$multi1_CostProj_PE, {
+        values$multi1$pen.cost.proj.pe <- input$multi1_CostProj_PE
+    })
+    observeEvent(input$multi1_CostMaint_PE, {
+        values$multi1$pen.cost.maint.pe <- input$multi1_CostMaint_PE
+    })
+    observeEvent(input$multi1_CostCapt_PE, {
+        values$multi1$pen.cost.capt.pe <- input$multi1_CostCapt_PE
+    })
+    observeEvent(input$multi1_CostPred_PE, {
+        values$multi1$pen.cost.capt.pe <- input$multi1_CostPred_PE
+    })
+
 
     ## get multi1 settings
     multi1_settings <- reactive({
@@ -190,11 +239,11 @@ server <- function(input, output, session) {
             ),
             pe    = wildlift_settings("pred.excl", herd=HERD,
                 c.surv.wild = input$multi1_DemCsw,
-                c.surv.capt = input$multi1_DemCsc,
+                c.surv.capt = input$multi1_DemCsc_PE,
                 f.surv.wild = input$multi1_DemFsw,
-                f.surv.capt = input$multi1_DemFsc,
+                f.surv.capt = input$multi1_DemFsc_PE,
                 f.preg.wild = input$multi1_DemFpw,
-                f.preg.capt = input$multi1_DemFpc,
+                f.preg.capt = input$multi1_DemFpc_PE,
                 pen.cap = input$multi1_CostPencap_PE,
                 pen.cost.setup = input$multi1_CostSetup_PE,
                 pen.cost.proj = input$multi1_CostProj_PE,
@@ -204,11 +253,11 @@ server <- function(input, output, session) {
             ),
             pe_mr = wildlift_settings("pred.excl", herd=HERD,
                 c.surv.wild = input$multi1_DemCsw,
-                c.surv.capt = input$multi1_DemCsc,
+                c.surv.capt = input$multi1_DemCsc_PE,
                 f.surv.wild = input$multi1_DemFsw_MR,
-                f.surv.capt = input$multi1_DemFsc,
+                f.surv.capt = input$multi1_DemFsc_PE,
                 f.preg.wild = input$multi1_DemFpw,
-                f.preg.capt = input$multi1_DemFpc,
+                f.preg.capt = input$multi1_DemFpc_PE,
                 pen.cap = input$multi1_CostPencap_PE,
                 pen.cost.setup = input$multi1_CostSetup_PE,
                 pen.cost.proj = input$multi1_CostProj_PE,
@@ -218,11 +267,11 @@ server <- function(input, output, session) {
             ),
             pe_wr = wildlift_settings("pred.excl", herd=HERD,
                 c.surv.wild = input$multi1_DemCsw_WR,
-                c.surv.capt = input$multi1_DemCsc,
+                c.surv.capt = input$multi1_DemCsc_PE,
                 f.surv.wild = input$multi1_DemFsw_WR,
-                f.surv.capt = input$multi1_DemFsc,
+                f.surv.capt = input$multi1_DemFsc_PE,
                 f.preg.wild = input$multi1_DemFpw,
-                f.preg.capt = input$multi1_DemFpc,
+                f.preg.capt = input$multi1_DemFpc_PE,
                 pen.cap = input$multi1_CostPencap_PE,
                 pen.cost.setup = input$multi1_CostSetup_PE,
                 pen.cost.proj = input$multi1_CostProj_PE,
@@ -310,7 +359,7 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$penning_demogr_sliders <- renderUI({
-        if (input$penning_herd != "Default")
+        if (input$penning_herd != "AverageSubpop")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("penning_DemCsw", "Calf survival, wild",
@@ -372,7 +421,7 @@ server <- function(input, output, session) {
             fpen.prop = values$penning$fpen.prop,
             fpen.inds = values$penning$fpen.inds,
             wildlift_settings("mat.pen",
-                herd = if (input$penning_herd == "Default")
+                herd = if (input$penning_herd == "AverageSubpop")
                     NULL else input$penning_herd))
         if (values$penning_compare) {
             values$penning0 <- values$penning
@@ -627,7 +676,7 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$predator_demogr_sliders <- renderUI({
-        if (input$predator_herd != "Default")
+        if (input$predator_herd != "AverageSubpop")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
              sliderInput("predator_DemCsw", "Calf survival, wild",
@@ -690,7 +739,7 @@ server <- function(input, output, session) {
             fpen.prop = values$predator$fpen.prop,
             fpen.inds = values$predator$fpen.inds,
             wildlift_settings("pred.excl",
-                herd = if (input$predator_herd == "Default") NULL else input$predator_herd))
+                herd = if (input$predator_herd == "AverageSubpop") NULL else input$predator_herd))
         if (values$predator_compare) {
             values$predator0 <- values$predator
         } else {
@@ -947,7 +996,7 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$moose_demogr_sliders <- renderUI({
-        if (input$moose_herd != "Default")
+        if (input$moose_herd != "AverageSubpop")
             return(p("Demography settings not available for specific subpopulations."
                      ))
         tagList(
@@ -979,13 +1028,13 @@ server <- function(input, output, session) {
             fpen.prop = 0.35,
             fpen.inds = 10,
             wildlift_settings("moose.red",
-                herd = if (input$moose_herd == "Default")
+                herd = if (input$moose_herd == "AverageSubpop")
                     NULL else input$moose_herd))
         values$moose0 <- c(
             fpen.prop = 0.35,
             fpen.inds = 10,
             wildlift_settings("mat.pen",
-                herd = if (input$moose_herd == "Default")
+                herd = if (input$moose_herd == "AverageSubpop")
                     NULL else input$moose_herd))
     })
     observeEvent(input$moose_DemCsw, {
@@ -1125,7 +1174,7 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$wolf_demogr_sliders <- renderUI({
-        if (input$wolf_herd != "Default")
+        if (input$wolf_herd != "AverageSubpop")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("wolf_DemCsw", "Calf survival, wolf reduction",
@@ -1147,18 +1196,18 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "wolf_herd", "Subpopulation",
-                c("Average subpopulation"="Default", HerdsWolf)
+                c("Average subpopulation"="AverageSubpop", HerdsWolf)
             )
         )
     })
     ## observers
     observeEvent(input$wolf_herd, {
         values$wolf <- wildlift_settings("wolf.red",
-                herd = if (input$wolf_herd == "Default")
+                herd = if (input$wolf_herd == "AverageSubpop")
                     NULL else input$wolf_herd)
         ## set AFS=0.801 CS=0.295 under no wolf option
         values$wolf0 <- wildlift_settings("mat.pen",
-                herd = if (input$wolf_herd == "Default")
+                herd = if (input$wolf_herd == "AverageSubpop")
                     NULL else input$wolf_herd,
                 f.surv.capt=0.801,
                 f.surv.wild=0.801,
@@ -1333,7 +1382,7 @@ server <- function(input, output, session) {
     })
     output$breeding_demogr_sliders <- renderUI({
         req(input$breeding_herd)
-        if (input$breeding_herd != "Default")
+        if (input$breeding_herd != "AverageSubpop")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("breeding_DemCsc", "Calf survival in facility",
@@ -1388,7 +1437,7 @@ server <- function(input, output, session) {
             c.surv.wild.wr = values$breeding$c.surv.wild.wr,
             f.surv.wild.wr = values$breeding$f.surv.wild.wr,
             wildlift_settings("cons.breed",
-                herd = if (input$breeding_herd == "Default")
+                herd = if (input$breeding_herd == "AverageSubpop")
                     NULL else input$breeding_herd))
     })
     ## plain

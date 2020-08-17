@@ -53,6 +53,14 @@ inits <- list(
         f.surv.wild.mr = 0.879,
         c.surv.wild.wr = 0.513,
         f.surv.wild.wr = 0.912,
+        c.surv.capt.pe = wildlift_settings("pred.excl")$c.surv.capt,
+        f.surv.capt.pe = wildlift_settings("pred.excl")$f.surv.capt,
+        f.preg.capt.pe = wildlift_settings("pred.excl")$f.preg.capt,
+        pen.cost.setup.pe = wildlift_settings("pred.excl")$pen.cost.setup,
+        pen.cost.proj.pe = wildlift_settings("pred.excl")$pen.cost.proj,
+        pen.cost.maint.pe = wildlift_settings("pred.excl")$pen.cost.maint,
+        pen.cost.capt.pe = wildlift_settings("pred.excl")$pen.cost.capt,
+        pen.cost.pred.pe = wildlift_settings("pred.excl")$pen.cost.pred,
         wildlift_settings("mat.pen"))
 )
 

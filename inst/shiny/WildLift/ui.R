@@ -58,7 +58,7 @@ dashboardPage(
         fluidRow(
           column(width=12,
             h2("Demographic Augmentation and Predator/Prey Management"),
-            HTML("<br/><p><strong>Limitations</strong> &mdash; Results using multiple levers are extrapolated based on knowledge from locations where single levers were studied. Some combinations of these levers might not have documented examples and need to be treated with caution.</p><p>MP = Maternity Penning; PE = Predator Exclosure; MR = Moose Reduction; WR = Wolf Reduction</p><br/>"),
+            HTML("<br/><p><strong>Limitations</strong> &mdash; Results using multiple levers are extrapolated based on knowledge from locations where single levers were studied. Some combinations of these levers might not have documented examples and need to be treated with caution.</p><p>MP = Maternity Penning; PE = Predator Exclosure; MR = Moose Reduction; WR = Wolf Reduction</p><p><strong>Check number of wolfs to be removed!</strong></p><br/>"),
           ),
           column(width=4,
             uiOutput("multi1_herd"),
@@ -123,15 +123,15 @@ dashboardPage(
               collapsible = TRUE, collapsed = FALSE,
               title = "MR and WR",
               #p("Moose reduction"),
-              sliderInput("multi1_DemFsw_MR", "Adult female survival, wild, MR",
+              sliderInput("multi1_DemFsw_MR", "Adult female survival, MR",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.wild.mr, step = 0.001),
               hr(),
               #p("Wolf reduction"),
-              sliderInput("multi1_DemCsw_WR", "Calf survival, wild, WR",
+              sliderInput("multi1_DemCsw_WR", "Calf survival, WR",
                   min = 0, max = 1,
                   value = inits$multi1$c.surv.wild.wr, step = 0.001),
-              sliderInput("multi1_DemFsw_WR", "Adult female survival, wild, WR",
+              sliderInput("multi1_DemFsw_WR", "Adult female survival, WR",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.wild.wr, step = 0.001)
             )
@@ -183,7 +183,7 @@ dashboardPage(
               sliderInput("multi1_cost1", "Cost per wolf to be removed",
                 min = 0, max = 10, value = 5.1, step = 0.1),
               sliderInput("multi1_nremove", "Number of wolves to be removed per year",
-                min = 0, max = 200, value = 0, step = 1),
+                min = 0, max = 200, value = 105, step = 1),
               bsTooltip("multi1_nremove",
                 "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
                 placement="bottom")
@@ -389,7 +389,10 @@ dashboardPage(
 
       tabItem("wolf",
         fluidRow(
-          column(width=12, h2("Wolf Reduction")),
+          column(width=12,
+            h2("Wolf Reduction"),
+            HTML("<br/><p><strong>Check number of wolfs to be removed!</strong></p><br/>")
+          ),
           column(width=8,
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -438,7 +441,7 @@ dashboardPage(
               sliderInput("wolf_cost1", "Cost per wolf to be removed (x $1000)",
                 min = 0, max = 10, value = 5.1, step = 0.1),
               sliderInput("wolf_nremove", "Number of wolves to be removed per year",
-                min = 0, max = 200, value = 0, step = 1),
+                min = 0, max = 200, value = 105, step = 1),
               bsTooltip("wolf_nremove",
                 "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
                 placement="bottom")
@@ -534,7 +537,7 @@ dashboardPage(
               sliderInput("breeding_costwolf", "Cost per wolf to be removed",
                 min = 0, max = 10, value = 5.1, step = 0.1),
               sliderInput("breeding_nremove", "Number of wolves to be removed per year",
-                min = 0, max = 200, value = 0, step = 1),
+                min = 0, max = 200, value = 105, step = 1),
               bsTooltip("breeding_nremove",
                 "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
                 placement="bottom")
