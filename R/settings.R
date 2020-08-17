@@ -78,14 +78,25 @@ herd=NULL) {
     df1 <- df[df$PenType==pen.type & df$PopID == Herd,]
     if (nrow(df1) < 1)
         stop(sprintf("%s recovery action is not avilable for %s", pen.type, Herd))
-    list(
-        c.surv.wild = df1$Scw,
-        c.surv.capt = df1$Scm,
-        f.surv.wild = df1$Saw,
-        f.surv.capt = df1$Sam,
-        f.preg.wild = df1$Fw,
-        f.preg.capt =df1$Fm
-    )
+    if (pen.type %in% c("mat.pen", "pred.excl", "cons.breed")) {
+        list(
+            c.surv.wild = df1$Scw,
+            c.surv.capt = df1$Scm,
+            f.surv.wild = df1$Saw,
+            f.surv.capt = df1$Sam,
+            f.preg.wild = df1$Fw,
+            f.preg.capt =df1$Fm
+        )
+    } else {
+        list(
+            c.surv.wild = df1$Scm,
+            c.surv.capt = df1$Scw,
+            f.surv.wild = df1$Sam,
+            f.surv.capt = df1$Saw,
+            f.preg.wild = df1$Fm,
+            f.preg.capt =df1$Fw
+        )
+    }
 }
 
 
