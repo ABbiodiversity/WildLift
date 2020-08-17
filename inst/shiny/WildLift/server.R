@@ -1069,7 +1069,7 @@ server <- function(input, output, session) {
         dB0 <- plot(moose_getB0(), plot=FALSE)
         colnames(dF0)[colnames(dF0) == "Npen"] <- "Individuals"
         p <- plot_ly(dF0, x = ~Years, y = ~Individuals,
-            name = 'Moose reduction, no pen', type = 'scatter', mode = 'lines',
+            name = 'Moose reduction', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
             add_trace(y = ~Npen, name = 'Status quo', data = dB0,
                     line=list(dash = 'dash', color='red')) %>%
