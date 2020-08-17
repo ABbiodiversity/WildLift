@@ -53,6 +53,14 @@ inits <- list(
         f.surv.wild.mr = 0.879,
         c.surv.wild.wr = 0.513,
         f.surv.wild.wr = 0.912,
+        c.surv.capt.pe = wildlift_settings("pred.excl")$c.surv.capt,
+        f.surv.capt.pe = wildlift_settings("pred.excl")$f.surv.capt,
+        f.preg.capt.pe = wildlift_settings("pred.excl")$f.preg.capt,
+        pen.cost.setup.pe = wildlift_settings("pred.excl")$pen.cost.setup,
+        pen.cost.proj.pe = wildlift_settings("pred.excl")$pen.cost.proj,
+        pen.cost.maint.pe = wildlift_settings("pred.excl")$pen.cost.maint,
+        pen.cost.capt.pe = wildlift_settings("pred.excl")$pen.cost.capt,
+        pen.cost.pred.pe = wildlift_settings("pred.excl")$pen.cost.pred,
         wildlift_settings("mat.pen"))
 )
 
@@ -79,6 +87,7 @@ get_summary <- function(x, use_perc=TRUE) {
 }
 
 Herds <- c(
+    "East Side Athabasca" = "EastSideAthabasca",
     "Columbia North" = "ColumbiaNorth",
     "Columbia South" = "ColumbiaSouth",
     "Frisby-Queest" = "FrisbyQueest",
@@ -133,20 +142,20 @@ TMAX, POP_START, VAL, USE_PROP) {
     Traces <- lapply(Forecast, plot, plot=FALSE)
 
     NAM <- list(
-        c("None", "MatPen", "PredExcl"),
-        c("None", "MooseRed", "WolfRed"),
+        c("Status quo", "MatPen", "PredExcl"),
+        c("Status quo", "MooseRed", "WolfRed"),
         c("lam", "Nend", "CostEnd", "Nnew", "CostNew"))
     OUT <- array(0, sapply(NAM, length), NAM)
 
-    OUT["None", "None", c("lam", "Nend")] <-
+    OUT["Status quo", "Status quo", c("lam", "Nend")] <-
         Summary[c("lam.nopen", "Nend.nopen"), "mp"]
-    OUT["MatPen", "None", c("lam", "Nend", "CostEnd")] <-
+    OUT["MatPen", "Status quo", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp"]
-    OUT["PredExcl", "None", c("lam", "Nend", "CostEnd")] <-
+    OUT["PredExcl", "Status quo", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe"]
 
     ## no extra cost
-    OUT["None", "MooseRed", c("lam", "Nend")] <-
+    OUT["Status quo", "MooseRed", c("lam", "Nend")] <-
         Summary[c("lam.nopen", "Nend.nopen"), "mp_mr"]
     OUT["MatPen", "MooseRed", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_mr"]
@@ -155,20 +164,20 @@ TMAX, POP_START, VAL, USE_PROP) {
 
     ## add extra cost
     # Cost <- input$wolf_nremove * input$tmax * input$wolf_cost1 / 1000
-    OUT["None", "WolfRed", c("lam", "Nend")] <-
+    OUT["Status quo", "WolfRed", c("lam", "Nend")] <-
         Summary[c("lam.nopen", "Nend.nopen"), "mp_wr"]
     OUT["MatPen", "WolfRed", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "mp_wr"]
     OUT["PredExcl", "WolfRed", c("lam", "Nend", "CostEnd")] <-
         Summary[c("lam.pen", "Nend.pen", "Cost.total"), "pe_wr"]
 
-    OUT[,,"Nnew"] <- pmax(0, OUT[,,"Nend"] - OUT["None", "None", "Nend"])
+    OUT[,,"Nnew"] <- pmax(0, OUT[,,"Nend"] - OUT["Status quo", "Status quo", "Nend"])
     OUT[,,"CostNew"] <- OUT[,,"CostEnd"] / OUT[,,"Nnew"]
     OUT[,,"CostNew"][is.na(OUT[,,"CostNew"])] <- 0
 
     TB <- data.frame(
-        Demogr = factor(rep(c("None", "MP", "PE"), 3), c("None", "MP", "PE")),
-        Manage = factor(rep(c("None", "MR", "WR"), each=3), c("None", "MR", "WR")))
+        Demogr = factor(rep(c("Status quo", "MP", "PE"), 3), c("Status quo", "MP", "PE")),
+        Manage = factor(rep(c("Status quo", "MR", "WR"), each=3), c("Status quo", "MR", "WR")))
     TB$lambda <- as.numeric(OUT[,,"lam"])
     TB$Nend <- as.numeric(OUT[,,"Nend"])
     TB$Nnew <- as.numeric(OUT[,,"Nnew"])
@@ -177,13 +186,32 @@ TMAX, POP_START, VAL, USE_PROP) {
     TB$Demogr <- as.character(TB$Demogr)
     TB$Manage <- as.character(TB$Manage)
     rownames(TB) <- paste0(
-        ifelse(TB$Demogr == "None", "", TB$Demogr),
-        ifelse(TB$Demogr != "None" & TB$Manage != "None", "+", ""),
-        ifelse(TB$Manage == "None", "", TB$Manage))
+        ifelse(TB$Demogr == "Status quo", "", TB$Demogr),
+        ifelse(TB$Demogr != "Status quo" & TB$Manage != "Status quo", "+", ""),
+        ifelse(TB$Manage == "Status quo", "", TB$Manage))
     rownames(TB)[1] <- "Status quo"
 
     list(summary=TB, traces=Traces)
 }
+
+COLOR <- c(
+    '#a6cee3', # light blue
+    '#1f78b4', # blue
+    '#b2df8a', # light green
+    '#33a02c', # green
+    '#fb9a99', # pink
+    '#e31a1c', # red
+    '#fdbf6f', # light orange
+    '#ff7f00', # orange
+    '#cab2d6', # light purple
+    '#6a3d9a') # purple
+
+TCOL <- c("#000000", COLOR[c(1,2,9,10,5,6,7,8)])
+names(TCOL) <- c("Status quo",
+    "MP", "PE",
+    "MR",  "WR",
+    "MP + MR", "MP + WR",
+    "PE + MR", "PE + WR")
 
 plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
 
@@ -193,19 +221,19 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
     POP_START <- ML$traces[[1]][1,2]
 
     PL <- rbind(
-        data.frame(Demogr="None", Manage="None", Years=0:TMAX,
+        data.frame(Demogr="Status quo", Manage="Status quo", Years=0:TMAX,
             N=Traces$mp$Nnopen, stringsAsFactors = FALSE),
-        data.frame(Demogr="MP", Manage="None", Years=0:TMAX,
+        data.frame(Demogr="MP", Manage="Status quo", Years=0:TMAX,
             N=Traces$mp$Npen, stringsAsFactors = FALSE),
-        data.frame(Demogr="PE", Manage="None", Years=0:TMAX,
+        data.frame(Demogr="PE", Manage="Status quo", Years=0:TMAX,
             N=Traces$pe$Npen, stringsAsFactors = FALSE),
-        data.frame(Demogr="None", Manage="MR", Years=0:TMAX,
+        data.frame(Demogr="Status quo", Manage="MR", Years=0:TMAX,
             N=Traces$mp_mr$Nnopen, stringsAsFactors = FALSE),
         PL_MP_MR <- data.frame(Demogr="MP", Manage="MR", Years=0:TMAX,
             N=Traces$mp_mr$Npen, stringsAsFactors = FALSE),
         PL_PE_MR <- data.frame(Demogr="PE", Manage="MR", Years=0:TMAX,
             N=Traces$pe_mr$Npen, stringsAsFactors = FALSE),
-        PL_SQ_WR <- data.frame(Demogr="None", Manage="WR", Years=0:TMAX,
+        PL_SQ_WR <- data.frame(Demogr="Status quo", Manage="WR", Years=0:TMAX,
             N=Traces$mp_wr$Nnopen, stringsAsFactors = FALSE),
         data.frame(Demogr="MP", Manage="WR", Years=0:TMAX,
             N=Traces$mp_wr$Npen, stringsAsFactors = FALSE),
@@ -214,14 +242,33 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
 
     PL$N <- floor(PL$N)
     PL$Two <- paste0(PL$Demogr, "+", PL$Manage)
-    PL$Manage <- factor(PL$Manage, c("None", "MR", "WR"))
-    PL$Demogr <- factor(PL$Demogr, c("None", "MP", "PE"))
+    PL$Manage <- factor(PL$Manage, c("Status quo", "MR", "WR"))
+    PL$Demogr <- factor(PL$Demogr, c("Status quo", "MP", "PE"))
+    PL$Comb <- paste0(as.character(PL$Demogr), " + ", as.character(PL$Manage))
+    PL$Comb[PL$Comb == "Status quo + Status quo"] <- "Status quo"
+    PL$Comb[PL$Comb == "MP + Status quo"] <- "MP"
+    PL$Comb[PL$Comb == "PE + Status quo"] <- "PE"
+    PL$Comb[PL$Comb == "Status quo + MR"] <- "MR"
+    PL$Comb[PL$Comb == "Status quo + WR"] <- "WR"
+    PL$Col <- as.character(PL$Demogr)
+    PL$Col[PL$Manage=="Status quo" & PL$Demogr=="Status quo"] <- "Baseline"
+    PL$Col <- factor(PL$Col, c("Baseline", "Status quo", "MP", "PE"))
+
+    PL$Comb <- factor(PL$Comb, c(
+        "Status quo",
+        "MP", "PE", "MR",  "WR",
+        "MP + MR", "MP + WR",
+        "PE + MR", "PE + WR"))
     PL$lty <- as.integer(PL$Manage)
 
     p <- ggplot(PL, aes(x=Years, y=N)) +
-        geom_line(aes(color=Demogr, linetype=Manage)) +
+#        geom_line(aes(color=Col, linetype=Manage)) +
+        geom_line(aes(color=Comb)) +
         theme_minimal() +
-        geom_hline(yintercept=POP_START, col="grey")
+        geom_hline(yintercept=POP_START, col="grey") +
+        theme(legend.title = element_blank()) +
+        ylab("Individuals") +
+        scale_color_manual(values=TCOL)
 
     if (type == "fac")
         p <- p + facet_grid(rows=vars(Demogr), cols=vars(Manage))
@@ -233,8 +280,3 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
     p
 }
 
-revrt <- function(out) {
-    out$population$Nwild_MR <- out$population$Nwild_WR <- NULL
-    out$population$Nrecip_MR <- out$population$Nrecip_WR <- NULL
-    out
-}

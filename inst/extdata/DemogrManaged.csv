@@ -1,0 +1,40 @@
+RecoveryAction,Subpopulation,Scm,Sam
+MP,East Side Athabasca,0.598,0.903
+MP,Columbia North,0.598,0.834
+MP,Columbia South,0.598,0.817
+MP,Frisby-Queest,0.598,0.903
+MP,Wells Grey South,0.598,0.918
+MP,Groundhog,0.598,0.903
+MP,Parsnip,0.598,0.925
+MP,Kennedy Siding,0.598,0.894
+MP,Klinse-za (Moberly),0.598,0.798
+MP,Quintette,0.598,0.86
+MP,Average subpopulation,0.598,0.876
+PE,East Side Athabasca,0.72,0.95
+PE,Columbia North,0.72,0.95
+PE,Columbia South,0.72,0.95
+PE,Frisby-Queest,0.72,0.95
+PE,Wells Grey South,0.72,0.95
+PE,Groundhog,0.72,0.95
+PE,Parsnip,0.72,0.95
+PE,Average subpopulation,0.72,0.95
+CB,East Side Athabasca,0.72,0.95
+CB,Columbia North,0.72,0.95
+CB,Columbia South,0.72,0.95
+CB,Frisby-Queest,0.72,0.95
+CB,Wells Grey South,0.72,0.95
+CB,Groundhog,0.72,0.95
+CB,Parsnip,0.72,0.95
+CB,Average subpopulation,0.72,0.95
+MR,East Side Athabasca,0.163,0.879
+MR,Columbia North,0.233,0.879
+MR,Columbia South,0.266,0.879
+MR,Frisby-Queest,0.227,0.879
+MR,Wells Grey South,0.313,0.879
+MR,Groundhog,0.434,0.879
+MR,Parsnip,0.163,0.879
+MR,Average subpopulation,0.257,0.879
+WR,Kennedy Siding,0.554,0.962
+WR,Klinse-za (Moberly),0.506,0.86
+WR,Quintette,0.489,0.917
+WR,Average subpopulation,0.513,0.912
