@@ -185,6 +185,25 @@ TMAX, POP_START, VAL, USE_PROP) {
     list(summary=TB, traces=Traces)
 }
 
+COLOR <- c(
+    '#a6cee3', # light blue
+    '#1f78b4', # blue
+    '#b2df8a', # light green
+    '#33a02c', # green
+    '#fb9a99', # pink
+    '#e31a1c', # red
+    '#fdbf6f', # light orange
+    '#ff7f00', # orange
+    '#cab2d6', # light purple
+    '#6a3d9a') # purple
+
+TCOL <- c("#000000", COLOR[c(1,2,9,10,5,6,7,8)])
+names(TCOL) <- c("Status quo",
+    "MP", "PE",
+    "MR",  "WR",
+    "MP + MR", "MP + WR",
+    "PE + MR", "PE + WR")
+
 plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
 
     type <- match.arg(type)
@@ -216,12 +235,31 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
     PL$Two <- paste0(PL$Demogr, "+", PL$Manage)
     PL$Manage <- factor(PL$Manage, c("Status quo", "MR", "WR"))
     PL$Demogr <- factor(PL$Demogr, c("Status quo", "MP", "PE"))
+    PL$Comb <- paste0(as.character(PL$Demogr), " + ", as.character(PL$Manage))
+    PL$Comb[PL$Comb == "Status quo + Status quo"] <- "Status quo"
+    PL$Comb[PL$Comb == "MP + Status quo"] <- "MP"
+    PL$Comb[PL$Comb == "PE + Status quo"] <- "PE"
+    PL$Comb[PL$Comb == "Status quo + MR"] <- "MR"
+    PL$Comb[PL$Comb == "Status quo + WR"] <- "WR"
+    PL$Col <- as.character(PL$Demogr)
+    PL$Col[PL$Manage=="Status quo" & PL$Demogr=="Status quo"] <- "Baseline"
+    PL$Col <- factor(PL$Col, c("Baseline", "Status quo", "MP", "PE"))
+
+    PL$Comb <- factor(PL$Comb, c(
+        "Status quo",
+        "MP", "PE", "MR",  "WR",
+        "MP + MR", "MP + WR",
+        "PE + MR", "PE + WR"))
     PL$lty <- as.integer(PL$Manage)
 
     p <- ggplot(PL, aes(x=Years, y=N)) +
-        geom_line(aes(color=Demogr, linetype=Manage)) +
+#        geom_line(aes(color=Col, linetype=Manage)) +
+        geom_line(aes(color=Comb)) +
         theme_minimal() +
-        geom_hline(yintercept=POP_START, col="grey")
+        geom_hline(yintercept=POP_START, col="grey") +
+        theme(legend.title = element_blank()) +
+        ylab("Individuals") +
+        scale_color_manual(values=TCOL)
 
     if (type == "fac")
         p <- p + facet_grid(rows=vars(Demogr), cols=vars(Manage))
@@ -233,8 +271,3 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
     p
 }
 
-revrt <- function(out) {
-    out$population$Nwild_MR <- out$population$Nwild_WR <- NULL
-    out$population$Nrecip_MR <- out$population$Nrecip_WR <- NULL
-    out
-}
