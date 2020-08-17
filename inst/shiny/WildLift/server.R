@@ -52,7 +52,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "multi1_herd", "Subpopulation",
-                c("Default (East Side Athabasca)"="Default", Herds, HerdsWolf)
+                c("Average subpopulation"="AverageSubpop", Herds, HerdsWolf)
             )
         )
     })
@@ -342,7 +342,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "penning_herd", "Subpopulation",
-                c("Default (East Side Athabasca)"="Default", Herds, HerdsWolf)
+                c("Average subpopulation"="AverageSubpop", Herds, HerdsWolf)
             )
         )
     })
@@ -660,7 +660,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "predator_herd", "Subpopulation",
-                c("Default (East Side Athabasca)"="Default", Herds)
+                c("Average subpopulation"="AverageSubpop", Herds)
             )
         )
     })
@@ -969,7 +969,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "moose_herd", "Subpopulation",
-                c("Default (East Side Athabasca)"="Default", Herds)
+                c("Average subpopulation"="AverageSubpop", Herds)
             )
         )
     })
@@ -1377,7 +1377,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "breeding_herd", "Subpopulation",
-                c("Default (East Side Athabasca)"="Default", Herds)
+                c("Average subpopulation"="AverageSubpop", Herds)
             )
         )
     })

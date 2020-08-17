@@ -79,6 +79,7 @@ get_summary <- function(x, use_perc=TRUE) {
 }
 
 Herds <- c(
+    "East Side Athabasca" = "EastSideAthabasca",
     "Columbia North" = "ColumbiaNorth",
     "Columbia South" = "ColumbiaSouth",
     "Frisby-Queest" = "FrisbyQueest",
