@@ -72,9 +72,15 @@ herd=NULL) {
         "Parsnip_MR", "AverageSubpop_MR", "KennedySiding_WR", "KlinsezaMoberly_WR",
         "Quintette_WR", "AverageSubpop_WR"), class = "data.frame")
     pen.type <- match.arg(pen.type)
-    Herd <- if (is.null(herd))
-        "EastSideAthabasca" else as.character(herd)
-    Herd <- match.arg(Herd, unique(df$PopID))
+    if (pen.type == "wolf.red") {
+        Herd <- if (is.null(herd))
+            "KennedySiding" else as.character(herd)
+        Herd <- match.arg(Herd, c("KennedySiding", "KlinsezaMoberly", "Quintette"))
+    } else {
+        Herd <- if (is.null(herd))
+            "EastSideAthabasca" else as.character(herd)
+        Herd <- match.arg(Herd, unique(df$PopID))
+    }
     df1 <- df[df$PenType==pen.type & df$PopID == Herd,]
     if (nrow(df1) < 1)
         stop(sprintf("%s recovery action is not avilable for %s", pen.type, Herd))
