@@ -73,7 +73,7 @@ herd=NULL) {
         "Quintette_WR", "AverageSubpop_WR"), class = "data.frame")
     pen.type <- match.arg(pen.type)
     Herd <- if (is.null(herd))
-        "AverageSubpop" else as.character(herd)
+        "EastSideAthabasca" else as.character(herd)
     Herd <- match.arg(Herd, unique(df$PopID))
     df1 <- df[df$PenType==pen.type & df$PopID == Herd,]
     if (nrow(df1) < 1)

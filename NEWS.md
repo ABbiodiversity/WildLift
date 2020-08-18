@@ -1,6 +1,6 @@
 # Version 0.2.9
 
-*
+* Updated demography parameters.
 
 # Version 0.2.81
 

@@ -26,7 +26,7 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$multi1_demogr_wild <- renderUI({
-        req(input$multi1_herd)
+        #req(input$multi1_herd)
         tagList(
             sliderInput("multi1_DemCsw", "Calf survival, wild",
                 min = 0, max = 1, value = values$multi1$c.surv.wild, step = 0.001),
@@ -37,7 +37,7 @@ server <- function(input, output, session) {
         )
     })
     output$multi1_demogr_captive <- renderUI({
-        req(input$multi1_herd)
+        #req(input$multi1_herd)
         tagList(
             sliderInput("multi1_DemCsc", "Calf survival, MP",
                 min = 0, max = 1, value = values$multi1$c.surv.capt, step = 0.001),
@@ -58,14 +58,14 @@ server <- function(input, output, session) {
         )
     })
     ## dynamically render subpopulation selector
-    output$multi1_herd <- renderUI({
-        tagList(
-            selectInput(
-                "multi1_herd", "Subpopulation",
-                c("Average subpopulation"="AverageSubpop", Herds, HerdsWolf)
-            )
-        )
-    })
+#    output$multi1_herd <- renderUI({
+#        tagList(
+#            selectInput(
+#                "multi1_herd", "Subpopulation",
+#                c("Average subpopulation"="AverageSubpop")
+#            )
+#        )
+#    })
     ## dynamically render perc or inds slider
     output$multi1_perc_or_inds <- renderUI({
         if (values$use_perc) {
@@ -87,26 +87,26 @@ server <- function(input, output, session) {
         }
     })
     ## observers
-    observeEvent(input$multi1_herd, {
-        values$multi1 <- c(
-            fpen.prop = values$multi1$fpen.prop,
-            fpen.inds = values$multi1$fpen.inds,
-            f.surv.wild.mr = values$multi1$f.surv.wild.mr,
-            c.surv.wild.wr = values$multi1$c.surv.wild.wr,
-            f.surv.wild.wr = values$multi1$f.surv.wild.wr,
-            c.surv.capt.pe = wildlift_settings("pred.excl",
-                herd = input$multi1_herd)$c.surv.capt,
-            f.surv.capt.pe = wildlift_settings("pred.excl",
-                herd = input$multi1_herd)$f.surv.capt,
-            f.preg.capt.pe = wildlift_settings("pred.excl",
-                herd = input$multi1_herd)$f.preg.capt,
-            pen.cost.setup.pe = values$multi1$pen.cost.setup.pe,
-            pen.cost.proj.pe = values$multi1$pen.cost.proj.pe,
-            pen.cost.maint.pe = values$multi1$pen.cost.maint.pe,
-            pen.cost.capt.pe = values$multi1$pen.cost.capt.pe,
-            pen.cost.pred.pe = values$multi1$pen.cost.pred.pe,
-            wildlift_settings("mat.pen", herd = input$multi1_herd))
-    })
+    # observeEvent(input$multi1_herd, {
+    #     values$multi1 <- c(
+    #         fpen.prop = values$multi1$fpen.prop,
+    #         fpen.inds = values$multi1$fpen.inds,
+    #         f.surv.wild.mr = values$multi1$f.surv.wild.mr,
+    #         c.surv.wild.wr = values$multi1$c.surv.wild.wr,
+    #         f.surv.wild.wr = values$multi1$f.surv.wild.wr,
+    #         c.surv.capt.pe = wildlift_settings("pred.excl",
+    #             herd = input$multi1_herd)$c.surv.capt,
+    #         f.surv.capt.pe = wildlift_settings("pred.excl",
+    #             herd = input$multi1_herd)$f.surv.capt,
+    #         f.preg.capt.pe = wildlift_settings("pred.excl",
+    #             herd = input$multi1_herd)$f.preg.capt,
+    #         pen.cost.setup.pe = values$multi1$pen.cost.setup.pe,
+    #         pen.cost.proj.pe = values$multi1$pen.cost.proj.pe,
+    #         pen.cost.maint.pe = values$multi1$pen.cost.maint.pe,
+    #         pen.cost.capt.pe = values$multi1$pen.cost.capt.pe,
+    #         pen.cost.pred.pe = values$multi1$pen.cost.pred.pe,
+    #         wildlift_settings("mat.pen", herd = input$multi1_herd))
+    # })
     observeEvent(input$multi1_Fpen, {
         if (values$use_perc) {
             values$multi1$fpen.prop <- input$multi1_Fpen / 100
@@ -193,7 +193,8 @@ server <- function(input, output, session) {
     multi1_settings <- reactive({
         req(input$multi1_DemCsw, input$multi1_DemFsw_MR,
             input$multi1_CostProj_MP, input$multi1_CostProj_PE)
-        HERD <- NULL
+        #HERD <- NULL
+        HERD <- "AverageSubpop"
         Settings <- list(
             mp    = wildlift_settings("mat.pen", herd=HERD,
                 c.surv.wild = input$multi1_DemCsw,
@@ -339,7 +340,7 @@ server <- function(input, output, session) {
         out <- list(
             Info=data.frame(WildLift=paste0(
                 c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$multi1_herd))),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), "AverageSubpop"))),
             Settings=ss,
             TimeSeries=TS,
             Summary=ML$summary)
@@ -359,7 +360,7 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$penning_demogr_sliders <- renderUI({
-        if (input$penning_herd != "AverageSubpop")
+        if (input$penning_herd != "EastSideAthabasca")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("penning_DemCsw", "Calf survival, wild",
@@ -391,7 +392,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "penning_herd", "Subpopulation",
-                c("Average subpopulation"="AverageSubpop", Herds, HerdsWolf)
+                c("Default (East Side Athabasca)"="EastSideAthabasca", Herds[-1], HerdsWolf)
             )
         )
     })
@@ -615,14 +616,14 @@ server <- function(input, output, session) {
             name = 'Maternity penning', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'Status quo',
-                mode = 'lines', color=I('blue')) %>%
+                mode = 'lines', color=I('black')) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         if (values$penning_compare) {
             df0 <- plot(penning_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Maternity penning, reference', data = df0,
                     line=list(dash = 'dash', color='red')) %>%
                 add_trace(y = ~Nnopen, name = 'Status quo, reference', data = df0,
-                    line=list(dash = 'dash', color='blue'))
+                    line=list(dash = 'dash', color='black'))
         }
         p <- p %>% layout(legend = list(x = 100, y = 0))
         p
@@ -709,7 +710,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "predator_herd", "Subpopulation",
-                c("Average subpopulation"="AverageSubpop", Herds)
+                c("Default (East Side Athabasca)"="EastSideAthabasca", Herds[-1])
             )
         )
     })
@@ -935,14 +936,14 @@ server <- function(input, output, session) {
             name = 'Predator exclosure', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
             add_trace(y = ~Nnopen, name = 'Status quo',
-                mode = 'lines', color=I('blue')) %>%
+                mode = 'lines', color=I('black')) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         if (values$predator_compare) {
             df0 <- plot(predator_getF0(), plot=FALSE)
             p <- p %>% add_trace(y = ~Npen, name = 'Predator exclosure, reference', data = df0,
                     line=list(dash = 'dash', color='red')) %>%
                 add_trace(y = ~Nnopen, name = 'Status quo, reference', data = df0,
-                    line=list(dash = 'dash', color='blue'))
+                    line=list(dash = 'dash', color='black'))
         }
         p <- p %>% layout(legend = list(x = 100, y = 0))
         p
@@ -1018,7 +1019,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "moose_herd", "Subpopulation",
-                c("Average subpopulation"="AverageSubpop", Herds)
+                c("Default (East Side Athabasca)"="EastSideAthabasca", Herds[-1])
             )
         )
     })
@@ -1121,7 +1122,7 @@ server <- function(input, output, session) {
             name = 'Moose reduction', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
             add_trace(y = ~Npen, name = 'Status quo', data = dB0,
-                    line=list(dash = 'dash', color='red')) %>%
+                    line=list(color='black')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         p
@@ -1196,7 +1197,7 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "wolf_herd", "Subpopulation",
-                c("Average subpopulation"="AverageSubpop", HerdsWolf)
+                c("Default (Kennedy Siding)"="KennedySiding", HerdsWolf[-1])
             )
         )
     })
@@ -1308,7 +1309,7 @@ server <- function(input, output, session) {
             name = 'Wolf reduction', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
             add_trace(y = ~Npen, name = 'Status quo', data = dB0,
-                    mode = 'lines', color=I('blue')) %>%
+                    mode = 'lines', color=I('black')) %>%
             layout(legend = list(x = 100, y = 0)) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         p
@@ -1552,19 +1553,20 @@ server <- function(input, output, session) {
             hoverinfo = 'text',
             color=I('red')) %>%
             add_trace(y = ~Nwild, name = 'Status quo', data = dF,
-                    mode = 'lines', color=I('blue'),
-                    text = hover(t(bb$Nwild))) %>%
-            add_trace(y = ~Ncapt, name = 'Inside facility', data = dF,
                     mode = 'lines', color=I('black'),
-                    text = hover(t(bb$Ncapt))) %>%
-            add_trace(y = ~Nout, name = 'Juvenile females out', data = dF,
-                    mode = 'lines', color=I('orange'),
-                    text = hover(t(bb$Nout))) %>%
-            add_trace(y = ~Nin, name = 'Adult females in', data = dF,
-                line=list(color='grey'),
-                text = hover(t(bb$Nin))) %>%
+                    text = hover(t(bb$Nwild))) %>%
             layout(legend = list(x = 100, y = 0)) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
+        if ("fac" %in% input$breeding_plot_show)
+            p <- p %>% add_trace(y = ~Ncapt, name = 'Inside facility', data = dF,
+                    mode = 'lines', color=I('purple'),
+                    text = hover(t(bb$Ncapt))) %>%
+                add_trace(y = ~Nout, name = 'Juvenile females out', data = dF,
+                    mode = 'lines', color=I('orange'),
+                    text = hover(t(bb$Nout))) %>%
+                add_trace(y = ~Nin, name = 'Adult females in', data = dF,
+                    line=list(color='green'),
+                    text = hover(t(bb$Nin)))
         if ("mr" %in% input$breeding_plot_show)
             p <- p %>% add_trace(y = ~Nrecip_MR, name = 'Recipient MR', data = dF,
                     mode = 'lines', type='scatter',
@@ -1787,9 +1789,9 @@ server <- function(input, output, session) {
             name = 'No linear features', type = 'scatter', mode = 'lines',
             color=I('red')) %>%
             add_trace(y = ~N1, name = 'Status quo', data = dF,
-                    mode = 'lines', color=I('blue')) %>%
-            add_trace(y = ~Ndeact, name = 'Deactivation', data = dF,
                     mode = 'lines', color=I('black')) %>%
+            add_trace(y = ~Ndeact, name = 'Deactivation', data = dF,
+                    mode = 'lines', color=I('blue')) %>%
             add_trace(y = ~Nrestor, name = 'Restoration', data = dF,
                     mode = 'lines', color=I('orange')) %>%
             layout(legend = list(x = 100, y = 0)) %>%

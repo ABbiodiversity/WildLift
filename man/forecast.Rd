@@ -41,7 +41,7 @@ wolf reduction, or conservation breeding.
 It can also be a settings object.
 }
   \item{herd}{
-\code{NULL} (default, average subpopulation) or character.
+\code{NULL} (default, East Side Athabasca) or character.
 The following herds are available:
 \code{"EastSideAthabasca"} (Boreal ecotype)
 \code{"ColumbiaNorth"}, \code{"ColumbiaSouth"},

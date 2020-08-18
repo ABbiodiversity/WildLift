@@ -18,6 +18,7 @@ ver <- read.dcf(file=system.file("DESCRIPTION", package="WildLift"),
                 fields="Version")
 
 ## initialize sliders for the different pen types
+S_PE <- wildlift_settings("pred.excl", "AverageSubpop") # for multi1
 inits <- list(
     penning = c(
         fpen.prop = 0.35,
@@ -53,14 +54,14 @@ inits <- list(
         f.surv.wild.mr = 0.879,
         c.surv.wild.wr = 0.513,
         f.surv.wild.wr = 0.912,
-        c.surv.capt.pe = wildlift_settings("pred.excl")$c.surv.capt,
-        f.surv.capt.pe = wildlift_settings("pred.excl")$f.surv.capt,
-        f.preg.capt.pe = wildlift_settings("pred.excl")$f.preg.capt,
-        pen.cost.setup.pe = wildlift_settings("pred.excl")$pen.cost.setup,
-        pen.cost.proj.pe = wildlift_settings("pred.excl")$pen.cost.proj,
-        pen.cost.maint.pe = wildlift_settings("pred.excl")$pen.cost.maint,
-        pen.cost.capt.pe = wildlift_settings("pred.excl")$pen.cost.capt,
-        pen.cost.pred.pe = wildlift_settings("pred.excl")$pen.cost.pred,
+        c.surv.capt.pe = S_PE$c.surv.capt,
+        f.surv.capt.pe = S_PE$f.surv.capt,
+        f.preg.capt.pe = S_PE$f.preg.capt,
+        pen.cost.setup.pe = S_PE$pen.cost.setup,
+        pen.cost.proj.pe = S_PE$pen.cost.proj,
+        pen.cost.maint.pe = S_PE$pen.cost.maint,
+        pen.cost.capt.pe = S_PE$pen.cost.capt,
+        pen.cost.pred.pe = S_PE$pen.cost.pred,
         wildlift_settings("mat.pen"))
 )
 
