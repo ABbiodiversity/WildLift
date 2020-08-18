@@ -10,12 +10,12 @@ dashboardPage(
         menuSubItem("Predator exclosure", tabName = "predator"),
         menuSubItem("Moose reduction", tabName = "moose"),
         menuSubItem("Wolf reduction", tabName = "wolf"),
-        menuSubItem("Linear feature", tabName = "seismic")#,
-#        menuSubItem("Conservation breeding", tabName = "breeding1")
+        menuSubItem("Linear feature", tabName = "seismic"),
+        menuSubItem("Conservation breeding", tabName = "breeding")
       ),
       menuItem("Multiple levers", tabName = "multiple", icon=icon("dice-two"),
         menuSubItem("Augmentation", tabName = "multi1"),
-        menuSubItem("Conservation breeding", tabName = "breeding")
+        menuSubItem("Conservation breeding", tabName = "breeding1")
       ),
       menuItem("Documentation", tabName = "docs", icon=icon("book"))
     ),
@@ -191,14 +191,6 @@ dashboardPage(
           )
         )
       ),
-
-
-#      tabItem("multi2",
-#        fluidRow(
-#          column(width=12, h2("Multiple levers / Breeding x Habitat"),
-#                 p("This part is under development..."))
-#        )
-#      ),
 
 
       tabItem("penning",
@@ -450,6 +442,62 @@ dashboardPage(
         )
       ),
 
+
+      tabItem("seismic",
+        fluidRow(
+          column(width=12, h2("Linear Reature Deactivation and Restoration")),
+          column(width=8,
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Population forecast: linear feature",
+              plotlyOutput("seismic_Plot", width = "100%", height = 400),
+              bsTooltip("seismic_Plot",
+                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
+                placement="right")
+            ),
+            box(
+              width = NULL, status = "success", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Summary: linear feature",
+              tableOutput("seismic_Table"),
+              downloadButton("seismic_download", "Download results as Excel file"),
+              bsTooltip("seismic_Table",
+                "Table summarizing reports. ",
+                placement="right"),
+              bsTooltip("seismic_download",
+                "Click here to download results.",
+                placement="top")
+            ),
+            HTML(FooterText)
+          ),
+          column(width=4,
+            box(
+              width = NULL, status = "info", solidHeader = TRUE,
+              collapsible = FALSE, collapsed = FALSE,
+              title = "Settings",
+              selectInput(
+                "seismic_herd", "Subpopulation",
+                c("ESAR"="esar", "WSAR"="wsar", "Cold Lake"="coldlake")
+              ),
+              bsTooltip("seismic_herd",
+                "Select a subpopulation for subpopulation range specific parameters.",
+                placement="top"),
+              uiOutput("seismic_sliders")
+            ),
+            box(
+              width = NULL, status = "warning", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Cost",
+              sliderInput("seismic_cost",
+                "Cost per km (x $1000)",
+                min = 0, max = 100, value = 12, step = 1),
+            )
+          )
+        )
+      ),
+
+
       tabItem("breeding",
         fluidRow(
           column(width=12,
@@ -545,59 +593,102 @@ dashboardPage(
         )
       ),
 
-      tabItem("seismic",
+
+      tabItem("breeding1",
         fluidRow(
-          column(width=12, h2("Linear Reature Deactivation and Restoration")),
-          column(width=8,
+          column(width=12,
+            h2("Conservation Breeding and Predator/Prey Management"),
+            HTML("<br/><p><strong>Limitations</strong> &mdash; Results using multiple levers are extrapolated based on knowledge from locations where single levers were studied. Some combinations of these levers might not have documented examples and need to be treated with caution.</p><p>CB = Conservation Breeding; MR = Moose Reduction; WR = Wolf Reduction</p><br/>"),
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Population forecast: linear feature",
-              plotlyOutput("seismic_Plot", width = "100%", height = 400),
-              bsTooltip("seismic_Plot",
+              title = "Population forecast: conservation breeding",
+              plotlyOutput("breeding1_Plot", width = "100%", height = 400),
+              bsTooltip("breeding1_Plot",
                 "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
-                placement="right")
+                placement="bottom"),
+              checkboxGroupInput("breeding1_plot_show", NULL,
+                  choices=list(
+                    "CB + MR"="mr",
+                    "CB + WR"="wr",
+                    "Facility in/out"="fac"
+                  ), selected=c("mr", "wr"), inline=TRUE)
             ),
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
-              title = "Summary: linear feature",
-              tableOutput("seismic_Table"),
-              downloadButton("seismic_download", "Download results as Excel file"),
-              bsTooltip("seismic_Table",
-                "Table summarizing reports. ",
-                placement="right"),
-              bsTooltip("seismic_download",
+              title = "Summary: conservation breeding",
+              tableOutput("breeding1_Table"),
+              downloadButton("breeding1_download", "Download results as Excel file"),
+              bsTooltip("breeding1_Table",
+                "Table summarizing reports. &lambda; is defined based on the last 2 years in facility or as (N<sub>t</sub>/N<sub>0</sub>)<sup>1/t</sup> otherwise. Click below to download the full summary.",
+                placement="bottom"),
+              bsTooltip("breeding1_download",
                 "Click here to download results.",
                 placement="top")
             ),
             HTML(FooterText)
-          ),
-          column(width=4,
+          )
+        ),
+        fluidRow(
             box(
-              width = NULL, status = "info", solidHeader = TRUE,
+              width = 4, status = "info", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
               title = "Settings",
-              selectInput(
-                "seismic_herd", "Subpopulation",
-                c("ESAR"="esar", "WSAR"="wsar", "Cold Lake"="coldlake")
-              ),
-              bsTooltip("seismic_herd",
-                "Select a subpopulation for subpopulation range specific parameters.",
+              uiOutput("breeding1_herd"),
+              bsTooltip("breeding1_herd",
+                "Select a subpopulation for subpopulation specific demographic parameters.",
                 placement="top"),
-              uiOutput("seismic_sliders")
+              sliderInput("breeding1_outprop", "Proportion of juvenile females transferred",
+                min = 0, max = 1, value = 0.5, step = 0.01),
+              bsTooltip("breeding1_outprop",
+                "The proportion of juvenile females transferred from the facility to the recipient subpopulation."),
+              sliderInput("breeding1_ininds", "Number of females put into facility each year (max)",
+                min = 0, max = 40, value = 10, step = 1),
+              uiOutput("breeding1_years"),
+              sliderInput("breeding1_ftrans", "Adult female survival during capture/transport to the facility",
+                min = 0, max = 1, value = 1, step = 0.01),
+              uiOutput("breeding1_jyears"),
+              sliderInput("breeding1_jtrans", "Juvenile female survival during capture/transport from the facility to the recipient subpopulation",
+                min = 0, max = 1, value = 1, step = 0.01),
+              sliderInput("breeding1_jsred", "Relative reduction in survival of juvenile females transported to recipient subpopulation for 1 year after transport",
+                min = 0, max = 1, value = 1, step = 0.01),
+              checkboxInput("breeding1_breedearly", "Females inside the facility reproduce at 2 yrs age with fecundity rate 0.57",
+                value = FALSE),
+
             ),
             box(
-              width = NULL, status = "warning", solidHeader = TRUE,
+              width = 4, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Cost",
-              sliderInput("seismic_cost",
-                "Cost per km (x $1000)",
-                min = 0, max = 100, value = 12, step = 1),
+              title = "Demography",
+              uiOutput("breeding1_demogr_sliders")
+            ),
+            box(
+              width = 4, status = "warning", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Cost (x $1000)",
+              sliderInput("breeding1_CostSetup", "Initial set up",
+                min = 0, max = 20000, value = 100*round(inits$breeding1$pen.cost.setup/100),
+                step = 1000),
+              sliderInput("breeding1_CostProj", "Project manager",
+                min = 0, max = 500, value = inits$breeding1$pen.cost.proj, step = 10),
+              sliderInput("breeding1_CostMaint", "Maintenance",
+                min = 0, max = 1000, value = inits$breeding1$pen.cost.maint, step = 10),
+              sliderInput("breeding1_CostCapt", "Capture/monitor",
+                min = 0, max = 500, value = inits$breeding1$pen.cost.capt, step = 10),
+              hr(),
+              p("Wolf reduction"),
+              sliderInput("breeding1_costwolf", "Cost per wolf to be removed",
+                min = 0, max = 10, value = 5.1, step = 0.1),
+              sliderInput("breeding1_nremove", "Number of wolves to be removed per year",
+                min = 0, max = 200, value = 105, step = 1),
+              bsTooltip("breeding1_nremove",
+                "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
+                placement="bottom")
             )
-          )
         )
       )
+
 
     )
   )

@@ -48,6 +48,12 @@ inits <- list(
         c.surv.wild.wr = 0.513,
         f.surv.wild.wr = 0.912,
         wildlift_settings("cons.breed", pen.cap=40)),
+    ## multi-lever
+    breeding1 = c(
+        f.surv.wild.mr = 0.879,
+        c.surv.wild.wr = 0.513,
+        f.surv.wild.wr = 0.912,
+        wildlift_settings("cons.breed", pen.cap=40)),
     multi1 = c(
         fpen.prop = 0.35,
         fpen.inds = 10,

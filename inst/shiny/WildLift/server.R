@@ -16,6 +16,7 @@ server <- function(input, output, session) {
         wolf = inits$wolf,
         wolf0 = inits$wolf0,
         breeding = inits$breeding,
+        breeding1 = inits$breeding1,
         multi1 = inits$multi1)
     ## set perc/inds
     observeEvent(input$use_perc, {
@@ -1364,7 +1365,153 @@ server <- function(input, output, session) {
     )
 
 
-    ## >>> breeding tab <<<=====================================
+    ## >>> linear features <<<=====================================
+
+    output$seismic_sliders <- renderUI({
+        area <- switch(input$seismic_herd,
+            "coldlake"=6726,
+            "esar"=13119,
+            "wsar"=15707)
+        linkm <- switch(input$seismic_herd,
+            "coldlake"=11432,
+            "esar"=26154,
+            "wsar"=26620)
+        lin2d <- switch(input$seismic_herd,
+            "coldlake"=8012,
+            "esar"=21235,
+            "wsar"=21941)
+        yng <- switch(input$seismic_herd,
+            "coldlake"=13.85,
+            "esar"=25.70,
+            "wsar"=6.88)
+        tagList(
+            sliderInput("seismic_area",
+                "Range area (sq km)",
+                min = 0, max = 20000, value = area, step = 1),
+            sliderInput("seismic_linkm",
+                "Linear feature length (km)",
+                min = 0, max = 40000, value = linkm, step = 1),
+            sliderInput("seismic_lin2d",
+                "Conventional seismic length (km)",
+                min = 0, max = 40000, value = lin2d, step = 1),
+            sliderInput("seismic_young",
+                "Percent young forest (<30 yrs; %)",
+                min = 0, max = 100, value = round(yng, 1), step = 0.11),
+#            sliderInput("seismic_cost",
+#                "Cost per km (x $1000)",
+#                min = 0, max = 100, value = 12, step = 1),
+            sliderInput("seismic_deact",
+                "Years for 100% deactivation",
+                min = 0, max = 50, value = 5, step = 1),
+            sliderInput("seismic_restor",
+                "Years for 100% restoration",
+                min = 0, max = 50, value = 15, step = 1)
+        )
+    })
+    seismic_all <- reactive({
+        req(input$seismic_area,
+            input$seismic_linkm,
+            input$seismic_lin2d,
+            input$seismic_young)
+        if (input$seismic_linkm < input$seismic_lin2d) {
+            showNotification("Conventional seismic cannot be more than total linear",
+                             type="error")
+            return(NULL)
+        }
+        wildlift_linear(
+            tmax=input$tmax,
+            pop.start=input$popstart,
+            area=input$seismic_area,
+            lin=input$seismic_linkm,
+            seism=input$seismic_lin2d,
+            young=input$seismic_young,
+            cost=input$seismic_cost,
+            yr_deact=input$seismic_deact,
+            yr_restor=input$seismic_restor)
+    })
+
+    ## plot
+    output$seismic_Plot <- renderPlotly({
+        req(seismic_all())
+        sm <- seismic_all()
+        #print(sm)
+        dF <- data.frame(sm$pop)
+        colnames(dF)[1:2] <- c("Years", "Individuals")
+        p <- plot_ly(dF, x = ~Years, y = ~Individuals,
+            name = 'No linear features', type = 'scatter', mode = 'lines',
+            color=I('red')) %>%
+            add_trace(y = ~N1, name = 'Status quo', data = dF,
+                    mode = 'lines', color=I('black')) %>%
+            add_trace(y = ~Ndeact, name = 'Deactivation', data = dF,
+                    mode = 'lines', color=I('blue')) %>%
+            add_trace(y = ~Nrestor, name = 'Restoration', data = dF,
+                    mode = 'lines', color=I('orange')) %>%
+            layout(legend = list(x = 100, y = 0)) %>%
+            config(displayModeBar = 'hover', displaylogo = FALSE)
+        p
+    })
+    ## table
+    seismic_getT <- reactive({
+        req(seismic_all())
+        sm <- seismic_all()
+        dF <- data.frame(sm$pop)
+        colnames(dF) <- c("Years", "No linear features", "Status quo",
+            "Deactivation", "Restoration",
+            "Linear density, deactivation", "Linear density, restoration",
+            "Percent young forest")
+        df <- dF[nrow(dF),2:5]
+        rownames(df) <- "N (end)"
+        cost <- c(NA, NA, sm$costdeact, sm$costrestor)
+        Nnew <- c(NA, NA, pmax(0, dF[nrow(dF),4:5]-dF[nrow(dF),3]))
+        df <- rbind(
+            "&lambda;"=dF[nrow(dF),2:5]/dF[nrow(dF)-1,2:5],
+            df,
+            "N (new)"=Nnew,
+            "Total cost (x $million)"=cost,
+            "Cost per new individual (x $million)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
+        df
+    })
+    output$seismic_Table <- renderTable({
+        req(seismic_getT())
+        seismic_getT()
+    }, rownames=TRUE, colnames=TRUE,
+    striped=TRUE, bordered=TRUE, na="n/a",
+    sanitize.text.function = function(x) x)
+
+    ## dowload
+    seismic_xlslist <- reactive({
+        req(seismic_all(), seismic_getT())
+        sm <- seismic_all()
+        dF <- data.frame(sm$pop)
+        colnames(dF) <- c("Years", "No linear features", "Status quo",
+                          "Deactivation", "Restoration",
+        "Linear density, deactivation", "Linear density, restoration",
+        "Percent young forest")
+        df <- seismic_getT()
+        print("getT")
+        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
+        out <- list(
+            Info=data.frame(WildLift=paste0(
+                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
+                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+            TimeSeries=as.data.frame(dF),
+            Summary=as.data.frame(df))
+        out$Summary$Variables <- rownames(df)
+        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
+        out
+    })
+    output$seismic_download <- downloadHandler(
+        filename = function() {
+            paste0("WildLift_linear_features_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+        },
+        content = function(file) {
+            write.xlsx(seismic_xlslist(), file=file, overwrite=TRUE)
+        },
+        contentType="application/octet-stream"
+    )
+
+
+    ## >>> breeding tab / single lever <<<=====================================
 
     ## dynamically render sliders
     output$breeding_years <- renderUI({
@@ -1713,147 +1860,352 @@ server <- function(input, output, session) {
         contentType="application/octet-stream"
     )
 
-    ## >>> linear features <<<=====================================
 
-    output$seismic_sliders <- renderUI({
-        area <- switch(input$seismic_herd,
-            "coldlake"=6726,
-            "esar"=13119,
-            "wsar"=15707)
-        linkm <- switch(input$seismic_herd,
-            "coldlake"=11432,
-            "esar"=26154,
-            "wsar"=26620)
-        lin2d <- switch(input$seismic_herd,
-            "coldlake"=8012,
-            "esar"=21235,
-            "wsar"=21941)
-        yng <- switch(input$seismic_herd,
-            "coldlake"=13.85,
-            "esar"=25.70,
-            "wsar"=6.88)
+    ## >>> breeding1 tab / multi lever <<<=====================================
+
+    ## dynamically render sliders
+    output$breeding1_years <- renderUI({
         tagList(
-            sliderInput("seismic_area",
-                "Range area (sq km)",
-                min = 0, max = 20000, value = area, step = 1),
-            sliderInput("seismic_linkm",
-                "Linear feature length (km)",
-                min = 0, max = 40000, value = linkm, step = 1),
-            sliderInput("seismic_lin2d",
-                "Conventional seismic length (km)",
-                min = 0, max = 40000, value = lin2d, step = 1),
-            sliderInput("seismic_young",
-                "Percent young forest (<30 yrs; %)",
-                min = 0, max = 100, value = round(yng, 1), step = 0.11),
-#            sliderInput("seismic_cost",
-#                "Cost per km (x $1000)",
-#                min = 0, max = 100, value = 12, step = 1),
-            sliderInput("seismic_deact",
-                "Years for 100% deactivation",
-                min = 0, max = 50, value = 5, step = 1),
-            sliderInput("seismic_restor",
-                "Years for 100% restoration",
-                min = 0, max = 50, value = 15, step = 1)
+            sliderInput("breeding1_yrs",
+                "Number of years that females are added to the facility",
+                min = 0, max = input$tmax, value = 0, step = 1) #value = 1
         )
     })
-    seismic_all <- reactive({
-        req(input$seismic_area,
-            input$seismic_linkm,
-            input$seismic_lin2d,
-            input$seismic_young)
-        if (input$seismic_linkm < input$seismic_lin2d) {
-            showNotification("Conventional seismic cannot be more than total linear",
-                             type="error")
-            return(NULL)
-        }
-        wildlift_linear(
-            tmax=input$tmax,
-            pop.start=input$popstart,
-            area=input$seismic_area,
-            lin=input$seismic_linkm,
-            seism=input$seismic_lin2d,
-            young=input$seismic_young,
-            cost=input$seismic_cost,
-            yr_deact=input$seismic_deact,
-            yr_restor=input$seismic_restor)
+    output$breeding1_jyears <- renderUI({
+        tagList(
+            sliderInput("breeding1_jyrs",
+                "Number of years to delay juvenile transfer",
+                min = 0, max = input$tmax, value = 0, step = 1)
+        )
     })
+    output$breeding1_demogr_sliders <- renderUI({
+        req(input$breeding1_herd)
+        if (input$breeding1_herd != "AverageSubpop")
+            return(p("Demography settings not available for specific subpopulations."))
+        tagList(
+            sliderInput("breeding1_DemCsc", "Calf survival in facility",
+                min = 0, max = 1,
+                value = inits$breeding1$c.surv.capt, step = 0.001),
+            sliderInput("breeding1_DemCsw", "Calf survival, recipient & status quo",
+                min = 0, max = 1,
+                value = inits$breeding1$c.surv.wild, step = 0.001),
+            sliderInput("breeding1_DemFsc", "Adult female survival in facility",
+                min = 0, max = 1,
+                value = inits$breeding1$f.surv.capt, step = 0.001),
+            sliderInput("breeding1_DemFsw",
+                        "Adult female survival, recipient & status quo",
+                min = 0, max = 1,
+                value = inits$breeding1$f.surv.wild, step = 0.001),
+            sliderInput("breeding1_DemFpc", "Fecundity in facility",
+                min = 0, max = 1,
+                value = inits$breeding1$f.preg.capt, step = 0.001),
+            sliderInput("breeding1_DemFpw", "Fecundity, recipient & status quo",
+                min = 0, max = 1,
+                value = inits$breeding1$f.preg.wild, step = 0.001),
+            hr(),
+            p("Moose reduction"),
+            sliderInput("breeding1_DemFsw_MR",
+                        "Adult female survival, recipient & status quo",
+                  min = 0, max = 1,
+                  value = inits$breeding1$f.surv.wild.mr, step = 0.001),
+            p("Wolf reduction"),
+            sliderInput("breeding1_DemCsw_WR",
+                        "Calf survival, recipient & status quo",
+                  min = 0, max = 1,
+                  value = inits$breeding1$c.surv.wild.wr, step = 0.001),
+            sliderInput("breeding1_DemFsw_WR",
+                        "Adult female survival, recipient & status quo",
+                  min = 0, max = 1,
+                  value = inits$breeding1$f.surv.wild.wr, step = 0.001)
+        )
+    })
+    ## dynamically render subpopulation selector
+    output$breeding1_herd <- renderUI({
+        tagList(
+            selectInput(
+                "breeding1_herd", "Subpopulation",
+                c("Average subpopulation"="AverageSubpop", Herds)
+            )
+        )
+    })
+    ## observers
+    observeEvent(input$breeding1_herd, {
+        values$breeding1 <- c(
+            f.surv.wild.mr = values$breeding1$f.surv.wild.mr,
+            c.surv.wild.wr = values$breeding1$c.surv.wild.wr,
+            f.surv.wild.wr = values$breeding1$f.surv.wild.wr,
+            wildlift_settings("cons.breed",
+                herd = if (input$breeding1_herd == "AverageSubpop")
+                    NULL else input$breeding1_herd))
+    })
+    ## plain
+    observeEvent(input$breeding1_DemCsw, {
+        values$breeding1$c.surv.wild <- input$breeding1_DemCsw
+    })
+    observeEvent(input$breeding1_DemCsc, {
+        values$breeding1$c.surv.capt <- input$breeding1_DemCsc
+    })
+    observeEvent(input$breeding1_DemFsw, {
+        values$breeding1$f.surv.wild <- input$breeding1_DemFsw
+    })
+    observeEvent(input$breeding1_DemFsc, {
+        values$breeding1$f.surv.capt <- input$breeding1_DemFsc
+    })
+    observeEvent(input$breeding1_DemFpw, {
+        values$breeding1$f.preg.wild <- input$breeding1_DemFpw
+    })
+    observeEvent(input$breeding1_DemFpc, {
+        values$breeding1$f.preg.capt <- input$breeding1_DemFpc
+    })
+    observeEvent(input$breeding1_CostSetup, {
+        values$breeding1$pen.cost.setup <- input$breeding1_CostSetup
+    })
+    observeEvent(input$breeding1_CostProj, {
+        values$breeding1$pen.cost.proj <- input$breeding1_CostProj
+    })
+    observeEvent(input$breeding1_CostMaint, {
+        values$breeding1$pen.cost.maint <- input$breeding1_CostMaint
+    })
+    observeEvent(input$breeding1_CostCapt, {
+        values$breeding1$pen.cost.capt <- input$breeding1_CostCapt
+    })
+    ## multi extras
+    observeEvent(input$breeding1_DemFsw_MR, {
+        values$breeding1$f.surv.wild.mr <- input$breeding1_DemFsw_MR
+    })
+    observeEvent(input$breeding1_DemCsw_WR, {
+        values$breeding1$c.surv.wild.wr <- input$breeding1_DemCsw_WR
+    })
+    observeEvent(input$breeding1_DemFsw_WR, {
+        values$breeding1$f.surv.wild.wr <- input$breeding1_DemFsw_WR
+    })
+    ## breeding reduction without penning
+    breeding1_getF <- reactive({
+        req(input$breeding1_herd, input$breeding1_DemFsw_MR)
+        if (is.null(input$breeding1_breedearly))
+            return(NULL)
+        req(input$breeding1_yrs, input$breeding1_ininds,
+            input$breeding1_jyrs)
+        nn <- rep(input$breeding1_ininds, input$breeding1_yrs)
+        op <- c(rep(0, input$breeding1_jyrs), input$breeding1_outprop)
+        out <- wildlift_breeding(values$breeding1,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            f.surv.trans = input$breeding1_ftrans,
+            j.surv.trans = input$breeding1_jtrans,
+            j.surv.red = input$breeding1_jsred,
+            in.inds = nn,
+            out.prop = op,
+            breed.early = input$breeding1_breedearly)
+        ## edit out$population: add MR
+        s_mr <- out$settings
+        s_mr$f.surv.wild <- input$breeding1_DemFsw_MR
+        out_mr <- wildlift_breeding(s_mr,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            f.surv.trans = input$breeding1_ftrans,
+            j.surv.trans = input$breeding1_jtrans,
+            j.surv.red = input$breeding1_jsred,
+            in.inds = nn,
+            out.prop = op,
+            breed.early = input$breeding1_breedearly)
+        out$population$Nwild_MR <- out_mr$population$Nwild
+        out$population$Nrecip_MR <- out_mr$population$Nrecip
+        out$mr <- list(
+            cost_extra = 0,
+            settings=s_mr,
+            output=out_mr)
+        ## edit out$population: add WR
+        s_wr <- out$settings
+        s_wr$c.surv.wild <- input$breeding1_DemCsw_WR
+        s_wr$f.surv.wild <- input$breeding1_DemFsw_WR
+        out_wr <- wildlift_breeding(s_wr,
+            tmax = input$tmax,
+            pop.start = input$popstart,
+            f.surv.trans = input$breeding1_ftrans,
+            j.surv.trans = input$breeding1_jtrans,
+            j.surv.red = input$breeding1_jsred,
+            in.inds = nn,
+            out.prop = op,
+            breed.early = input$breeding1_breedearly)
+        out$population$Nwild_WR <- out_wr$population$Nwild
+        out$population$Nrecip_WR <- out_wr$population$Nrecip
+        out$wr <- list(
+            cost_extra = input$breeding1_nremove * input$tmax *
+                input$breeding1_costwolf / 1000,
+            settings=s_wr,
+            output=out_wr)
 
+        out
+    })
     ## plot
-    output$seismic_Plot <- renderPlotly({
-        req(seismic_all())
-        sm <- seismic_all()
-        #print(sm)
-        dF <- data.frame(sm$pop)
-        colnames(dF)[1:2] <- c("Years", "Individuals")
+    output$breeding1_Plot <- renderPlotly({
+        req(breeding1_getF())
+        bb <- breeding1_getF()
+        dF <- summary(bb)
+        colnames(dF)[colnames(dF) == "Nrecip"] <- "Individuals"
         p <- plot_ly(dF, x = ~Years, y = ~Individuals,
-            name = 'No linear features', type = 'scatter', mode = 'lines',
+            name = 'Recipient', type = 'scatter', mode = 'lines',
+            text = hover(t(bb$Nrecip)),
+            hoverinfo = 'text',
             color=I('red')) %>%
-            add_trace(y = ~N1, name = 'Status quo', data = dF,
-                    mode = 'lines', color=I('black')) %>%
-            add_trace(y = ~Ndeact, name = 'Deactivation', data = dF,
-                    mode = 'lines', color=I('blue')) %>%
-            add_trace(y = ~Nrestor, name = 'Restoration', data = dF,
-                    mode = 'lines', color=I('orange')) %>%
+            add_trace(y = ~Nwild, name = 'Status quo', data = dF,
+                    mode = 'lines', color=I('black'),
+                    text = hover(t(bb$Nwild))) %>%
             layout(legend = list(x = 100, y = 0)) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
+        if ("fac" %in% input$breeding1_plot_show)
+            p <- p %>% add_trace(y = ~Ncapt, name = 'Inside facility', data = dF,
+                    mode = 'lines', color=I('purple'),
+                    text = hover(t(bb$Ncapt))) %>%
+                add_trace(y = ~Nout, name = 'Juvenile females out', data = dF,
+                    mode = 'lines', color=I('orange'),
+                    text = hover(t(bb$Nout))) %>%
+                add_trace(y = ~Nin, name = 'Adult females in', data = dF,
+                    line=list(color='green'),
+                    text = hover(t(bb$Nin)))
+        if ("mr" %in% input$breeding1_plot_show)
+            p <- p %>% add_trace(y = ~Nrecip_MR, name = 'Recipient MR', data = dF,
+                    mode = 'lines', type='scatter',
+                    text = hover(t(bb$mr$output$Nrecip)),
+                    hoverinfo = 'text',
+                    color=I('red'), line=list(dash='dash')) %>%
+                add_trace(y = ~Nwild_MR, name = 'Status quo MR', data = dF,
+                    mode = 'lines', type='scatter',
+                    text = hover(t(bb$mr$output$Nwild)),
+                    hoverinfo = 'text',
+                    color=I('blue'), line=list(dash='dash'))
+        if ("wr" %in% input$breeding1_plot_show)
+            p <- p %>% add_trace(y = ~Nrecip_WR, name = 'Recipient WR', data = dF,
+                    mode = 'lines', type='scatter',
+                    text = hover(t(bb$wr$output$Nrecip)),
+                    hoverinfo = 'text',
+                    color=I('red'), line=list(dash='dot')) %>%
+                add_trace(y = ~Nwild_WR, name = 'Status quo WR', data = dF,
+                    mode = 'lines', type='scatter',
+                    text = hover(t(bb$wr$output$Nwild)),
+                    hoverinfo = 'text',
+                    color=I('blue'), line=list(dash='dot'))
+
         p
     })
-    ## table
-    seismic_getT <- reactive({
-        req(seismic_all())
-        sm <- seismic_all()
-        dF <- data.frame(sm$pop)
-        colnames(dF) <- c("Years", "No linear features", "Status quo",
-            "Deactivation", "Restoration",
-            "Linear density, deactivation", "Linear density, restoration",
-            "Percent young forest")
-        df <- dF[nrow(dF),2:5]
-        rownames(df) <- "N (end)"
-        cost <- c(NA, NA, sm$costdeact, sm$costrestor)
-        Nnew <- c(NA, NA, pmax(0, dF[nrow(dF),4:5]-dF[nrow(dF),3]))
-        df <- rbind(
-            "&lambda;"=dF[nrow(dF),2:5]/dF[nrow(dF)-1,2:5],
-            df,
-            "N (new)"=Nnew,
-            "Total cost (x $million)"=cost,
-            "Cost per new individual (x $million)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
+    ## making nice table of the settings
+    breeding1_getS <- reactive({
+        req(breeding1_getF())
+        x <- breeding1_getF()
+        s <- x$settings
+        s$call <- NULL
+        tab <- cbind(c(tmax = x$tmax,
+            pop.start = x$pop.start,
+            out.prop=x$out.prop,
+            f.surv.trans=x$f.surv.trans,
+            j.surv.trans=x$j.surv.trans,
+            j.surv.red=x$j.surv.red,
+            f.surv.wild.mr=x$mr$f.surv.wild,
+            f.surv.wild.wr=x$wr$f.surv.wild,
+            c.surv.wild.wr=x$wr$c.surv.wild,
+            unlist(s)))
+        SNAM <- c(
+            "tmax" = "T max",
+            "pop.start" = "N start",
+            "c.surv.wild" = "Calf survival, wild",
+            "c.surv.wild.wr" = "Calf survival, wild with wolf reduction",
+            "c.surv.capt" = "Calf survival in facility",
+            "f.surv.wild" = "Adult female survival, wild",
+            "f.surv.wild.wr" = "Adult female survival, wild with wolf reduction",
+            "f.surv.wild.mr" = "Adult female survival, wild with moose reduction",
+            "f.surv.capt" = "Adult female survival in facility",
+            "f.preg.wild" = "Fecundity, wild",
+            "f.preg.capt" = "Fecundity in facility",
+            #"out.prop"="Proportion of calves transferred",
+            "pen.cost.setup" = "Initial set up (x $1000)",
+            "pen.cost.proj" = "Project manager (x $1000)",
+            "pen.cost.maint" = "Maintenance (x $1000)",
+            "pen.cost.capt" = "Capture/monitor (x $1000)",
+            "pen.cost.pred" = "Removing predators (x $1000)",
+            "f.surv.trans"="Adult female survival during capture/transport to facility",
+            "j.surv.trans"="Juvenile female survival during capture/transport from facility to recipient subpopulation",
+            "j.surv.red"="Relative reduction in survival of juvenile females transported to recipient subpopulation for 1 year after transport")
+        df <- tab[names(SNAM),,drop=FALSE]
+        rownames(df) <- SNAM
+        colnames(df) <- "Breeding"
+        #print(df)
         df
     })
-    output$seismic_Table <- renderTable({
-        req(seismic_getT())
-        seismic_getT()
+
+    ## table
+    output$breeding1_Table <- renderTable({
+        req(breeding1_getF())
+        zz <- breeding1_getF()
+        #zz <- revrt(zz)
+
+        ## one time cost
+        cost1 <- zz$settings$pen.cost.setup
+        ## yearly costs
+        cost2 <- zz$settings$pen.cost.proj +
+            zz$settings$pen.cost.maint +
+            zz$settings$pen.cost.capt +
+            zz$settings$pen.cost.pred
+        cost <- (cost1 + zz$tmax * cost2) / 1000
+        costWR <- cost + zz$wr$cost_extra
+        #print(c(cost1/1000, cost2/1000, cost))
+
+        Pick <- c(Ncapt="In facility", Nrecip="Recipient", Nwild="Status quo",
+                  Nrecip_MR="Recipient MR", Nwild_MR="Status quo MR",
+                  Nrecip_WR="Recipient WR", Nwild_WR="Status quo WR")
+        dF <- summary(zz)[,names(Pick)]
+        colnames(dF) <- Pick
+        N0 <- dF[1,,drop=FALSE]
+        Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
+        Ntmax <- dF[nrow(dF),,drop=FALSE]
+        Nnew <- Ntmax[1,"Recipient"] - Ntmax[1,"Status quo"]
+        NnewMR <- Ntmax[1,"Recipient MR"] - Ntmax[1,"Status quo MR"]
+        NnewWR <- Ntmax[1,"Recipient WR"] - Ntmax[1,"Status quo WR"]
+        df <- rbind(
+            '&lambda;'=round(Ntmax/Ntmax1, 3),
+            'N (end)'=Ntmax,
+            'N (new)'=c(NA, max(0,Nnew),NA, max(0,NnewMR),NA, max(0,NnewWR),NA),
+            "Total cost (x $million)"=c(NA, cost, NA, cost, NA, costWR, NA),
+            "Cost per new individual (x $million)"=c(NA,
+                ifelse(Nnew>0,cost/Nnew, NA), NA,
+                ifelse(NnewMR>0,cost/NnewMR, NA), NA,
+                ifelse(NnewWR>0,costWR/NnewWR, NA), NA))
+        if (!("mr" %in% input$breeding1_plot_show))
+            df <- df[,!(colnames(df) %in% c("Recipient MR", "Status quo MR"))]
+        if (!("wr" %in% input$breeding1_plot_show))
+            df <- df[,!(colnames(df) %in% c("Recipient WR", "Status quo WR"))]
+
+        df
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
     sanitize.text.function = function(x) x)
 
     ## dowload
-    seismic_xlslist <- reactive({
-        req(seismic_all(), seismic_getT())
-        sm <- seismic_all()
-        dF <- data.frame(sm$pop)
-        colnames(dF) <- c("Years", "No linear features", "Status quo",
-                          "Deactivation", "Restoration",
-        "Linear density, deactivation", "Linear density, restoration",
-        "Percent young forest")
-        df <- seismic_getT()
-        print("getT")
-        rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
+    breeding1_xlslist <- reactive({
+        req(breeding1_getF())
+        bb <- breeding1_getF()
+        #bb <- revrt(bb)
+        dF <- summary(bb)
+        ss <- breeding1_getS()
         out <- list(
             Info=data.frame(WildLift=paste0(
                 c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding1_herd))),
+            Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(dF),
-            Summary=as.data.frame(df))
-        out$Summary$Variables <- rownames(df)
-        out$Summary <- out$Summary[,c(ncol(df)+1, 1:ncol(df))]
+            AgeClasses=stack_breeding(bb),
+            AgeClasses_MR=stack_breeding(bb$mr$output),
+            AgeClasses_WR=stack_breeding(bb$wr$output))
+        out$Settings$Parameters <- rownames(ss)
+        out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
         out
     })
-    output$seismic_download <- downloadHandler(
+    output$breeding1_download <- downloadHandler(
         filename = function() {
-            paste0("WildLift_linear_features_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
+            paste0("WildLift_conservation_multi_", format(Sys.time(), "%Y-%m-%d"), ".xlsx")
         },
         content = function(file) {
-            write.xlsx(seismic_xlslist(), file=file, overwrite=TRUE)
+            write.xlsx(breeding1_xlslist(), file=file, overwrite=TRUE)
         },
         contentType="application/octet-stream"
     )
