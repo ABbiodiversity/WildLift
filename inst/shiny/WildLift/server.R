@@ -1530,7 +1530,7 @@ server <- function(input, output, session) {
     })
     output$breeding_demogr_sliders <- renderUI({
         req(input$breeding_herd)
-        if (input$breeding_herd != "AverageSubpop")
+        if (input$breeding_herd != "EastSideAthabasca")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("breeding_DemCsc", "Calf survival in facility",
@@ -1551,22 +1551,7 @@ server <- function(input, output, session) {
                 value = inits$breeding$f.preg.capt, step = 0.001),
             sliderInput("breeding_DemFpw", "Fecundity, recipient & status quo",
                 min = 0, max = 1,
-                value = inits$breeding$f.preg.wild, step = 0.001),
-            hr(),
-            p("Moose reduction"),
-            sliderInput("breeding_DemFsw_MR",
-                        "Adult female survival, recipient & status quo",
-                  min = 0, max = 1,
-                  value = inits$breeding$f.surv.wild.mr, step = 0.001),
-            p("Wolf reduction"),
-            sliderInput("breeding_DemCsw_WR",
-                        "Calf survival, recipient & status quo",
-                  min = 0, max = 1,
-                  value = inits$breeding$c.surv.wild.wr, step = 0.001),
-            sliderInput("breeding_DemFsw_WR",
-                        "Adult female survival, recipient & status quo",
-                  min = 0, max = 1,
-                  value = inits$breeding$f.surv.wild.wr, step = 0.001)
+                value = inits$breeding$f.preg.wild, step = 0.001)
         )
     })
     ## dynamically render subpopulation selector
@@ -1574,19 +1559,15 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "breeding_herd", "Subpopulation",
-                c("Average subpopulation"="AverageSubpop", Herds)
+                c("Default (East Side Athabasca)"="EastSideAthabasca", Herds[-1])
             )
         )
     })
     ## observers
     observeEvent(input$breeding_herd, {
-        values$breeding <- c(
-            f.surv.wild.mr = values$breeding$f.surv.wild.mr,
-            c.surv.wild.wr = values$breeding$c.surv.wild.wr,
-            f.surv.wild.wr = values$breeding$f.surv.wild.wr,
-            wildlift_settings("cons.breed",
-                herd = if (input$breeding_herd == "AverageSubpop")
-                    NULL else input$breeding_herd))
+        values$breeding <- wildlift_settings("cons.breed",
+                herd = if (input$breeding_herd == "EastSideAthabasca")
+                    NULL else input$breeding_herd)
     })
     ## plain
     observeEvent(input$breeding_DemCsw, {
@@ -1619,26 +1600,16 @@ server <- function(input, output, session) {
     observeEvent(input$breeding_CostCapt, {
         values$breeding$pen.cost.capt <- input$breeding_CostCapt
     })
-    ## multi extras
-    observeEvent(input$breeding_DemFsw_MR, {
-        values$breeding$f.surv.wild.mr <- input$breeding_DemFsw_MR
-    })
-    observeEvent(input$breeding_DemCsw_WR, {
-        values$breeding$c.surv.wild.wr <- input$breeding_DemCsw_WR
-    })
-    observeEvent(input$breeding_DemFsw_WR, {
-        values$breeding$f.surv.wild.wr <- input$breeding_DemFsw_WR
-    })
     ## breeding reduction without penning
     breeding_getF <- reactive({
-        req(input$breeding_herd, input$breeding_DemFsw_MR)
+        req(input$breeding_herd)
         if (is.null(input$breeding_breedearly))
             return(NULL)
         req(input$breeding_yrs, input$breeding_ininds,
             input$breeding_jyrs)
         nn <- rep(input$breeding_ininds, input$breeding_yrs)
         op <- c(rep(0, input$breeding_jyrs), input$breeding_outprop)
-        out <- wildlift_breeding(values$breeding,
+        wildlift_breeding(values$breeding,
             tmax = input$tmax,
             pop.start = input$popstart,
             f.surv.trans = input$breeding_ftrans,
@@ -1647,46 +1618,6 @@ server <- function(input, output, session) {
             in.inds = nn,
             out.prop = op,
             breed.early = input$breeding_breedearly)
-        ## edit out$population: add MR
-        s_mr <- out$settings
-        s_mr$f.surv.wild <- input$breeding_DemFsw_MR
-        out_mr <- wildlift_breeding(s_mr,
-            tmax = input$tmax,
-            pop.start = input$popstart,
-            f.surv.trans = input$breeding_ftrans,
-            j.surv.trans = input$breeding_jtrans,
-            j.surv.red = input$breeding_jsred,
-            in.inds = nn,
-            out.prop = op,
-            breed.early = input$breeding_breedearly)
-        out$population$Nwild_MR <- out_mr$population$Nwild
-        out$population$Nrecip_MR <- out_mr$population$Nrecip
-        out$mr <- list(
-            cost_extra = 0,
-            settings=s_mr,
-            output=out_mr)
-        ## edit out$population: add WR
-        s_wr <- out$settings
-        s_wr$c.surv.wild <- input$breeding_DemCsw_WR
-        s_wr$f.surv.wild <- input$breeding_DemFsw_WR
-        out_wr <- wildlift_breeding(s_wr,
-            tmax = input$tmax,
-            pop.start = input$popstart,
-            f.surv.trans = input$breeding_ftrans,
-            j.surv.trans = input$breeding_jtrans,
-            j.surv.red = input$breeding_jsred,
-            in.inds = nn,
-            out.prop = op,
-            breed.early = input$breeding_breedearly)
-        out$population$Nwild_WR <- out_wr$population$Nwild
-        out$population$Nrecip_WR <- out_wr$population$Nrecip
-        out$wr <- list(
-            cost_extra = input$breeding_nremove * input$tmax *
-                input$breeding_costwolf / 1000,
-            settings=s_wr,
-            output=out_wr)
-
-        out
     })
     ## plot
     output$breeding_Plot <- renderPlotly({
@@ -1702,41 +1633,17 @@ server <- function(input, output, session) {
             add_trace(y = ~Nwild, name = 'Status quo', data = dF,
                     mode = 'lines', color=I('black'),
                     text = hover(t(bb$Nwild))) %>%
-            layout(legend = list(x = 100, y = 0)) %>%
-            config(displayModeBar = 'hover', displaylogo = FALSE)
-        if ("fac" %in% input$breeding_plot_show)
-            p <- p %>% add_trace(y = ~Ncapt, name = 'Inside facility', data = dF,
+            add_trace(y = ~Ncapt, name = 'Inside facility', data = dF,
                     mode = 'lines', color=I('purple'),
                     text = hover(t(bb$Ncapt))) %>%
-                add_trace(y = ~Nout, name = 'Juvenile females out', data = dF,
+            add_trace(y = ~Nout, name = 'Juvenile females out', data = dF,
                     mode = 'lines', color=I('orange'),
                     text = hover(t(bb$Nout))) %>%
-                add_trace(y = ~Nin, name = 'Adult females in', data = dF,
+            add_trace(y = ~Nin, name = 'Adult females in', data = dF,
                     line=list(color='green'),
-                    text = hover(t(bb$Nin)))
-        if ("mr" %in% input$breeding_plot_show)
-            p <- p %>% add_trace(y = ~Nrecip_MR, name = 'Recipient MR', data = dF,
-                    mode = 'lines', type='scatter',
-                    text = hover(t(bb$mr$output$Nrecip)),
-                    hoverinfo = 'text',
-                    color=I('red'), line=list(dash='dash')) %>%
-                add_trace(y = ~Nwild_MR, name = 'Status quo MR', data = dF,
-                    mode = 'lines', type='scatter',
-                    text = hover(t(bb$mr$output$Nwild)),
-                    hoverinfo = 'text',
-                    color=I('blue'), line=list(dash='dash'))
-        if ("wr" %in% input$breeding_plot_show)
-            p <- p %>% add_trace(y = ~Nrecip_WR, name = 'Recipient WR', data = dF,
-                    mode = 'lines', type='scatter',
-                    text = hover(t(bb$wr$output$Nrecip)),
-                    hoverinfo = 'text',
-                    color=I('red'), line=list(dash='dot')) %>%
-                add_trace(y = ~Nwild_WR, name = 'Status quo WR', data = dF,
-                    mode = 'lines', type='scatter',
-                    text = hover(t(bb$wr$output$Nwild)),
-                    hoverinfo = 'text',
-                    color=I('blue'), line=list(dash='dot'))
-
+                    text = hover(t(bb$Nin))) %>%
+            layout(legend = list(x = 100, y = 0)) %>%
+            config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
     ## making nice table of the settings
@@ -1759,11 +1666,8 @@ server <- function(input, output, session) {
             "tmax" = "T max",
             "pop.start" = "N start",
             "c.surv.wild" = "Calf survival, wild",
-            "c.surv.wild.wr" = "Calf survival, wild with wolf reduction",
             "c.surv.capt" = "Calf survival in facility",
             "f.surv.wild" = "Adult female survival, wild",
-            "f.surv.wild.wr" = "Adult female survival, wild with wolf reduction",
-            "f.surv.wild.mr" = "Adult female survival, wild with moose reduction",
             "f.surv.capt" = "Adult female survival in facility",
             "f.preg.wild" = "Fecundity, wild",
             "f.preg.capt" = "Fecundity in facility",
@@ -1797,34 +1701,22 @@ server <- function(input, output, session) {
             zz$settings$pen.cost.capt +
             zz$settings$pen.cost.pred
         cost <- (cost1 + zz$tmax * cost2) / 1000
-        costWR <- cost + zz$wr$cost_extra
         #print(c(cost1/1000, cost2/1000, cost))
 
-        Pick <- c(Ncapt="In facility", Nrecip="Recipient", Nwild="Status quo",
-                  Nrecip_MR="Recipient MR", Nwild_MR="Status quo MR",
-                  Nrecip_WR="Recipient WR", Nwild_WR="Status quo WR")
+        Pick <- c(Ncapt="In facility", Nrecip="Recipient", Nwild="Status quo")
         dF <- summary(zz)[,names(Pick)]
         colnames(dF) <- Pick
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
         Nnew <- Ntmax[1,"Recipient"] - Ntmax[1,"Status quo"]
-        NnewMR <- Ntmax[1,"Recipient MR"] - Ntmax[1,"Status quo MR"]
-        NnewWR <- Ntmax[1,"Recipient WR"] - Ntmax[1,"Status quo WR"]
         df <- rbind(
             '&lambda;'=round(Ntmax/Ntmax1, 3),
             'N (end)'=Ntmax,
-            'N (new)'=c(NA, max(0,Nnew),NA, max(0,NnewMR),NA, max(0,NnewWR),NA),
-            "Total cost (x $million)"=c(NA, cost, NA, cost, NA, costWR, NA),
+            'N (new)'=c(NA, max(0,Nnew),NA),
+            "Total cost (x $million)"=c(NA, cost, NA),
             "Cost per new individual (x $million)"=c(NA,
-                ifelse(Nnew>0,cost/Nnew, NA), NA,
-                ifelse(NnewMR>0,cost/NnewMR, NA), NA,
-                ifelse(NnewWR>0,costWR/NnewWR, NA), NA))
-        if (!("mr" %in% input$breeding_plot_show))
-            df <- df[,!(colnames(df) %in% c("Recipient MR", "Status quo MR"))]
-        if (!("wr" %in% input$breeding_plot_show))
-            df <- df[,!(colnames(df) %in% c("Recipient WR", "Status quo WR"))]
-
+                ifelse(Nnew>0,cost/Nnew, NA), NA))
         df
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
@@ -1843,9 +1735,7 @@ server <- function(input, output, session) {
                 c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(dF),
-            AgeClasses=stack_breeding(bb),
-            AgeClasses_MR=stack_breeding(bb$mr$output),
-            AgeClasses_WR=stack_breeding(bb$wr$output))
+            AgeClasses=stack_breeding(bb))
         out$Settings$Parameters <- rownames(ss)
         out$Settings <- out$Settings[,c(ncol(ss)+1, 1:ncol(ss))]
         out
@@ -1879,9 +1769,9 @@ server <- function(input, output, session) {
         )
     })
     output$breeding1_demogr_sliders <- renderUI({
-        req(input$breeding1_herd)
-        if (input$breeding1_herd != "AverageSubpop")
-            return(p("Demography settings not available for specific subpopulations."))
+#        req(input$breeding1_herd)
+#        if (input$breeding1_herd != "AverageSubpop")
+#            return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("breeding1_DemCsc", "Calf survival in facility",
                 min = 0, max = 1,
@@ -1920,24 +1810,24 @@ server <- function(input, output, session) {
         )
     })
     ## dynamically render subpopulation selector
-    output$breeding1_herd <- renderUI({
-        tagList(
-            selectInput(
-                "breeding1_herd", "Subpopulation",
-                c("Average subpopulation"="AverageSubpop", Herds)
-            )
-        )
-    })
+#    output$breeding1_herd <- renderUI({
+#        tagList(
+#            selectInput(
+#                "breeding1_herd", "Subpopulation",
+#                c("Average subpopulation"="AverageSubpop", Herds)
+#            )
+#        )
+#    })
     ## observers
-    observeEvent(input$breeding1_herd, {
-        values$breeding1 <- c(
-            f.surv.wild.mr = values$breeding1$f.surv.wild.mr,
-            c.surv.wild.wr = values$breeding1$c.surv.wild.wr,
-            f.surv.wild.wr = values$breeding1$f.surv.wild.wr,
-            wildlift_settings("cons.breed",
-                herd = if (input$breeding1_herd == "AverageSubpop")
-                    NULL else input$breeding1_herd))
-    })
+#    observeEvent(input$breeding1_herd, {
+#        values$breeding1 <- c(
+#            f.surv.wild.mr = values$breeding1$f.surv.wild.mr,
+#            c.surv.wild.wr = values$breeding1$c.surv.wild.wr,
+#            f.surv.wild.wr = values$breeding1$f.surv.wild.wr,
+#            wildlift_settings("cons.breed",
+#                herd = if (input$breeding1_herd == "AverageSubpop")
+#                    NULL else input$breeding1_herd))
+#    })
     ## plain
     observeEvent(input$breeding1_DemCsw, {
         values$breeding1$c.surv.wild <- input$breeding1_DemCsw
@@ -1981,7 +1871,7 @@ server <- function(input, output, session) {
     })
     ## breeding reduction without penning
     breeding1_getF <- reactive({
-        req(input$breeding1_herd, input$breeding1_DemFsw_MR)
+        req(input$breeding1_DemFsw_MR)
         if (is.null(input$breeding1_breedearly))
             return(NULL)
         req(input$breeding1_yrs, input$breeding1_ininds,
@@ -2190,7 +2080,7 @@ server <- function(input, output, session) {
         out <- list(
             Info=data.frame(WildLift=paste0(
                 c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding1_herd))),
+                c(ver, format(Sys.time(), "%Y-%m-%d"), "AverageSubpop"))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(dF),
             AgeClasses=stack_breeding(bb),

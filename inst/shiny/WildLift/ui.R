@@ -501,8 +501,7 @@ dashboardPage(
       tabItem("breeding",
         fluidRow(
           column(width=12,
-            h2("Conservation Breeding and Predator/Prey Management"),
-            HTML("<br/><p><strong>Limitations</strong> &mdash; Results using multiple levers are extrapolated based on knowledge from locations where single levers were studied. Some combinations of these levers might not have documented examples and need to be treated with caution.</p><p>CB = Conservation Breeding; MR = Moose Reduction; WR = Wolf Reduction</p><br/>"),
+            h2("Conservation Breeding"),
             box(
               width = NULL, status = "success", solidHeader = TRUE,
               collapsible = FALSE, collapsed = FALSE,
@@ -510,13 +509,7 @@ dashboardPage(
               plotlyOutput("breeding_Plot", width = "100%", height = 400),
               bsTooltip("breeding_Plot",
                 "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
-                placement="bottom"),
-              checkboxGroupInput("breeding_plot_show", NULL,
-                  choices=list(
-                    "CB + MR"="mr",
-                    "CB + WR"="wr",
-                    "Facility in/out"="fac"
-                  ), selected=c("mr", "wr"), inline=TRUE)
+                placement="bottom")
             ),
             box(
               width = NULL, status = "success", solidHeader = TRUE,
@@ -579,16 +572,7 @@ dashboardPage(
               sliderInput("breeding_CostMaint", "Maintenance",
                 min = 0, max = 1000, value = inits$breeding$pen.cost.maint, step = 10),
               sliderInput("breeding_CostCapt", "Capture/monitor",
-                min = 0, max = 500, value = inits$breeding$pen.cost.capt, step = 10),
-              hr(),
-              p("Wolf reduction"),
-              sliderInput("breeding_costwolf", "Cost per wolf to be removed",
-                min = 0, max = 10, value = 5.1, step = 0.1),
-              sliderInput("breeding_nremove", "Number of wolves to be removed per year",
-                min = 0, max = 200, value = 105, step = 1),
-              bsTooltip("breeding_nremove",
-                "The number of wolves is used to calculate cost, but does not influence demographic response given the assumption that wolf reduction results in 2 wolves / 1000 km<sup>2</sup>. Please make sure to add the annual number of wolves to be removed to achieve a maximum wolf density of 2 wolves / 1000 km<sup>2</sup> within the subpopulation range.",
-                placement="bottom")
+                min = 0, max = 500, value = inits$breeding$pen.cost.capt, step = 10)
             )
         )
       ),
