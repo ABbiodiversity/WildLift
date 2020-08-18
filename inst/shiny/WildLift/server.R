@@ -393,7 +393,9 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "penning_herd", "Subpopulation",
-                c("Default (East Side Athabasca)"="EastSideAthabasca", Herds[-1], HerdsWolf)
+                c("Default (East Side Athabasca)"="EastSideAthabasca",
+                  "Average subpopulation"="AverageSubpop",
+                  Herds[-1], HerdsWolf)
             )
         )
     })
@@ -711,7 +713,9 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "predator_herd", "Subpopulation",
-                c("Default (East Side Athabasca)"="EastSideAthabasca", Herds[-1])
+                c("Default (East Side Athabasca)"="EastSideAthabasca",
+                  "Average subpopulation"="AverageSubpop",
+                  Herds[-1])
             )
         )
     })
@@ -1020,7 +1024,9 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "moose_herd", "Subpopulation",
-                c("Default (East Side Athabasca)"="EastSideAthabasca", Herds[-1])
+                c("Default (East Side Athabasca)"="EastSideAthabasca",
+                  "Average subpopulation"="AverageSubpop",
+                  Herds[-1])
             )
         )
     })
@@ -1198,7 +1204,8 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "wolf_herd", "Subpopulation",
-                c("Default (Kennedy Siding)"="KennedySiding", HerdsWolf[-1])
+                c("Average subpopulation"="AverageSubpop",
+                  HerdsWolf)
             )
         )
     })
@@ -1559,7 +1566,9 @@ server <- function(input, output, session) {
         tagList(
             selectInput(
                 "breeding_herd", "Subpopulation",
-                c("Default (East Side Athabasca)"="EastSideAthabasca", Herds[-1])
+                c("Default (East Side Athabasca)"="EastSideAthabasca",
+                  "Average subpopulation"="AverageSubpop",
+                  Herds[-1])
             )
         )
     })
