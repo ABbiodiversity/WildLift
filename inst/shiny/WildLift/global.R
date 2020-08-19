@@ -56,6 +56,11 @@ inits <- list(
         f.surv.wild.mr = 0.879,
         c.surv.wild.wr = 0.513,
         f.surv.wild.wr = 0.912,
+        ## this boost for captive comes from females spending some of their life
+        ## outside of the pen, thus receiving the boost
+        ## boost is on top of the normal surv rate (MP+WR only)
+        c.surv.wild.mpwr.boost = 0.085,
+        f.surv.wild.mpwr.boost = 0.035,
         c.surv.capt.pe = S_PE$c.surv.capt,
         f.surv.capt.pe = S_PE$f.surv.capt,
         f.preg.capt.pe = S_PE$f.preg.capt,
@@ -265,7 +270,6 @@ plot_multilever <- function(ML, type=c("all", "dem", "man", "fac")) {
     PL$lty <- as.integer(PL$Manage)
 
     p <- ggplot(PL, aes(x=Years, y=N)) +
-#        geom_line(aes(color=Col, linetype=Manage)) +
         geom_line(aes(color=Comb)) +
         theme_minimal() +
         geom_hline(yintercept=POP_START, col="grey") +

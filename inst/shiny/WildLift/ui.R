@@ -60,12 +60,6 @@ dashboardPage(
             h2("Demographic Augmentation and Predator/Prey Management"),
             HTML("<br/><p><strong>Limitations</strong> &mdash; Results using multiple levers are extrapolated based on knowledge from locations where single levers were studied. Some combinations of these levers might not have documented examples and need to be treated with caution.</p><p>MP = Maternity Penning; PE = Predator Exclosure; MR = Moose Reduction; WR = Wolf Reduction</p><p><strong>Check number of wolfs to be removed!</strong></p><br/>"),
           ),
-#          column(width=4,
-#            uiOutput("multi1_herd"),
-#            bsTooltip("multi1_herd",
-#              "Select a subpopulation for subpopulation specific demography parameters.",
-#              placement="top")
-#          ),
           column(width=6,
             uiOutput("multi1_perc_or_inds")
           ),
@@ -133,7 +127,13 @@ dashboardPage(
                   value = inits$multi1$c.surv.wild.wr, step = 0.001),
               sliderInput("multi1_DemFsw_WR", "Adult female survival, WR",
                   min = 0, max = 1,
-                  value = inits$multi1$f.surv.wild.wr, step = 0.001)
+                  value = inits$multi1$f.surv.wild.wr, step = 0.001),
+              sliderInput("multi1_DemCsw_MPWRboost", "Calf survival boost, MP + WR",
+                  min = 0, max = 1,
+                  value = inits$multi1$c.surv.wild.mpwr.boost, step = 0.001),
+              sliderInput("multi1_DemFsw_MPWRboost", "Adult female survival boost, MP + WR",
+                  min = 0, max = 1,
+                  value = inits$multi1$f.surv.wild.mpwr.boost, step = 0.001)
             )
           )
         ),

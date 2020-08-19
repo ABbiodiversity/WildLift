@@ -58,15 +58,6 @@ server <- function(input, output, session) {
                 step = 0.001)
         )
     })
-    ## dynamically render subpopulation selector
-#    output$multi1_herd <- renderUI({
-#        tagList(
-#            selectInput(
-#                "multi1_herd", "Subpopulation",
-#                c("Average subpopulation"="AverageSubpop")
-#            )
-#        )
-#    })
     ## dynamically render perc or inds slider
     output$multi1_perc_or_inds <- renderUI({
         if (values$use_perc) {
@@ -87,27 +78,6 @@ server <- function(input, output, session) {
             )
         }
     })
-    ## observers
-    # observeEvent(input$multi1_herd, {
-    #     values$multi1 <- c(
-    #         fpen.prop = values$multi1$fpen.prop,
-    #         fpen.inds = values$multi1$fpen.inds,
-    #         f.surv.wild.mr = values$multi1$f.surv.wild.mr,
-    #         c.surv.wild.wr = values$multi1$c.surv.wild.wr,
-    #         f.surv.wild.wr = values$multi1$f.surv.wild.wr,
-    #         c.surv.capt.pe = wildlift_settings("pred.excl",
-    #             herd = input$multi1_herd)$c.surv.capt,
-    #         f.surv.capt.pe = wildlift_settings("pred.excl",
-    #             herd = input$multi1_herd)$f.surv.capt,
-    #         f.preg.capt.pe = wildlift_settings("pred.excl",
-    #             herd = input$multi1_herd)$f.preg.capt,
-    #         pen.cost.setup.pe = values$multi1$pen.cost.setup.pe,
-    #         pen.cost.proj.pe = values$multi1$pen.cost.proj.pe,
-    #         pen.cost.maint.pe = values$multi1$pen.cost.maint.pe,
-    #         pen.cost.capt.pe = values$multi1$pen.cost.capt.pe,
-    #         pen.cost.pred.pe = values$multi1$pen.cost.pred.pe,
-    #         wildlift_settings("mat.pen", herd = input$multi1_herd))
-    # })
     observeEvent(input$multi1_Fpen, {
         if (values$use_perc) {
             values$multi1$fpen.prop <- input$multi1_Fpen / 100
@@ -124,6 +94,12 @@ server <- function(input, output, session) {
     })
     observeEvent(input$multi1_DemFsw_WR, {
         values$multi1$f.surv.wild.wr <- input$multi1_DemFsw_WR
+    })
+    observeEvent(input$multi1_DemCsw_MPWRboost, {
+        values$multi1$c.surv.wild.mpwrboost <- input$multi1_DemCsw_MPWRboost
+    })
+    observeEvent(input$multi1_DemFsw_MPWRboost, {
+        values$multi1$f.surv.wild.mpwrboost <- input$multi1_DemFsw_MPWRboost
     })
     observeEvent(input$multi1_DemCsc_PE, {
         values$multi1$c.surv.capt.pe <- input$multi1_DemCsc_PE
@@ -189,7 +165,6 @@ server <- function(input, output, session) {
         values$multi1$pen.cost.capt.pe <- input$multi1_CostPred_PE
     })
 
-
     ## get multi1 settings
     multi1_settings <- reactive({
         req(input$multi1_DemCsw, input$multi1_DemFsw_MR,
@@ -225,11 +200,14 @@ server <- function(input, output, session) {
                 pen.cost.capt = input$multi1_CostCapt_MP,
                 pen.cost.pred = 0
             ),
+            ## this boost for captive comes from females spending some of their life
+            ## outside of the pen, thus receiving the boost
+            ## boost is on top of the normal surv rate (MP+WR only)
             mp_wr = wildlift_settings("mat.pen", herd=HERD,
                 c.surv.wild = input$multi1_DemCsw_WR,
-                c.surv.capt = input$multi1_DemCsc,
+                c.surv.capt = input$multi1_DemCsc + input$multi1_DemCsw_MPWRboost,
                 f.surv.wild = input$multi1_DemFsw_WR,
-                f.surv.capt = input$multi1_DemFsc,
+                f.surv.capt = input$multi1_DemFsc + input$multi1_DemFsw_MPWRboost,
                 f.preg.wild = input$multi1_DemFpw,
                 f.preg.capt = input$multi1_DemFpc,
                 pen.cap = input$multi1_CostPencap_MP,
@@ -531,11 +509,11 @@ server <- function(input, output, session) {
     ## making nice table of the results
     penning_getT <- reactive({
         req(penning_getF())
+        cat("Max # adult in pen:",
+            round(max(penning_getF()$Npop$tot.adult.in.pen), 1), "\n")
         bev <- if (is.null(penning_getB()))
-            #NA else unlist(summary(penning_getB()))
             NA else get_summary(penning_getB(), values$use_perc)
         tab <- cbind(
-            #Results=unlist(summary(penning_getF())),
             Results=get_summary(penning_getF(), values$use_perc),
             Breakeven=bev)
         subs <- c("fpen", "npens", "lam.pen", "lam.nopen",
