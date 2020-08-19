@@ -75,7 +75,8 @@ herd=NULL) {
     if (pen.type == "wolf.red") {
         Herd <- if (is.null(herd))
             "KennedySiding" else as.character(herd)
-        Herd <- match.arg(Herd, c("KennedySiding", "KlinsezaMoberly", "Quintette"))
+        Herd <- match.arg(Herd, c("KennedySiding", "KlinsezaMoberly",
+                                  "Quintette", "AverageSubpop"))
     } else {
         Herd <- if (is.null(herd))
             "EastSideAthabasca" else as.character(herd)
