@@ -204,7 +204,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, lambdaw=1)
             s.c.pop.pen= surv.c1,
             s.c.pop.nopen=surv.c2,
             s.f.pop.pen = surv.f1,
-            s.f.pop.nopen = surv.f2)
+            s.f.pop.nopen = surv.f2,
+            tot.adult.in.pen=tot.adult.in.pen)
         # store the data for all t
         if (i==1) {
             Npop <- Nt
@@ -230,7 +231,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, lambdaw=1)
         s.c.pop.pen= surv.c1,
         s.c.pop.nopen = surv.c2,
         s.f.pop.pen = surv.f1,
-        s.f.pop.nopen=surv.f2)
+        s.f.pop.nopen=surv.f2,
+        tot.adult.in.pen=0)
     # add year 0 data to projection data
     Npop <- rbind(Npop.r1, Npop)
     # summaries
