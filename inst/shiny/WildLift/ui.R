@@ -103,7 +103,7 @@ dashboardPage(
             box(
               width = 4, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Demography wild",
+              title = "Demography status quo",
               uiOutput("multi1_demogr_wild")
             ),
             box(
@@ -128,12 +128,13 @@ dashboardPage(
               sliderInput("multi1_DemFsw_WR", "Adult female survival, WR",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.wild.wr, step = 0.001),
-              sliderInput("multi1_DemCsw_MPWRboost", "Calf survival boost, MP + WR",
+              sliderInput("multi1_DemCsc_MPWRboost", "Calf survival boost, MP + WR",
                   min = 0, max = 1,
-                  value = inits$multi1$c.surv.wild.mpwr.boost, step = 0.001),
-              sliderInput("multi1_DemFsw_MPWRboost", "Adult female survival boost, MP + WR",
+                  value = inits$multi1$c.surv.capt.mpwr.boost, step = 0.001),
+              sliderInput("multi1_DemFsc_MPWRboost", "Adult female survival boost, MP + WR",
                   min = 0, max = 1,
-                  value = inits$multi1$f.surv.wild.mpwr.boost, step = 0.001)
+                  value = inits$multi1$f.surv.capt.mpwr.boost, step = 0.001),
+              p("The 'boost' is a constant added to calf and adult female survival under MP due to females spending some of their life outside of the pen.")
             )
           )
         ),
@@ -213,7 +214,7 @@ dashboardPage(
               tableOutput("penning_Table"),
               downloadButton("penning_download", "Download results as Excel file"),
               bsTooltip("penning_Table",
-                "Table summarizing reports. Click below to download the full summary.",
+                "Table summarizing reports (NA for breakeven point indicates that a breakeven point cannot be found that satisfies tha lambda=1 criterion). Click below to download the full summary.",
                 placement="right"),
               bsTooltip("penning_download",
                 "Click here to download results.",
@@ -281,7 +282,7 @@ dashboardPage(
               tableOutput("predator_Table"),
               downloadButton("predator_download", "Download results as Excel file"),
               bsTooltip("predator_Table",
-                "Table summarizing reports. Click below to download the full summary.",
+                "Table summarizing reports (NA for breakeven point indicates that a breakeven point cannot be found that satisfies tha lambda=1 criterion). Click below to download the full summary.",
                 placement="right"),
               bsTooltip("predator_download",
                 "Click here to download results.",

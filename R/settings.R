@@ -84,7 +84,7 @@ herd=NULL) {
     df1 <- df[df$PenType==pen.type & df$PopID == Herd,]
     if (nrow(df1) < 1)
         stop(sprintf("%s recovery action is not avilable for %s", pen.type, Herd))
-    if (pen.type %in% c("mat.pen", "pred.excl", "cons.breed")) {
+    out <- if (pen.type %in% c("mat.pen", "pred.excl", "cons.breed")) {
         list(
             c.surv.wild = df1$Scw,
             c.surv.capt = df1$Scm,
@@ -103,6 +103,8 @@ herd=NULL) {
             f.preg.capt =df1$Fw
         )
     }
+    attr(out, "herd") <- Herd
+    out
 }
 
 
@@ -313,10 +315,13 @@ herd=NULL,
     if (inherits(pen.type, "wildlift_settings")) {
         parms <- pen.type
     } else {
-        parms <- c(.get_demography(pen.type, herd), .get_cost(pen.type))
+        ds <- .get_demography(pen.type, herd)
+        Herd <- attr(ds, "herd")
+        attr(ds, "herd") <- NULL
+        parms <- c(ds, .get_cost(pen.type))
         attr(parms, "pen.type") <- pen.type
         if (!is.null(herd))
-            attr(parms, "herd") <- herd
+            attr(parms, "herd") <- Herd
         class(parms) <- "wildlift_settings"
     }
     dots <- list(...)

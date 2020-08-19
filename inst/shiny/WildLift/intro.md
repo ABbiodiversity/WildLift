@@ -31,6 +31,6 @@ associated with seven alternative recovery actions:
 
 ## Multiple levers
 
-Multiple recovery actions are compared allowing to combine
+Multiple recovery actions are compared allowing users to combine 
 demographic augmentation (maternal penning, predator exclosure, 
-and conservation breeding) and predator/prey management.
+and conservation breeding) with predator and primary prey reductions.

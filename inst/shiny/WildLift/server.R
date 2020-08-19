@@ -95,11 +95,11 @@ server <- function(input, output, session) {
     observeEvent(input$multi1_DemFsw_WR, {
         values$multi1$f.surv.wild.wr <- input$multi1_DemFsw_WR
     })
-    observeEvent(input$multi1_DemCsw_MPWRboost, {
-        values$multi1$c.surv.wild.mpwrboost <- input$multi1_DemCsw_MPWRboost
+    observeEvent(input$multi1_DemCsc_MPWRboost, {
+        values$multi1$c.surv.capt.mpwrboost <- input$multi1_DemCsc_MPWRboost
     })
-    observeEvent(input$multi1_DemFsw_MPWRboost, {
-        values$multi1$f.surv.wild.mpwrboost <- input$multi1_DemFsw_MPWRboost
+    observeEvent(input$multi1_DemFsc_MPWRboost, {
+        values$multi1$f.surv.capt.mpwrboost <- input$multi1_DemFsc_MPWRboost
     })
     observeEvent(input$multi1_DemCsc_PE, {
         values$multi1$c.surv.capt.pe <- input$multi1_DemCsc_PE
@@ -205,9 +205,9 @@ server <- function(input, output, session) {
             ## boost is on top of the normal surv rate (MP+WR only)
             mp_wr = wildlift_settings("mat.pen", herd=HERD,
                 c.surv.wild = input$multi1_DemCsw_WR,
-                c.surv.capt = input$multi1_DemCsc + input$multi1_DemCsw_MPWRboost,
+                c.surv.capt = input$multi1_DemCsc + input$multi1_DemCsc_MPWRboost,
                 f.surv.wild = input$multi1_DemFsw_WR,
-                f.surv.capt = input$multi1_DemFsc + input$multi1_DemFsw_MPWRboost,
+                f.surv.capt = input$multi1_DemFsc + input$multi1_DemFsc_MPWRboost,
                 f.preg.wild = input$multi1_DemFpw,
                 f.preg.capt = input$multi1_DemFpc,
                 pen.cap = input$multi1_CostPencap_MP,
@@ -403,7 +403,7 @@ server <- function(input, output, session) {
             fpen.prop = values$penning$fpen.prop,
             fpen.inds = values$penning$fpen.inds,
             wildlift_settings("mat.pen",
-                herd = if (input$penning_herd == "AverageSubpop")
+                herd = if (input$penning_herd == "EastSideAthabasca")
                     NULL else input$penning_herd))
         if (values$penning_compare) {
             values$penning0 <- values$penning
@@ -511,6 +511,7 @@ server <- function(input, output, session) {
         req(penning_getF())
         cat("Max # adult in pen:",
             round(max(penning_getF()$Npop$tot.adult.in.pen), 1), "\n")
+        str(penning_getF()$settings)
         bev <- if (is.null(penning_getB()))
             NA else get_summary(penning_getB(), values$use_perc)
         tab <- cbind(
@@ -658,7 +659,7 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$predator_demogr_sliders <- renderUI({
-        if (input$predator_herd != "AverageSubpop")
+        if (input$predator_herd != "EastSideAthabasca")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
              sliderInput("predator_DemCsw", "Calf survival, wild",
@@ -723,7 +724,7 @@ server <- function(input, output, session) {
             fpen.prop = values$predator$fpen.prop,
             fpen.inds = values$predator$fpen.inds,
             wildlift_settings("pred.excl",
-                herd = if (input$predator_herd == "AverageSubpop") NULL else input$predator_herd))
+                herd = if (input$predator_herd == "EastSideAthabasca") NULL else input$predator_herd))
         if (values$predator_compare) {
             values$predator0 <- values$predator
         } else {
@@ -980,21 +981,21 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$moose_demogr_sliders <- renderUI({
-        if (input$moose_herd != "AverageSubpop")
+        if (input$moose_herd != "EastSideAthabasca")
             return(p("Demography settings not available for specific subpopulations."
                      ))
         tagList(
             sliderInput("moose_DemCsw", "Calf survival, moose reduction",
                 min = 0, max = 1, value = inits$moose$c.surv.wild, step = 0.001),
-            sliderInput("moose_DemCsc", "Calf survival, no moose reduction",
+            sliderInput("moose_DemCsc", "Calf survival, status quo",
                 min = 0, max = 1, value = inits$moose0$c.surv.wild, step = 0.001),
             sliderInput("moose_DemFsw", "Adult female survival, moose reduction",
                 min = 0, max = 1, value = inits$moose$f.surv.wild, step = 0.001),
-            sliderInput("moose_DemFsc", "Adult female survival, no moose reduction",
+            sliderInput("moose_DemFsc", "Adult female survival, status quo",
                 min = 0, max = 1, value = inits$moose0$f.surv.wild, step = 0.001),
             sliderInput("moose_DemFpw", "Fecundity, moose reduction",
                 min = 0, max = 1, value = inits$moose$f.preg.wild, step = 0.001),
-            sliderInput("moose_DemFpc", "Fecundity, no moose reduction",
+            sliderInput("moose_DemFpc", "Fecundity, status quo",
                 min = 0, max = 1, value = inits$moose0$f.preg.wild, step = 0.001)
         )
     })    ## dynamically render subpopulation selector
@@ -1014,13 +1015,13 @@ server <- function(input, output, session) {
             fpen.prop = 0.35,
             fpen.inds = 10,
             wildlift_settings("moose.red",
-                herd = if (input$moose_herd == "AverageSubpop")
+                herd = if (input$moose_herd == "EastSideAthabasca")
                     NULL else input$moose_herd))
         values$moose0 <- c(
             fpen.prop = 0.35,
             fpen.inds = 10,
             wildlift_settings("mat.pen",
-                herd = if (input$moose_herd == "AverageSubpop")
+                herd = if (input$moose_herd == "EastSideAthabasca")
                     NULL else input$moose_herd))
     })
     observeEvent(input$moose_DemCsw, {
@@ -1073,7 +1074,7 @@ server <- function(input, output, session) {
                           "Cost per new individual (x $million)")
         colnames(df) <- c(
             "Status quo",
-            "Moose reduction, no pen")
+            "Moose reduction")
         df
     })
 
@@ -1093,7 +1094,7 @@ server <- function(input, output, session) {
         df <- tab[names(SNAM),,drop=FALSE]
         rownames(df) <- SNAM
         colnames(df) <- c(
-            "Moose reduction, no pen",
+            "Moose reduction",
             "Status quo")
         df
     })
@@ -1127,7 +1128,7 @@ server <- function(input, output, session) {
             plot(moose_getF0(), plot=FALSE)[,c("Years", "Npen")],
             plot(moose_getB0(), plot=FALSE)[,"Npen"])
         colnames(TS) <- c("Years",
-            "N moose reduction, no pen",
+            "N moose reduction",
             "N status quo")
         df <- moose_getT()
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
@@ -1160,7 +1161,7 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$wolf_demogr_sliders <- renderUI({
-        if (input$wolf_herd != "AverageSubpop")
+        if (input$wolf_herd != "EastSideAthabasca")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("wolf_DemCsw", "Calf survival, wolf reduction",
@@ -1190,12 +1191,10 @@ server <- function(input, output, session) {
     ## observers
     observeEvent(input$wolf_herd, {
         values$wolf <- wildlift_settings("wolf.red",
-                herd = if (input$wolf_herd == "AverageSubpop")
-                    NULL else input$wolf_herd)
+                herd = input$wolf_herd)
         ## set AFS=0.801 CS=0.295 under no wolf option
         values$wolf0 <- wildlift_settings("mat.pen",
-                herd = if (input$wolf_herd == "AverageSubpop")
-                    NULL else input$wolf_herd,
+                herd = input$wolf_herd,
                 f.surv.capt=0.801,
                 f.surv.wild=0.801,
                 c.surv.capt=0.295,
