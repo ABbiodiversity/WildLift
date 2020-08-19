@@ -33,7 +33,4 @@ associated with seven alternative recovery actions:
 
 Multiple recovery actions are compared allowing to combine
 demographic augmentation (maternal penning, predator exclosure, 
-and conservation breeding) and predator/prey reduction and habitat management.
-
-Conservation breeding is the 3rd type of demographic augmentation
-that can also be combined with predator/prey reduction and habitat management.
+and conservation breeding) and predator/prey management.
