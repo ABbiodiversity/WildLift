@@ -105,6 +105,7 @@ herd=NULL) {
         )
     }
     attr(out, "herd") <- Herd
+    attr(out, "pen.type") <- pen.type
     out
 }
 
@@ -318,9 +319,11 @@ herd=NULL,
     } else {
         ds <- .get_demography(pen.type, herd)
         Herd <- attr(ds, "herd")
+        Pt <- attr(ds, "pen.type")
         attr(ds, "herd") <- NULL
+        attr(ds, "pen.type") <- NULL
         parms <- c(ds, .get_cost(pen.type))
-        attr(parms, "pen.type") <- pen.type
+        attr(parms, "pen.type") <- Pt
         if (!is.null(herd))
             attr(parms, "herd") <- Herd
         class(parms) <- "wildlift_settings"
