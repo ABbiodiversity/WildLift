@@ -410,7 +410,13 @@ server <- function(input, output, session) {
             fpen.inds = values$penning$fpen.inds,
             wildlift_settings("mat.pen",
                 herd = if (input$penning_herd == "EastSideAthabasca")
-                    NULL else input$penning_herd))
+                    NULL else input$penning_herd,
+            pen.cap = input$penning_CostPencap,
+            pen.cost.setup = input$penning_CostSetup,
+            pen.cost.proj = input$penning_CostProj,
+            pen.cost.maint = input$penning_CostMaint,
+            pen.cost.capt = input$penning_CostCapt,
+            pen.cost.pred = 0))
         if (values$penning_compare) {
             values$penning0 <- values$penning
         } else {
@@ -515,9 +521,6 @@ server <- function(input, output, session) {
     ## making nice table of the results
     penning_getT <- reactive({
         req(penning_getF())
-        cat("Max # adult in pen:",
-            round(max(penning_getF()$Npop$tot.adult.in.pen), 1), "\n")
-        str(penning_getF()$settings)
         bev <- if (is.null(penning_getB()))
             NA else get_summary(penning_getB(), values$use_perc)
         tab <- cbind(
@@ -598,6 +601,11 @@ server <- function(input, output, session) {
     ## plot
     output$penning_Plot <- renderPlotly({
         req(penning_getF())
+
+        cat("Max # adult in pen:",
+            round(max(penning_getF()$Npop$tot.adult.in.pen), 1), "\n")
+        print(predator_getF()$Npop[,c("N.pen","N.nopen","pens.needed","tot.adult.in.pen")])
+
         df <- plot(penning_getF(), plot=FALSE)
         colnames(df)[colnames(df) == "Npen"] <- "Individuals"
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
@@ -730,7 +738,14 @@ server <- function(input, output, session) {
             fpen.prop = values$predator$fpen.prop,
             fpen.inds = values$predator$fpen.inds,
             wildlift_settings("pred.excl",
-                herd = if (input$predator_herd == "EastSideAthabasca") NULL else input$predator_herd))
+                herd = if (input$predator_herd == "EastSideAthabasca")
+                    NULL else input$predator_herd,
+            pen.cap = input$predator_CostPencap,
+            pen.cost.setup = input$predator_CostSetup,
+            pen.cost.proj = input$predator_CostProj,
+            pen.cost.maint = input$predator_CostMaint,
+            pen.cost.capt = input$predator_CostCapt,
+            pen.cost.pred = input$predator_CostPred))
         if (values$predator_compare) {
             values$predator0 <- values$predator
         } else {
@@ -920,6 +935,11 @@ server <- function(input, output, session) {
     ## plot
     output$predator_Plot <- renderPlotly({
         req(predator_getF())
+
+        cat("Max # adult in pen:",
+            round(max(penning_getF()$Npop$tot.adult.in.pen), 1), "\n")
+        print(predator_getF()$Npop[,c("N.pen","N.nopen","pens.needed","tot.adult.in.pen")])
+
         df <- plot(predator_getF(), plot=FALSE)
         colnames(df)[colnames(df) == "Npen"] <- "Individuals"
         p <- plot_ly(df, x = ~Years, y = ~Individuals,
@@ -1558,8 +1578,14 @@ server <- function(input, output, session) {
     ## observers
     observeEvent(input$breeding_herd, {
         values$breeding <- wildlift_settings("cons.breed",
-                herd = if (input$breeding_herd == "EastSideAthabasca")
-                    NULL else input$breeding_herd)
+            herd = if (input$breeding_herd == "EastSideAthabasca")
+                NULL else input$breeding_herd,
+            pen.cap = input$breeding_CostPencap,
+            pen.cost.setup = input$breeding_CostSetup,
+            pen.cost.proj = input$breeding_CostProj,
+            pen.cost.maint = input$breeding_CostMaint,
+            pen.cost.capt = input$breeding_CostCapt,
+            pen.cost.pred = input$breeding_CostPred)
     })
     ## plain
     observeEvent(input$breeding_DemCsw, {
