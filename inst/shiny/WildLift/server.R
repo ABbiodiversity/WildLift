@@ -101,6 +101,9 @@ server <- function(input, output, session) {
     observeEvent(input$multi1_DemFsc_MPWRboost, {
         values$multi1$f.surv.capt.mpwrboost <- input$multi1_DemFsc_MPWRboost
     })
+    observeEvent(input$multi1_DemFsc_MPMRboost, {
+        values$multi1$f.surv.capt.mpmrboost <- input$multi1_DemFsc_MPMRboost
+    })
     observeEvent(input$multi1_DemCsc_PE, {
         values$multi1$c.surv.capt.pe <- input$multi1_DemCsc_PE
     })
@@ -186,11 +189,14 @@ server <- function(input, output, session) {
                 pen.cost.capt = input$multi1_CostCapt_MP,
                 pen.cost.pred = 0
             ),
+            ## this boost for captive comes from females spending some of their life
+            ## outside of the pen, thus receiving the boost
+            ## boost is on top of the normal surv rate (MP+MR only)
             mp_mr = wildlift_settings("mat.pen", herd=HERD,
                 c.surv.wild = input$multi1_DemCsw,
                 c.surv.capt = input$multi1_DemCsc,
                 f.surv.wild = input$multi1_DemFsw_MR,
-                f.surv.capt = input$multi1_DemFsc,
+                f.surv.capt = input$multi1_DemFsc + input$multi1_DemFsc_MPMRboost,
                 f.preg.wild = input$multi1_DemFpw,
                 f.preg.capt = input$multi1_DemFpc,
                 pen.cap = input$multi1_CostPencap_MP,

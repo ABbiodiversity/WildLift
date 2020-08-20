@@ -101,40 +101,48 @@ dashboardPage(
         fluidRow(
           column(width=12,
             box(
-              width = 4, status = "info", solidHeader = TRUE,
+              width = 3, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
               title = "Demography status quo",
               uiOutput("multi1_demogr_wild")
             ),
             box(
-              width = 4, status = "info", solidHeader = TRUE,
+              width = 3, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
               title = "Demography captive",
               uiOutput("multi1_demogr_captive")
             ),
             box(
-              width = 4, status = "info", solidHeader = TRUE,
+              width = 3, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "MR and WR",
-              #p("Moose reduction"),
+              title = "Moose reduction",
               sliderInput("multi1_DemFsw_MR", "Adult female survival, MR",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.wild.mr, step = 0.001),
               hr(),
-              #p("Wolf reduction"),
+              HTML("<p><strong>Additive effect of MP over MR-only parameters</strong></p><p>Survival boost due to females spending some of their life outside of the pen</p>"),
+              sliderInput("multi1_DemFsc_MPMRboost", "Adult female survival boost, MP + MR captive",
+                  min = 0, max = 1,
+                  value = inits$multi1$f.surv.capt.mpmr.boost, step = 0.001)
+            ),
+            box(
+              width = 3, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Wolf reduction",
               sliderInput("multi1_DemCsw_WR", "Calf survival, WR",
                   min = 0, max = 1,
                   value = inits$multi1$c.surv.wild.wr, step = 0.001),
               sliderInput("multi1_DemFsw_WR", "Adult female survival, WR",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.wild.wr, step = 0.001),
-              sliderInput("multi1_DemCsc_MPWRboost", "Calf survival boost, MP + WR",
+              hr(),
+              HTML("<p><strong>Additive effect of MP over WR-only parameters</strong></p><p>Survival boost due to females spending some of their life outside of the pen</p>"),
+              sliderInput("multi1_DemCsc_MPWRboost", "Calf survival boost, MP + WR captive",
                   min = 0, max = 1,
                   value = inits$multi1$c.surv.capt.mpwr.boost, step = 0.001),
-              sliderInput("multi1_DemFsc_MPWRboost", "Adult female survival boost, MP + WR",
+              sliderInput("multi1_DemFsc_MPWRboost", "Adult female survival boost, MP + WR captive",
                   min = 0, max = 1,
-                  value = inits$multi1$f.surv.capt.mpwr.boost, step = 0.001),
-              p("The 'boost' is a constant added to calf and adult female survival under MP due to females spending some of their life outside of the pen.")
+                  value = inits$multi1$f.surv.capt.mpwr.boost, step = 0.001)
             )
           )
         ),
@@ -479,7 +487,8 @@ dashboardPage(
               title = "Settings",
               selectInput(
                 "seismic_herd", "Subpopulation",
-                c("ESAR"="esar", "WSAR"="wsar", "Cold Lake"="coldlake")
+                c("East Side Athabasca"="esar",
+                  "West Side Athabasca"="wsar", "Cold Lake"="coldlake")
               ),
               bsTooltip("seismic_herd",
                 "Select a subpopulation for subpopulation range specific parameters.",

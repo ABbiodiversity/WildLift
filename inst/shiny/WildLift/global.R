@@ -59,8 +59,9 @@ inits <- list(
         ## this boost for captive comes from females spending some of their life
         ## outside of the pen, thus receiving the boost
         ## boost is on top of the normal surv rate (MP+WR only)
-        c.surv.capt.mpwr.boost = 0.085,
-        f.surv.capt.mpwr.boost = 0.035,
+        c.surv.capt.mpwr.boost = 0.17,
+        f.surv.capt.mpwr.boost = 0.026,
+        f.surv.capt.mpmr.boost = 0.026,
         c.surv.capt.pe = S_PE$c.surv.capt,
         f.surv.capt.pe = S_PE$f.surv.capt,
         f.preg.capt.pe = S_PE$f.preg.capt,
