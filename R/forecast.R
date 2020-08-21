@@ -8,9 +8,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
     out
 }
 
-## lambdaw is the adjustment for linear feature piece
 .wildlift_forecast <-
-function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, lambdaw=1)
+function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, tot_is_af=FALSE)
 {
     if (tmax < 1)
         stop("Argument tmax must be >= 1.")
@@ -91,8 +90,12 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, lambdaw=1)
     # extract stable stage distribution
     Stable.st <- eigen.analysis(A)$stable.stage
     # assign correct # of animals to each age class
-    Nstart <- matrix(pop.start*Stable.st, ncol=1)
-    #Nstart <- matrix(pop.start*Stable.st/Stable.st[4], ncol=1) # 2018-11-04
+    NstartTOT <- matrix(pop.start*Stable.st, ncol=1)
+    # number of females in each class
+    # so that number of adult (class 4 females) is = to pop.start
+    NstartAF <- matrix(pop.start*Stable.st/Stable.st[4], ncol=1) # 2018-11-04
+    Nstart <- if (tot_is_af)
+        NstartAF else NstartTOT
     # starting populations for time loop
     N1 <- N2 <- Nstart
 
