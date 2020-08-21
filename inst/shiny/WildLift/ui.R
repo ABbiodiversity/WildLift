@@ -121,7 +121,7 @@ dashboardPage(
                   value = inits$multi1$f.surv.wild.mr, step = 0.001),
               hr(),
               HTML("<p><strong>Additive effect of MP over MR-only parameters</strong></p><p>Survival boost due to females spending some of their life outside of the pen</p>"),
-              sliderInput("multi1_DemFsc_MPMRboost", "Adult female survival boost, MP + MR captive",
+              sliderInput("multi1_DemFsc_MPMRboost", "Additive effect of MP over MR-only adult female survival, captive",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.capt.mpmr.boost, step = 0.001)
             ),
@@ -136,11 +136,11 @@ dashboardPage(
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.wild.wr, step = 0.001),
               hr(),
-              HTML("<p><strong>Additive effect of MP over WR-only parameters</strong></p><p>Survival boost due to females spending some of their life outside of the pen</p>"),
-              sliderInput("multi1_DemCsc_MPWRboost", "Calf survival boost, MP + WR captive",
+              HTML("<p><strong>Additive effect of MP over WR-only parameters</strong></p>"),
+              sliderInput("multi1_DemCsc_MPWRboost", "Additive effect of MP over WR-only calf survival, captive",
                   min = 0, max = 1,
                   value = inits$multi1$c.surv.capt.mpwr.boost, step = 0.001),
-              sliderInput("multi1_DemFsc_MPWRboost", "Adult female survival boost, MP + WR captive",
+              sliderInput("multi1_DemFsc_MPWRboost", "Additive effect of MP over WR-only adult female survival, captive",
                   min = 0, max = 1,
                   value = inits$multi1$f.surv.capt.mpwr.boost, step = 0.001)
             )
@@ -654,13 +654,34 @@ dashboardPage(
             box(
               width = 4, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Demography",
-              uiOutput("breeding1_demogr_sliders")
+              title = "Demography faility",
+              uiOutput("breeding1_demogr_sliders_fac")
             ),
             box(
-              width = 4, status = "warning", solidHeader = TRUE,
+              width = 4, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Cost (x $1000)",
+              title = "Demography status quo & recipient",
+              uiOutput("breeding1_demogr_sliders_out")
+            )
+        ),
+        fluidRow(
+            box(
+              width = 3, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Moose reduction",
+              uiOutput("breeding1_demogr_sliders_mr")
+            ),
+            box(
+              width = 3, status = "info", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Wolf removal",
+              uiOutput("breeding1_demogr_sliders_wr")
+            ),
+            box(
+              width = 3, status = "warning", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Cost: CB",
+              p("All costs: x $1000"),
               sliderInput("breeding1_CostSetup", "Initial set up",
                 min = 0, max = 20000, value = 100*round(inits$breeding1$pen.cost.setup/100),
                 step = 1000),
@@ -669,9 +690,13 @@ dashboardPage(
               sliderInput("breeding1_CostMaint", "Maintenance",
                 min = 0, max = 1000, value = inits$breeding1$pen.cost.maint, step = 10),
               sliderInput("breeding1_CostCapt", "Capture/monitor",
-                min = 0, max = 500, value = inits$breeding1$pen.cost.capt, step = 10),
-              hr(),
-              p("Wolf reduction"),
+                min = 0, max = 500, value = inits$breeding1$pen.cost.capt, step = 10)
+            ),
+            box(
+              width = 3, status = "warning", solidHeader = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
+              title = "Cost: WR",
+              p("All costs: x $1000"),
               sliderInput("breeding1_costwolf", "Cost per wolf to be removed",
                 min = 0, max = 10, value = 5.1, step = 0.1),
               sliderInput("breeding1_nremove", "Number of wolves to be removed per year",

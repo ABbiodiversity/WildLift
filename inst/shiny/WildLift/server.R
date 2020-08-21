@@ -1786,37 +1786,44 @@ server <- function(input, output, session) {
                 min = 0, max = input$tmax, value = 0, step = 1)
         )
     })
-    output$breeding1_demogr_sliders <- renderUI({
-#        req(input$breeding1_herd)
-#        if (input$breeding1_herd != "AverageSubpop")
-#            return(p("Demography settings not available for specific subpopulations."))
+
+    output$breeding1_demogr_sliders_fac <- renderUI({
         tagList(
             sliderInput("breeding1_DemCsc", "Calf survival in facility",
                 min = 0, max = 1,
                 value = inits$breeding1$c.surv.capt, step = 0.001),
-            sliderInput("breeding1_DemCsw", "Calf survival, recipient & status quo",
-                min = 0, max = 1,
-                value = inits$breeding1$c.surv.wild, step = 0.001),
             sliderInput("breeding1_DemFsc", "Adult female survival in facility",
                 min = 0, max = 1,
                 value = inits$breeding1$f.surv.capt, step = 0.001),
+            sliderInput("breeding1_DemFpc", "Fecundity in facility",
+                min = 0, max = 1,
+                value = inits$breeding1$f.preg.capt, step = 0.001)
+        )
+    })
+    output$breeding1_demogr_sliders_out <- renderUI({
+        tagList(
+            sliderInput("breeding1_DemCsw", "Calf survival, recipient & status quo",
+                min = 0, max = 1,
+                value = inits$breeding1$c.surv.wild, step = 0.001),
             sliderInput("breeding1_DemFsw",
                         "Adult female survival, recipient & status quo",
                 min = 0, max = 1,
                 value = inits$breeding1$f.surv.wild, step = 0.001),
-            sliderInput("breeding1_DemFpc", "Fecundity in facility",
-                min = 0, max = 1,
-                value = inits$breeding1$f.preg.capt, step = 0.001),
             sliderInput("breeding1_DemFpw", "Fecundity, recipient & status quo",
                 min = 0, max = 1,
-                value = inits$breeding1$f.preg.wild, step = 0.001),
-            hr(),
-            p("Moose reduction"),
+                value = inits$breeding1$f.preg.wild, step = 0.001)
+        )
+    })
+    output$breeding1_demogr_sliders_mr <- renderUI({
+        tagList(
             sliderInput("breeding1_DemFsw_MR",
                         "Adult female survival, recipient & status quo",
                   min = 0, max = 1,
-                  value = inits$breeding1$f.surv.wild.mr, step = 0.001),
-            p("Wolf reduction"),
+                  value = inits$breeding1$f.surv.wild.mr, step = 0.001)
+        )
+    })
+    output$breeding1_demogr_sliders_wr <- renderUI({
+        tagList(
             sliderInput("breeding1_DemCsw_WR",
                         "Calf survival, recipient & status quo",
                   min = 0, max = 1,
@@ -1827,25 +1834,7 @@ server <- function(input, output, session) {
                   value = inits$breeding1$f.surv.wild.wr, step = 0.001)
         )
     })
-    ## dynamically render subpopulation selector
-#    output$breeding1_herd <- renderUI({
-#        tagList(
-#            selectInput(
-#                "breeding1_herd", "Subpopulation",
-#                c("Average subpopulation"="AverageSubpop", Herds)
-#            )
-#        )
-#    })
-    ## observers
-#    observeEvent(input$breeding1_herd, {
-#        values$breeding1 <- c(
-#            f.surv.wild.mr = values$breeding1$f.surv.wild.mr,
-#            c.surv.wild.wr = values$breeding1$c.surv.wild.wr,
-#            f.surv.wild.wr = values$breeding1$f.surv.wild.wr,
-#            wildlift_settings("cons.breed",
-#                herd = if (input$breeding1_herd == "AverageSubpop")
-#                    NULL else input$breeding1_herd))
-#    })
+
     ## plain
     observeEvent(input$breeding1_DemCsw, {
         values$breeding1$c.surv.wild <- input$breeding1_DemCsw
