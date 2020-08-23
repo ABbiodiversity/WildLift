@@ -16,5 +16,5 @@ var addTooltipToClass = function(classname, text, placement) {
     addTooltipToID(classname, text, placement);
 }
 //sidebar-toggle: burger icon
-addTooltipToClass('logo', 'Welcome to the Caribou BC app. Please check out the help file for information on how to use this tool to support management decisions.', 'right');
-addTooltipToClass('sidebar-toggle', 'Number of years in which the caribou population is forecasted. Default set, but the user can toggle.', 'right');
+//addTooltipToClass('logo', 'Welcome to the WildLift app. Please check out the help file for information on how to use this tool to support management decisions.', 'right');
+//addTooltipToClass('sidebar-toggle', 'Number of years in which the caribou population is forecasted. Default set, but the user can toggle.', 'right');

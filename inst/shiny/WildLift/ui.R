@@ -27,9 +27,9 @@ dashboardPage(
       min = 1, max = 1000, value = 100, step = 1
     ),
     bsTooltip("tmax",
-      "Number of years in which the caribou population is forecasted. Default set, but the user can change the value by slider."),
+      "Number of years in which the population is forecasted. Default set, but the user can change the value by slider."),
     bsTooltip("popstart",
-      "Number of caribou in the starting population. Default set, but the user can change the value by slider."),
+      "Number of females in the starting population. Default set, but the user can change the value by slider."),
     radioButtons("use_perc", "How to provide females penned",
       list("Percent"="perc", "Number of individuals"="inds"))
   ),
@@ -79,7 +79,7 @@ dashboardPage(
               title = "Population forecast: Multiple levers",
               plotlyOutput("multi1_Plot", width = "100%", height = 400),
               bsTooltip("multi1_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
+                "Change in the number of females over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
                 placement="bottom")
             ),
             box(
@@ -212,7 +212,7 @@ dashboardPage(
               title = "Population forecast: Maternity penning",
               plotlyOutput("penning_Plot", width = "100%", height = 400),
               bsTooltip("penning_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
+                "Change in the number of females over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
                 placement="right")
             ),
             box(
@@ -280,7 +280,7 @@ dashboardPage(
               title = "Population forecast: Predator exclosure",
               plotlyOutput("predator_Plot", width = "100%", height = 400),
               bsTooltip("predator_Plot",
-                "Change in the number of caribou over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
+                "Change in the number of females over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
                 placement="right")
             ),
             box(
@@ -350,7 +350,7 @@ dashboardPage(
               title = "Population forecast: Moose reduction",
               plotlyOutput("moose_Plot", width = "100%", height = 400),
               bsTooltip("moose_Plot",
-                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
+                "Change in the number of females over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
                 placement="right")
             ),
             box(
@@ -401,7 +401,7 @@ dashboardPage(
               title = "Population forecast: Wolf reduction",
               plotlyOutput("wolf_Plot", width = "100%", height = 400),
               bsTooltip("wolf_Plot",
-                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
+                "Change in the number of females over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
                 placement="right")
             ),
             box(
@@ -431,7 +431,7 @@ dashboardPage(
             ),
             box(
               width = NULL, status = "info", solidHeader = TRUE,
-              collapsible = TRUE, collapsed = TRUE,
+              collapsible = TRUE, collapsed = FALSE,
               title = "Demography",
               uiOutput("wolf_demogr_sliders")
             ),
@@ -462,7 +462,7 @@ dashboardPage(
               title = "Population forecast: linear feature",
               plotlyOutput("seismic_Plot", width = "100%", height = 400),
               bsTooltip("seismic_Plot",
-                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
+                "Change in the number of females over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
                 placement="right")
             ),
             box(
@@ -518,7 +518,7 @@ dashboardPage(
               title = "Population forecast: conservation breeding",
               plotlyOutput("breeding_Plot", width = "100%", height = 400),
               bsTooltip("breeding_Plot",
-                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
+                "Change in the number of females over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
                 placement="bottom")
             ),
             box(
@@ -599,7 +599,7 @@ dashboardPage(
               title = "Population forecast: conservation breeding",
               plotlyOutput("breeding1_Plot", width = "100%", height = 400),
               bsTooltip("breeding1_Plot",
-                "Change in the number of individual over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
+                "Change in the number of females over time. Hover over the plot to download, zoom and explore the results. Click on the legend to hide a line, double click to show a single line.",
                 placement="bottom"),
               checkboxGroupInput("breeding1_plot_show", NULL,
                   choices=list(
@@ -654,13 +654,13 @@ dashboardPage(
             box(
               width = 4, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Demography faility",
+              title = "Demography facility",
               uiOutput("breeding1_demogr_sliders_fac")
             ),
             box(
               width = 4, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Demography status quo & recipient",
+              title = "Demography status quo & recipient CB only",
               uiOutput("breeding1_demogr_sliders_out")
             )
         ),
@@ -674,7 +674,7 @@ dashboardPage(
             box(
               width = 3, status = "info", solidHeader = TRUE,
               collapsible = TRUE, collapsed = FALSE,
-              title = "Wolf removal",
+              title = "Wolf reduction",
               uiOutput("breeding1_demogr_sliders_wr")
             ),
             box(

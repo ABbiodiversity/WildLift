@@ -324,8 +324,10 @@ server <- function(input, output, session) {
 
         out <- list(
             Info=data.frame(WildLift=paste0(
-                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), "AverageSubpop"))),
+                c("R package version: ", "Tab: ",
+                  "Date of analysis: ", "Subpopulation: "),
+                c(ver, "Multi lever",
+                  format(Sys.time(), "%Y-%m-%d"), "AverageSubpop"))),
             Settings=ss,
             TimeSeries=TS,
             Summary=ML$summary)
@@ -621,7 +623,8 @@ server <- function(input, output, session) {
                 add_trace(y = ~Nnopen, name = 'Status quo, reference', data = df0,
                     line=list(dash = 'dash', color='black'))
         }
-        p <- p %>% layout(legend = list(x = 100, y = 0))
+        p <- p %>% layout(legend = list(x = 100, y = 0),
+                          yaxis=list(title="Number of females"))
         p
     })
     ## table
@@ -647,8 +650,10 @@ server <- function(input, output, session) {
         ss <- penning_getS()
         out <- list(
             Info=data.frame(WildLift=paste0(
-                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$penning_herd))),
+                c("R package version: ", "Tab: ",
+                  "Date of analysis: ", "Subpopulation: "),
+                c(ver, "Maternal penning",
+                  format(Sys.time(), "%Y-%m-%d"), input$penning_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
@@ -869,7 +874,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (predator exclosure)", "&lambda; (status quo)",
             "N (end, predator exclosure)", "N (end, status quo)", "N (new)",
-            "Total cost (x $million)", "Cost per new individual (x $million)")
+            "Total cost (x $million)", "Cost per new female (x $million)")
         if (values$predator_compare) {
             bev0 <- if (is.null(predator_getB0()))
                 #NA else unlist(summary(predator_getB0()))
@@ -955,7 +960,8 @@ server <- function(input, output, session) {
                 add_trace(y = ~Nnopen, name = 'Status quo, reference', data = df0,
                     line=list(dash = 'dash', color='black'))
         }
-        p <- p %>% layout(legend = list(x = 100, y = 0))
+        p <- p %>% layout(legend = list(x = 100, y = 0),
+                          yaxis=list(title="Number of females"))
         p
     })
     ## table
@@ -981,8 +987,10 @@ server <- function(input, output, session) {
         ss <- predator_getS()
         out <- list(
             Info=data.frame(WildLift=paste0(
-                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$predator_herd))),
+                c("R package version: ", "Tab: ",
+                  "Date of analysis: ", "Subpopulation: "),
+                c(ver, "Predator exclosure",
+                  format(Sys.time(), "%Y-%m-%d"), input$predator_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
@@ -1097,7 +1105,7 @@ server <- function(input, output, session) {
             CostPerNew=c(NA, NA))
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
                           "Total cost (x $million)",
-                          "Cost per new individual (x $million)")
+                          "Cost per new female (x $million)")
         colnames(df) <- c(
             "Status quo",
             "Moose reduction")
@@ -1135,7 +1143,8 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Npen, name = 'Status quo', data = dB0,
                     line=list(color='black')) %>%
-            layout(legend = list(x = 100, y = 0)) %>%
+            layout(legend = list(x = 100, y = 0),
+                   yaxis=list(title="Number of females")) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
@@ -1161,8 +1170,10 @@ server <- function(input, output, session) {
         ss <- moose_getS()
         out <- list(
             Info=data.frame(WildLift=paste0(
-                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$moose_herd))),
+                c("R package version: ", "Tab: ",
+                  "Date of analysis: ", "Subpopulation: "),
+                c(ver, "Moose reduction",
+                  format(Sys.time(), "%Y-%m-%d"), input$moose_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
@@ -1187,7 +1198,8 @@ server <- function(input, output, session) {
 
     ## dynamically render sliders
     output$wolf_demogr_sliders <- renderUI({
-        if (input$wolf_herd != "EastSideAthabasca")
+        req(input$wolf_herd)
+        if (input$wolf_herd != "AverageSubpop")
             return(p("Demography settings not available for specific subpopulations."))
         tagList(
             sliderInput("wolf_DemCsw", "Calf survival, wolf reduction",
@@ -1246,6 +1258,7 @@ server <- function(input, output, session) {
     })
     ## wolf reduction without penning
     wolf_getF0 <- reactive({
+        req(input$wolf_DemCsw)
         wildlift_forecast(values$wolf,
             tmax = input$tmax,
             pop.start = input$popstart,
@@ -1253,6 +1266,7 @@ server <- function(input, output, session) {
     })
     ## no wolf reduction (status quo) without penning
     wolf_getB0 <- reactive({
+        req(input$wolf_DemCsw)
         wildlift_forecast(values$wolf0,
             tmax = input$tmax,
             pop.start = input$popstart,
@@ -1275,7 +1289,7 @@ server <- function(input, output, session) {
             CostPerNew=c(CostPerNew, NA))
         rownames(df) <- c("&lambda;", "N (end)", "N (new)",
                           "Total cost (x $million)",
-                          "Cost per new individual (x $million)")
+                          "Cost per new female (x $million)")
         colnames(df) <- c(
             "Wolf reduction",
             "Status quo")
@@ -1321,7 +1335,8 @@ server <- function(input, output, session) {
             color=I('red')) %>%
             add_trace(y = ~Npen, name = 'Status quo', data = dB0,
                     mode = 'lines', color=I('black')) %>%
-            layout(legend = list(x = 100, y = 0)) %>%
+            layout(legend = list(x = 100, y = 0),
+                yaxis=list(title="Number of females")) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
@@ -1352,8 +1367,10 @@ server <- function(input, output, session) {
         print("getS")
         out <- list(
             Info=data.frame(WildLift=paste0(
-                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$wolf_herd))),
+                c("R package version: ", "Tab: ",
+                  "Date of analysis: ", "Subpopulation: "),
+                c(ver, "Wolf reduction",
+                  format(Sys.time(), "%Y-%m-%d"), input$wolf_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(TS),
             Summary=as.data.frame(df))
@@ -1456,7 +1473,8 @@ server <- function(input, output, session) {
                     mode = 'lines', color=I('blue')) %>%
             add_trace(y = ~Nrestor, name = 'Restoration', data = dF,
                     mode = 'lines', color=I('orange')) %>%
-            layout(legend = list(x = 100, y = 0)) %>%
+            layout(legend = list(x = 100, y = 0),
+                   yaxis=list(title="Number of females")) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
@@ -1478,7 +1496,7 @@ server <- function(input, output, session) {
             df,
             "N (new)"=Nnew,
             "Total cost (x $million)"=cost,
-            "Cost per new individual (x $million)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
+            "Cost per new female (x $million)"=c(ifelse(Nnew>0,cost/Nnew, NA), NA, NA))
         df
     })
     output$seismic_Table <- renderTable({
@@ -1492,7 +1510,7 @@ server <- function(input, output, session) {
     seismic_xlslist <- reactive({
         req(seismic_all(), seismic_getT())
         sm <- seismic_all()
-        dF <- data.frame(sm$pop)
+        dF <- data.frame(sm$pop)[,1:8]
         colnames(dF) <- c("Years", "No linear features", "Status quo",
                           "Deactivation", "Restoration",
         "Linear density, deactivation", "Linear density, restoration",
@@ -1502,8 +1520,10 @@ server <- function(input, output, session) {
         rownames(df) <- gsub("&lambda;", "lambda", rownames(df))
         out <- list(
             Info=data.frame(WildLift=paste0(
-                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d")))),
+                c("R package version: ", "Tab: ",
+                  "Date of analysis: ", "Subpopulation: "),
+                c(ver, "Linear feature deactivation/restoration",
+                  format(Sys.time(), "%Y-%m-%d")))),
             TimeSeries=as.data.frame(dF),
             Summary=as.data.frame(df))
         out$Summary$Variables <- rownames(df)
@@ -1585,7 +1605,7 @@ server <- function(input, output, session) {
             pen.cost.proj = input$breeding_CostProj,
             pen.cost.maint = input$breeding_CostMaint,
             pen.cost.capt = input$breeding_CostCapt,
-            pen.cost.pred = input$breeding_CostPred)
+            pen.cost.pred = 0)
     })
     ## plain
     observeEvent(input$breeding_DemCsw, {
@@ -1660,7 +1680,8 @@ server <- function(input, output, session) {
             add_trace(y = ~Nin, name = 'Adult females in', data = dF,
                     line=list(color='green'),
                     text = hover(t(bb$Nin))) %>%
-            layout(legend = list(x = 100, y = 0)) %>%
+            layout(legend = list(x = 100, y = 0),
+                   yaxis=list(title="Number of females")) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         p
     })
@@ -1710,6 +1731,7 @@ server <- function(input, output, session) {
         req(breeding_getF())
         zz <- breeding_getF()
         #zz <- revrt(zz)
+        #str(zz$settings)
 
         ## one time cost
         cost1 <- zz$settings$pen.cost.setup
@@ -1719,7 +1741,7 @@ server <- function(input, output, session) {
             zz$settings$pen.cost.capt +
             zz$settings$pen.cost.pred
         cost <- (cost1 + zz$tmax * cost2) / 1000
-        #print(c(cost1/1000, cost2/1000, cost))
+        #print(c(c1=cost1/1000, c2=cost2/1000, c3=cost))
 
         Pick <- c(Ncapt="In facility", Nrecip="Recipient", Nwild="Status quo")
         dF <- summary(zz)[,names(Pick)]
@@ -1733,7 +1755,7 @@ server <- function(input, output, session) {
             'N (end)'=Ntmax,
             'N (new)'=c(NA, max(0,Nnew),NA),
             "Total cost (x $million)"=c(NA, cost, NA),
-            "Cost per new individual (x $million)"=c(NA,
+            "Cost per new female (x $million)"=c(NA,
                 ifelse(Nnew>0,cost/Nnew, NA), NA))
         df
     }, rownames=TRUE, colnames=TRUE,
@@ -1749,8 +1771,10 @@ server <- function(input, output, session) {
         ss <- breeding_getS()
         out <- list(
             Info=data.frame(WildLift=paste0(
-                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
+                c("R package version: ", "Tab: ",
+                  "Date of analysis: ", "Subpopulation: "),
+                c(ver, "Conservation breeding",
+                  format(Sys.time(), "%Y-%m-%d"), input$breeding_herd))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(dF),
             AgeClasses=stack_breeding(bb))
@@ -1942,14 +1966,15 @@ server <- function(input, output, session) {
         dF <- summary(bb)
         colnames(dF)[colnames(dF) == "Nrecip"] <- "Individuals"
         p <- plot_ly(dF, x = ~Years, y = ~Individuals,
-            name = 'Recipient', type = 'scatter', mode = 'lines',
+            name = 'Recipient CB', type = 'scatter', mode = 'lines',
             text = hover(t(bb$Nrecip)),
             hoverinfo = 'text',
             color=I('red')) %>%
             add_trace(y = ~Nwild, name = 'Status quo', data = dF,
                     mode = 'lines', color=I('black'),
                     text = hover(t(bb$Nwild))) %>%
-            layout(legend = list(x = 100, y = 0)) %>%
+            layout(legend = list(x = 100, y = 0),
+                   yaxis=list(title="Number of females")) %>%
             config(displayModeBar = 'hover', displaylogo = FALSE)
         if ("fac" %in% input$breeding1_plot_show)
             p <- p %>% add_trace(y = ~Ncapt, name = 'Inside facility', data = dF,
@@ -1962,23 +1987,24 @@ server <- function(input, output, session) {
                     line=list(color='green'),
                     text = hover(t(bb$Nin)))
         if ("mr" %in% input$breeding1_plot_show)
-            p <- p %>% add_trace(y = ~Nrecip_MR, name = 'Recipient MR', data = dF,
+            p <- p %>% add_trace(y = ~Nrecip_MR,
+                    name = 'CB + MR', data = dF,
                     mode = 'lines', type='scatter',
                     text = hover(t(bb$mr$output$Nrecip)),
                     hoverinfo = 'text',
                     color=I('red'), line=list(dash='dash')) %>%
-                add_trace(y = ~Nwild_MR, name = 'Status quo MR', data = dF,
+                add_trace(y = ~Nwild_MR, name = 'MR', data = dF,
                     mode = 'lines', type='scatter',
                     text = hover(t(bb$mr$output$Nwild)),
                     hoverinfo = 'text',
                     color=I('blue'), line=list(dash='dash'))
         if ("wr" %in% input$breeding1_plot_show)
-            p <- p %>% add_trace(y = ~Nrecip_WR, name = 'Recipient WR', data = dF,
+            p <- p %>% add_trace(y = ~Nrecip_WR, name = 'CB + WR', data = dF,
                     mode = 'lines', type='scatter',
                     text = hover(t(bb$wr$output$Nrecip)),
                     hoverinfo = 'text',
                     color=I('red'), line=list(dash='dot')) %>%
-                add_trace(y = ~Nwild_WR, name = 'Status quo WR', data = dF,
+                add_trace(y = ~Nwild_WR, name = 'WR', data = dF,
                     mode = 'lines', type='scatter',
                     text = hover(t(bb$wr$output$Nwild)),
                     hoverinfo = 'text',
@@ -2047,30 +2073,30 @@ server <- function(input, output, session) {
         costWR <- cost + zz$wr$cost_extra
         #print(c(cost1/1000, cost2/1000, cost))
 
-        Pick <- c(Ncapt="In facility", Nrecip="Recipient", Nwild="Status quo",
-                  Nrecip_MR="Recipient MR", Nwild_MR="Status quo MR",
-                  Nrecip_WR="Recipient WR", Nwild_WR="Status quo WR")
+        Pick <- c(Ncapt="In facility", Nrecip="Recipient CB", Nwild="Status quo",
+                  Nrecip_MR="CB + MR", Nwild_MR="MR",
+                  Nrecip_WR="CB + WR", Nwild_WR="WR")
         dF <- summary(zz)[,names(Pick)]
         colnames(dF) <- Pick
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
-        Nnew <- Ntmax[1,"Recipient"] - Ntmax[1,"Status quo"]
-        NnewMR <- Ntmax[1,"Recipient MR"] - Ntmax[1,"Status quo MR"]
-        NnewWR <- Ntmax[1,"Recipient WR"] - Ntmax[1,"Status quo WR"]
+        Nnew <- Ntmax[1,"Recipient CB"] - Ntmax[1,"Status quo"]
+        NnewMR <- Ntmax[1,"CB + MR"] - Ntmax[1,"MR"]
+        NnewWR <- Ntmax[1,"CB + WR"] - Ntmax[1,"WR"]
         df <- rbind(
             '&lambda;'=round(Ntmax/Ntmax1, 3),
             'N (end)'=Ntmax,
             'N (new)'=c(NA, max(0,Nnew),NA, max(0,NnewMR),NA, max(0,NnewWR),NA),
             "Total cost (x $million)"=c(NA, cost, NA, cost, NA, costWR, NA),
-            "Cost per new individual (x $million)"=c(NA,
+            "Cost per new female (x $million)"=c(NA,
                 ifelse(Nnew>0,cost/Nnew, NA), NA,
                 ifelse(NnewMR>0,cost/NnewMR, NA), NA,
                 ifelse(NnewWR>0,costWR/NnewWR, NA), NA))
         if (!("mr" %in% input$breeding1_plot_show))
-            df <- df[,!(colnames(df) %in% c("Recipient MR", "Status quo MR"))]
+            df <- df[,!(colnames(df) %in% c("CB + MR", "MR"))]
         if (!("wr" %in% input$breeding1_plot_show))
-            df <- df[,!(colnames(df) %in% c("Recipient WR", "Status quo WR"))]
+            df <- df[,!(colnames(df) %in% c("CB + WR", "WR"))]
 
         df
     }, rownames=TRUE, colnames=TRUE,
@@ -2086,8 +2112,10 @@ server <- function(input, output, session) {
         ss <- breeding1_getS()
         out <- list(
             Info=data.frame(WildLift=paste0(
-                c("R package version: ", "Date of analysis: ", "Subpopulation: "),
-                c(ver, format(Sys.time(), "%Y-%m-%d"), "AverageSubpop"))),
+                c("R package version: ", "Tab: ",
+                  "Date of analysis: ", "Subpopulation: "),
+                c(ver, "Conservation breeding, multiple levers",
+                  format(Sys.time(), "%Y-%m-%d"), "AverageSubpop"))),
             Settings=as.data.frame(ss),
             TimeSeries=as.data.frame(dF),
             AgeClasses=stack_breeding(bb),
