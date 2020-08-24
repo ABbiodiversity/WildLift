@@ -297,6 +297,7 @@ server <- function(input, output, session) {
     output$multi1_Table <- renderReactable({
         req(multi1_getF())
         TB <- multi1_getF()$summary
+        #print(TB)
         TB$Demogr <- NULL
         TB$Manage <- NULL
         colnames(TB) <- c("lambda", "N (end)", "N (new)", "Cost",
@@ -1842,7 +1843,7 @@ server <- function(input, output, session) {
     output$breeding1_demogr_sliders_mr <- renderUI({
         tagList(
             sliderInput("breeding1_DemFsw_MR",
-                        "Adult female survival, recipient & status quo",
+                        "Adult female survival, recipient",
                   min = 0, max = 1,
                   value = inits$breeding1$f.surv.wild.mr, step = 0.001)
         )
@@ -1850,11 +1851,11 @@ server <- function(input, output, session) {
     output$breeding1_demogr_sliders_wr <- renderUI({
         tagList(
             sliderInput("breeding1_DemCsw_WR",
-                        "Calf survival, recipient & status quo",
+                        "Calf survival, recipient",
                   min = 0, max = 1,
                   value = inits$breeding1$c.surv.wild.wr, step = 0.001),
             sliderInput("breeding1_DemFsw_WR",
-                        "Adult female survival, recipient & status quo",
+                        "Adult female survival, recipient",
                   min = 0, max = 1,
                   value = inits$breeding1$f.surv.wild.wr, step = 0.001)
         )
@@ -2071,34 +2072,45 @@ server <- function(input, output, session) {
             zz$settings$pen.cost.capt +
             zz$settings$pen.cost.pred
         cost <- (cost1 + zz$tmax * cost2) / 1000
-        costWR <- cost + zz$wr$cost_extra
+        costCBWR <- cost + zz$wr$cost_extra
+        costWR <- zz$wr$cost_extra
         #print(c(cost1/1000, cost2/1000, cost))
 
         Pick <- c(Ncapt="In facility", Nrecip="Recipient CB", Nwild="Status quo",
-                  Nrecip_MR="CB + MR", Nwild_MR="MR",
-                  Nrecip_WR="CB + WR", Nwild_WR="WR")
+                  Nrecip_MR="CB + MR",
+                  Nwild_MR="MR",
+                  Nrecip_WR="CB + WR",
+                  Nwild_WR="WR")
         dF <- summary(zz)[,names(Pick)]
         colnames(dF) <- Pick
         N0 <- dF[1,,drop=FALSE]
         Ntmax1 <- dF[nrow(dF)-1L,,drop=FALSE]
         Ntmax <- dF[nrow(dF),,drop=FALSE]
         Nnew <- Ntmax[1,"Recipient CB"] - Ntmax[1,"Status quo"]
-        NnewMR <- Ntmax[1,"CB + MR"] - Ntmax[1,"MR"]
-        NnewWR <- Ntmax[1,"CB + WR"] - Ntmax[1,"WR"]
+        NnewCBMR <- Ntmax[1,"CB + MR"] - Ntmax[1,"Status quo"]
+        NnewMR <- Ntmax[1,"MR"] - Ntmax[1,"Status quo"]
+        NnewCBWR <- Ntmax[1,"CB + WR"] - Ntmax[1,"Status quo"]
+        NnewWR <- Ntmax[1,"WR"] - Ntmax[1,"Status quo"]
         df <- rbind(
             '&lambda;'=round(Ntmax/Ntmax1, 3),
             'N (end)'=Ntmax,
-            'N (new)'=c(NA, max(0,Nnew),NA, max(0,NnewMR),NA, max(0,NnewWR),NA),
-            "Total cost (x $million)"=c(NA, cost, NA, cost, NA, costWR, NA),
+            'N (new)'=c(NA, max(0,Nnew),NA,
+                max(0,NnewCBMR), max(0,NnewMR),
+                max(0,NnewCBWR), max(0,NnewWR)),
+            "Total cost (x $million)"=c(NA, cost, NA,
+                cost, 0,
+                costCBWR, costWR),
             "Cost per new female (x $million)"=c(NA,
-                ifelse(Nnew>0,cost/Nnew, NA), NA,
-                ifelse(NnewMR>0,cost/NnewMR, NA), NA,
-                ifelse(NnewWR>0,costWR/NnewWR, NA), NA))
+                ifelse(Nnew>0,cost/Nnew, 0), NA,
+                ifelse(NnewCBMR>0,cost/NnewCBMR, 0),
+                0,
+                ifelse(NnewCBWR>0,costCBWR/NnewCBWR, 0),
+                ifelse(NnewWR>0,costWR/NnewWR, 0)))
         if (!("mr" %in% input$breeding1_plot_show))
             df <- df[,!(colnames(df) %in% c("CB + MR", "MR"))]
         if (!("wr" %in% input$breeding1_plot_show))
             df <- df[,!(colnames(df) %in% c("CB + WR", "WR"))]
-
+        print(df)
         df
     }, rownames=TRUE, colnames=TRUE,
     striped=TRUE, bordered=TRUE, na="n/a",
