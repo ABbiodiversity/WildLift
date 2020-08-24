@@ -300,8 +300,9 @@ server <- function(input, output, session) {
         #print(TB)
         TB$Demogr <- NULL
         TB$Manage <- NULL
-        colnames(TB) <- c("lambda", "N (end)", "N (new)", "Cost",
-                          "$M / new ind.")
+        colnames(TB) <- c("lambda", "N (end)", "N (new)",
+                          "Total cost (x $million)",
+                          "Cost per new female (x $million)")
         reactable(round(TB, 3),
             highlight = TRUE,
             fullWidth = FALSE)
@@ -539,7 +540,7 @@ server <- function(input, output, session) {
         rownames(df) <- c(if (values$use_perc) "% penned" else "# penned",
             "# pens", "&lambda; (maternity penning)", "&lambda; (status quo)",
             "N (end, maternity penning)", "N (end, status quo)", "N (new)",
-            "Total cost (x $million)", "Cost per new individual (x $million)")
+            "Total cost (x $million)", "Cost per new female (x $million)")
         if (values$penning_compare) {
             bev0 <- if (is.null(penning_getB0()))
                 #NA else unlist(summary(penning_getB0()))

@@ -34,3 +34,12 @@ associated with seven alternative recovery actions:
 Multiple recovery actions are compared allowing users to combine 
 demographic augmentation (maternal penning, predator exclosure, 
 and conservation breeding) with predator and primary prey reductions.
+
+## Glossary
+
+The following definitions apply to all the tabs in the app:
+
+- *N(new)* is the umber of additional females (from all stage classes) produced as a result of implemented recovery action
+- *N(end)* is the number of females (from all stage classes) at the end of the forecast
+- *Cost* are deined in million CAD, 2020
+- *Cost per new females* are defined as cost per additional female (from all stage classes) produced as a result of implemented recovery action
