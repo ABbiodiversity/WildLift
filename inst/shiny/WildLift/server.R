@@ -170,8 +170,8 @@ server <- function(input, output, session) {
 
     ## get multi1 settings
     multi1_settings <- reactive({
-        req(input$multi1_DemCsw, input$multi1_DemFsw_MR,
-            input$multi1_CostProj_MP, input$multi1_CostProj_PE)
+        req(input$multi1_DemCsw, input$multi1_DemCsc, input$multi1_DemFsw_MR,
+            input$multi1_CostProj_MP, input$multi1_CostProj_PE, input$multi1_Fpen)
         #HERD <- NULL
         HERD <- "AverageSubpop"
         Settings <- list(
@@ -289,6 +289,7 @@ server <- function(input, output, session) {
     ## plot
     output$multi1_Plot <- renderPlotly({
         req(multi1_getF())
+        print("multi1 render")
         p <- plot_multilever(multi1_getF(), input$multi1_plot_type)
         config(ggplotly(p), displaylogo = FALSE)
     })
