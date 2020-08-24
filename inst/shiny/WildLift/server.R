@@ -62,19 +62,19 @@ server <- function(input, output, session) {
     output$multi1_perc_or_inds <- renderUI({
         if (values$use_perc) {
             tagList(
-                sliderInput("multi1_Fpen", "Percent of females penned",
+                sliderInput("multi1_Fpen", "Percent of adult females penned",
                     min = 0, max = 100, value = round(100*inits$multi1$fpen.prop),
                     step = 1),
                 bsTooltip("multi1_Fpen",
-                    "Change the percent of female population in maternity penning. Default set, but the user can toggle.")
+                    "Change the percent of adult female population in maternity penning. Default set, but the user can toggle.")
             )
         } else {
             tagList(
-                sliderInput("multi1_Fpen", "Number of females penned",
+                sliderInput("multi1_Fpen", "Number of adult females penned",
                     min = 0, max = input$popstart, value = inits$multi1$fpen.inds,
                     step = 1),
                 bsTooltip("multi1_Fpen",
-                    "Change the number of females in maternity penning. Default set, but the user can toggle.")
+                    "Change the number of adult females in maternity penning. Default set, but the user can toggle.")
             )
         }
     })
@@ -391,19 +391,19 @@ server <- function(input, output, session) {
     output$penning_perc_or_inds <- renderUI({
         if (values$use_perc) {
             tagList(
-                sliderInput("penning_Fpen", "Percent of females penned",
+                sliderInput("penning_Fpen", "Percent of adult females penned",
                     min = 0, max = 100, value = round(100*inits$penning$fpen.prop),
                     step = 1),
                 bsTooltip("penning_Fpen",
-                    "Change the percent of female population in maternity penning. Default set, but the user can toggle.")
+                    "Change the percent of adult female population in maternity penning. Default set, but the user can toggle.")
             )
         } else {
             tagList(
-                sliderInput("penning_Fpen", "Number of females penned",
+                sliderInput("penning_Fpen", "Number of adult females penned",
                     min = 0, max = input$popstart, value = inits$penning$fpen.inds,
                     step = 1),
                 bsTooltip("penning_Fpen",
-                    "Change the number of females in maternity penning. Default set, but the user can toggle.")
+                    "Change the number of adult females in maternity penning. Default set, but the user can toggle.")
             )
         }
     })
@@ -571,7 +571,7 @@ server <- function(input, output, session) {
             "pop.start" = "N start",
             #"fpen.prop" = "% females penned",
             "fpen" = if (values$use_perc)
-                "% females penned" else "# females penned",
+                "% adult females penned" else "# adult females penned",
             "c.surv.wild" = "Calf survival, wild",
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
@@ -723,19 +723,19 @@ server <- function(input, output, session) {
     output$predator_perc_or_inds <- renderUI({
         if (values$use_perc) {
             tagList(
-                sliderInput("predator_Fpen", "Percent of females penned",
+                sliderInput("predator_Fpen", "Percent of adult females penned",
                     min = 0, max = 100, value = round(100*inits$predator$fpen.prop),
                     step = 1),
                 bsTooltip("predator_Fpen",
-                    "Change the percent of female population in maternity penning. Default set, but the user can toggle.")
+                    "Change the percent of adult female population in maternity penning. Default set, but the user can toggle.")
             )
         } else {
             tagList(
-                sliderInput("predator_Fpen", "Number of females penned",
+                sliderInput("predator_Fpen", "Number of adult females penned",
                     min = 0, max = input$popstart, value = inits$predator$fpen.inds,
                     step = 1),
                 bsTooltip("predator_Fpen",
-                    "Change the number of females in maternity penning. Default set, but the user can toggle.")
+                    "Change the number of adult females in maternity penning. Default set, but the user can toggle.")
             )
         }
     })
@@ -908,7 +908,7 @@ server <- function(input, output, session) {
             "pop.start" = "N start",
             #"fpen.prop" = "% females penned",
             "fpen" = if (values$use_perc)
-                "% females penned" else "# females penned",
+                "% adult females penned" else "# adult females penned",
             "c.surv.wild" = "Calf survival, wild",
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
@@ -1309,7 +1309,7 @@ server <- function(input, output, session) {
             "pop.start" = "N start",
             #"fpen.prop" = "% females penned",
             "fpen" = if (values$use_perc)
-                "% females penned" else "# females penned",
+                "% adult females penned" else "# adult females penned",
             "c.surv.wild" = "Calf survival, wild",
             "c.surv.capt" = "Calf survival, captive",
             "f.surv.wild" = "Adult female survival, wild",
@@ -1549,7 +1549,7 @@ server <- function(input, output, session) {
     output$breeding_years <- renderUI({
         tagList(
             sliderInput("breeding_yrs",
-                "Number of years that females are added to the facility",
+                "Number of years that adult females are added to the facility",
                 min = 0, max = input$tmax, value = 0, step = 1) #value = 1
         )
     })
@@ -1801,7 +1801,7 @@ server <- function(input, output, session) {
     output$breeding1_years <- renderUI({
         tagList(
             sliderInput("breeding1_yrs",
-                "Number of years that females are added to the facility",
+                "Number of years that adult females are added to the facility",
                 min = 0, max = input$tmax, value = 0, step = 1) #value = 1
         )
     })
