@@ -10,7 +10,7 @@
 \alias{summary.wildlift_forecast}
 \alias{print.summary.wildlift_forecast}
 \title{
-Caribou Population Forecasting
+Population Forecasting
 }
 \description{
 Functions to set demographic and cost parameter, to perform
@@ -112,7 +112,7 @@ additional arguments to functions. For \code{wildlift_settings} see Details.
 \details{
 The following cost parameters can be set by \code{wildlift_settings}:
 
-\code{pen.cap}: how many individual Caribou can live in a
+\code{pen.cap}: how many adult females can live in a
 single maternity pen.
 
 \code{pen.cost.setup}: initial cost in thousands to set up pen.

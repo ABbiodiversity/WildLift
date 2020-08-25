@@ -5,7 +5,7 @@
 \alias{summary.wildlift_breeding}
 \alias{plot.wildlift_breeding}
 \title{
-Caribou Conservation Breeding
+Conservation Breeding
 }
 \description{
 Functions evaluate different options for conservation breeding.
