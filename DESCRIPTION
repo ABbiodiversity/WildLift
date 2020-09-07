@@ -1,7 +1,7 @@
 Package: WildLift
 Title: An Open-source Tool to Guide Decisions for Wildlife Conservation
-Date: 2020-08-16
-Version: 0.2.9
+Date: 2020-09-07
+Version: 0.3.0
 Authors@R: 
     c(person(given = "Peter",
              family = "Solymos",
@@ -29,6 +29,7 @@ Description: Compare alternative recovery actions:
   Linear Feature Restoration, Linear Feature Deactivation, 
   Maternal Penning, Conservation Breeding, Predator Exclosure, 
   Wolf Reduction, and Moose Reduction.
+  Based on Nagy-Reis et al. (2020) <doi:10.3389/fevo.2020.564508>.
 License: Apache License (== 2.0) | file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -1,3 +1,8 @@
+# Version 0.3.0
+
+* Paper describing the package accepted in Frontiers in Ecology and Evolution.
+  Added `CITATION` file and updated `DESCRIPTION`.
+
 # Version 0.2.9
 
 * Updated demography parameters.

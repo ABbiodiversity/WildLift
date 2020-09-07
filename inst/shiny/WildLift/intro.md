@@ -14,7 +14,7 @@ parametrized based on information from the published literature or ongoing
 experiments. Users can input population parameters 
 (e.g., population size and survival rates) or choose from 
 pre-set caribou subpopulations to estimate changes to populations 
-from implementing recovery actions. 
+from implementing recovery actions as described in Nagy-Reis et al. (2020). 
 
 ## Single levers
 
@@ -43,3 +43,11 @@ The following definitions apply to all the tabs in the app:
 - *N(end)* is the number of females (from all stage classes) at the end of the forecast
 - *Cost* are deined in million CAD, 2020
 - *Cost per new females* are defined as cost per additional female (from all stage classes) produced as a result of implemented recovery action
+
+## References
+
+Nagy-Reis, M., Dickie, M., Sólymos, P., Gilbert, S., DeMars, C.,
+Serrouya, R., and Boutin, S., 2020. WildLift: An open-source tool to
+guide decisions for wildlife conservation. 
+*Frontiers in Ecology and Evolution*, in press. 
+DOI [10.3389/fevo.2020.564508](https://dx.doi.org/10.3389/fevo.2020.564508)
