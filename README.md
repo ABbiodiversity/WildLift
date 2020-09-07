@@ -1,27 +1,54 @@
 # WildLift
 
->  An Open-source Tool to Guide Decisions for Wildlife Conservation
+> An Open-source Tool to Guide Decisions for Wildlife Conservation
 
 [![Linux build
 status](https://travis-ci.org/psolymos/CaribouBC.svg?branch=master)](https://travis-ci.org/psolymos/CaribouBC)
 [![codecov](https://codecov.io/gh/psolymos/CaribouBC/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/CaribouBC)
 
-Try the [Shiny app](https://psolymos.shinyapps.io/CaribouBC/) or run
-locally as `shiny::runGitHub("bcgov/CaribouBC", subdir =
-"inst/shiny/matpen")`.
+**WildLift** can be used to quantitatively compare the **costs** and
+demographic **benefits** of recovery actions for an iconic threatened
+species, woodland caribou (*Rangifer tarandus caribou*). While we use
+caribou as a case study, our approach to developing this management tool
+is transferable to other threatened taxa.
+
+The tool consists of a generalized matrix population model that is
+parametrized based on information from the published literature or
+ongoing experiments. Users can input population parameters (e.g.,
+population size and survival rates) or choose from pre-set caribou
+subpopulations to estimate changes to populations from implementing
+recovery actions.
+
+The tool estimates the trade-offs associated with seven alternative
+recovery actions:
+
+  - Linear Feature Restoration,
+  - Linear Feature Deactivation,
+  - Maternal Penning,
+  - Conservation Breeding,
+  - Predator Exclosure,
+  - Wolf Reduction, and
+  - Moose Reduction.
+
+Multiple recovery actions are compared allowing users to combine
+demographic augmentation (maternal penning, predator exclosure, and
+conservation breeding) with predator and primary prey reductions.
+
+Try the [Shiny app](https://abbiodiversity.shinyapps.io/WildLift/) or
+run locally as `WildLift::run_app()`.
+
+## Citation
+
+Nagy-Reis, M., Dickie, M., Sólymos, P., Gilbert, S., DeMars, C.,
+Serrouya, R., and Boutin, S., 2020. WildLift: An open-source tool to
+guide decisions for wildlife conservation. *Frontiers in Ecology and
+Evolution*, in press. DOI
+[10.3389/fevo.2020.564508](https://dx.doi.org/10.3389/fevo.2020.564508)
 
 ## Installation
 
-Stable version:
-
 ``` r
-remotes::install_github("bcgov/CaribouBC")
-```
-
-Development version is available as this fork:
-
-``` r
-remotes::install_github("psolymos/CaribouBC")
+remotes::install_github("ABbiodiversity/WildLift")
 ```
 
 See user visible changes in the [NEWS](NEWS.md) file.
@@ -29,16 +56,16 @@ See user visible changes in the [NEWS](NEWS.md) file.
 ## Usage
 
 ``` r
-library(CaribouBC)
+library(WildLift)
 #> Loading required package: popbio
-#> CaribouBC 0.2.2   2019-10-17
+#> WildLift 0.3.0    2020-09-07
 
 ## Predefined settings
-(s1 <- caribou_settings("mat.pen"))
+(s1 <- wildlift_settings("mat.pen"))
 #> Caribou settings - pen type: mat.pen 
 #> 
 #>  - c.surv.wild   :0.163
-#>  - c.surv.capt   :0.54
+#>  - c.surv.capt   :0.598
 #>  - f.surv.wild   :0.853
 #>  - f.surv.capt   :0.903
 #>  - f.preg.wild   :0.92
@@ -49,7 +76,7 @@ library(CaribouBC)
 #>  - pen.cost.maint:300
 #>  - pen.cost.capt :250
 #>  - pen.cost.pred :0
-(s2 <- caribou_settings("pred.excl"))
+(s2 <- wildlift_settings("pred.excl"))
 #> Caribou settings - pen type: pred.excl 
 #> 
 #>  - c.surv.wild   :0.163
@@ -66,7 +93,7 @@ library(CaribouBC)
 #>  - pen.cost.pred :80
 
 ## Modifying predefined settings
-caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
+wildlift_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
 #> Caribou settings - pen type: mat.pen 
 #> 
 #>  - c.surv.wild   :0.163
@@ -83,8 +110,8 @@ caribou_settings("mat.pen", c.surv.capt=0.65, pen.cap=30)
 #>  - pen.cost.pred :0
 
 ## Forecast based on settings for 75% females penned
-f1 <- caribou_forecast(s1, fpen.prop = 0.75)
-f2 <- caribou_forecast(s2, fpen.prop = 0.75)
+f1 <- wildlift_forecast(s1, fpen.prop = 0.75)
+f2 <- wildlift_forecast(s2, fpen.prop = 0.75)
 
 ## Most important results summarized
 summary(f1)
@@ -94,14 +121,14 @@ summary(f1)
 #>  - pop.start:100
 #>  - fpen.prop:0.75
 #> 
-#>  - npens      :5
-#>  - lam.pen    :1.02
+#>  - npens      :3
+#>  - lam.pen    :1.03
 #>  - lam.nopen  :0.914
 #>  - Nend.nopen :17
-#>  - Nend.pen   :163
-#>  - Nend.diff  :146
-#>  - Cost.total :56
-#>  - Cost.percap:0.384
+#>  - Nend.pen   :195
+#>  - Nend.diff  :178
+#>  - Cost.total :30.5
+#>  - Cost.percap:0.171
 summary(f2)
 #> Caribou forecast - pen type: pred.excl 
 #> 
@@ -109,14 +136,14 @@ summary(f2)
 #>  - pop.start:100
 #>  - fpen.prop:0.75
 #> 
-#>  - npens      :16
+#>  - npens      :7
 #>  - lam.pen    :1.09
 #>  - lam.nopen  :0.914
 #>  - Nend.nopen :17
 #>  - Nend.pen   :556
 #>  - Nend.diff  :539
-#>  - Cost.total :192
-#>  - Cost.percap:0.356
+#>  - Cost.total :87
+#>  - Cost.percap:0.161
 
 ## Plot the results
 plot(f2)
@@ -130,12 +157,12 @@ legend("topleft", col = c(1,1,2), lty = c(2,1,1),
 ``` r
 
 ## Find 'breakeven' proportion of females penned where lambda=1
-(b1 <- caribou_breakeven(f1, lambda = 1))
-#> [1] 0.5669914
-(b2 <- caribou_breakeven(f2, lambda = 1))
+(b1 <- wildlift_breakeven(f1, lambda = 1))
+#> [1] 0.5171369
+(b2 <- wildlift_breakeven(f2, lambda = 1))
 #> [1] 0.3441178
-f3 <- caribou_forecast(s1, fpen.prop = b1)
-f4 <- caribou_forecast(s2, fpen.prop = b2)
+f3 <- wildlift_forecast(s1, fpen.prop = b1)
+f4 <- wildlift_forecast(s2, fpen.prop = b2)
 ## See that lines are truly flat
 op <- par(mfrow = c(1, 2))
 plot(f3, main = "Mat pen")
@@ -150,13 +177,13 @@ par(op)
 ## Forecast using number of penned females
 ## - it can be an initial number
 ## - or a vector of individuals for subsequent years
-caribou_forecast(s1, fpen.inds = 5)
+wildlift_forecast(s1, fpen.inds = 5)
 #> Caribou forecast - pen type: mat.pen 
 #> 
 #>  - tmax     :20
 #>  - pop.start:100
 #>  - fpen.inds:5
-caribou_forecast(s2, fpen.inds = c(5, 0, 4, 6))
+wildlift_forecast(s2, fpen.inds = c(5, 0, 4, 6))
 #> Caribou forecast - pen type: pred.excl 
 #> 
 #>  - tmax     :20
@@ -167,7 +194,7 @@ caribou_forecast(s2, fpen.inds = c(5, 0, 4, 6))
 ## Getting Help or Reporting an Issue
 
 To report bugs/issues/feature requests, please file an
-[issue](https://github.com/bcgov/CaribouBC/issues/).
+[issue](https://github.com/Abbiodiversity/WildLift/issues/).
 
 ## How to Contribute
 
