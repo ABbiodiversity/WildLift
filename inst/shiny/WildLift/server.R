@@ -1551,14 +1551,14 @@ server <- function(input, output, session) {
         tagList(
             sliderInput("breeding_yrs",
                 "Number of years that adult females are added to the facility",
-                min = 0, max = input$tmax, value = 0, step = 1) #value = 1
+                min = 0, max = input$tmax, value = min(4, input$tmax), step = 1)
         )
     })
     output$breeding_jyears <- renderUI({
         tagList(
             sliderInput("breeding_jyrs",
                 "Number of years to delay juvenile transfer",
-                min = 0, max = input$tmax, value = 0, step = 1)
+                min = 0, max = input$tmax, value = min(2, input$tmax), step = 1)
         )
     })
     output$breeding_demogr_sliders <- renderUI({
@@ -1803,14 +1803,14 @@ server <- function(input, output, session) {
         tagList(
             sliderInput("breeding1_yrs",
                 "Number of years that adult females are added to the facility",
-                min = 0, max = input$tmax, value = 0, step = 1) #value = 1
+                min = 0, max = input$tmax, value = min(4, input$tmax), step = 1)
         )
     })
     output$breeding1_jyears <- renderUI({
         tagList(
             sliderInput("breeding1_jyrs",
                 "Number of years to delay juvenile transfer",
-                min = 0, max = input$tmax, value = 0, step = 1)
+                min = 0, max = input$tmax, value = min(2, input$tmax), step = 1)
         )
     })
 
