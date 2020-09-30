@@ -50,4 +50,8 @@ Nagy-Reis, M., Dickie, M., Sólymos, P., Gilbert, S., DeMars, C.,
 Serrouya, R., and Boutin, S., 2020. WildLift: An open-source tool to
 guide decisions for wildlife conservation. 
 *Frontiers in Ecology and Evolution*, in press. 
-DOI [10.3389/fevo.2020.564508](https://dx.doi.org/10.3389/fevo.2020.564508)
+DOI [10.3389/fevo.2020.564508](https://dx.doi.org/10.3389/fevo.2020.564508).
+
+See [Supplementary Material](WildLift_Supplementary_Material_2020-09-19.pdf) 
+for details about the settings in this application.
+

@@ -29,7 +29,16 @@ Description: Compare alternative recovery actions:
   Linear Feature Restoration, Linear Feature Deactivation, 
   Maternal Penning, Conservation Breeding, Predator Exclosure, 
   Wolf Reduction, and Moose Reduction.
-  Based on Nagy-Reis et al. (2020) <doi:10.3389/fevo.2020.564508>.
+  
+  Quantifying the trade-offs associated with alternative
+  recovery actions for threatened species.
+  The tool consists of a generalized matrix population model that is 
+  parametrized based on information from the published literature or ongoing
+  experiments. Users can input population parameters 
+  (e.g., population size and survival rates) or choose from 
+  pre-set caribou subpopulations to estimate changes to populations 
+  from implementing recovery actions as described in 
+  Nagy-Reis et al. (2020) <doi:10.3389/fevo.2020.564508>.
 License: Apache License (== 2.0) | file LICENSE
 Encoding: UTF-8
 LazyData: true

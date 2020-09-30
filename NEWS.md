@@ -2,6 +2,7 @@
 
 * Paper describing the package accepted in Frontiers in Ecology and Evolution.
   Added `CITATION` file and updated `DESCRIPTION`.
+* App documentation updated with links to the paper and its supplement.
 
 # Version 0.2.9
 
