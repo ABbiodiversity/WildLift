@@ -2,7 +2,8 @@
 
 > An Open-source Tool to Guide Decisions for Wildlife Conservation
 
-[![Linux build status](https://travis-ci.org/ABbiodiversity/WildLift.svg?branch=master)](https://travis-ci.org/ABbiodiversity/WildLift)
+[![Linux build
+status](https://travis-ci.org/ABbiodiversity/WildLift.svg?branch=master)](https://travis-ci.org/ABbiodiversity/WildLift)
 [![codecov](https://codecov.io/gh/ABbiodiversity/WildLift/branch/master/graph/badge.svg)](https://codecov.io/gh/ABbiodiversity/WildLift)
 
 **WildLift** can be used to quantitatively compare the **costs** and
