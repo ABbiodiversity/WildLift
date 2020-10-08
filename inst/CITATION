@@ -27,12 +27,10 @@ citEntry(entry = "Article",
              role = "cph")),
   journal      = "Frontiers in Ecology and Evolution",
   year         = "2020",
-  volume       = "xx",
-  number       = "xx",
-  pages        = "xx--xx",
+  volume       = "8",
+  pages        = "564508",
   url          = "https://dx.doi.org/10.3389/fevo.2020.564508",
 
-  textVersion  =
-  paste("Nagy-Reis, M., Dickie, M., Sólymos, P., Gilbert, S., DeMars, C., Serrouya, R., and Boutin, S., 2020. WildLift: An open-source tool to guide decisions for wildlife conservation. Frontiers in Ecology and Evolution, xx: xx–xx. DOI 10.3389/fevo.2020.564508")
+  textVersion  = "Nagy-Reis, M., Dickie, M., Sólymos, P., Gilbert, S., DeMars, C., Serrouya, R., and Boutin, S., 2020. WildLift: An open-source tool to guide decisions for wildlife conservation. Frontiers in Ecology and Evolution, 8:564508. DOI: 10.3389/fevo.2020.564508"
 )
 

@@ -42,7 +42,7 @@ run locally as `WildLift::run_app()`.
 Nagy-Reis, M., Dickie, M., Sólymos, P., Gilbert, S., DeMars, C.,
 Serrouya, R., and Boutin, S., 2020. WildLift: An open-source tool to
 guide decisions for wildlife conservation. *Frontiers in Ecology and
-Evolution*, in press. DOI
+Evolution*, 8:564508. DOI
 [10.3389/fevo.2020.564508](https://dx.doi.org/10.3389/fevo.2020.564508)
 
 ## Installation
