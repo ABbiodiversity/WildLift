@@ -1,3 +1,7 @@
+# Version 0.3.1
+
+* Using the `fpen.inds` argument was not giving identical results to when using same settings via the `fpen.prop` argument. The return object now allows better tracking the changes and the two options produce identical results.
+
 # Version 0.3.0
 
 * Paper describing the package accepted in Frontiers in Ecology and Evolution.

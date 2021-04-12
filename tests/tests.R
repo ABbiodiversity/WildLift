@@ -80,18 +80,17 @@ df[1L,] <- df[1L,]*100
 #p
 
 
+## test if % and inds give identical results
 
-library(WildLift)
 settings=wildlift_settings("mat.pen")
 ## proportion
-f1=.wildlift_forecast(settings, fpen.prop = 0.9)
+f1=wildlift_forecast(wildlift_settings("mat.pen"), fpen.prop = 0.9)
 ## fpen.prop <- (fpen.inds.vec[i] + fpen.prop*N1[4,]) / N1[4,]
 ## starting in year 2
-f2=.wildlift_forecast(settings, fpen.inds = 90)
-
-f1$Npop[c(1,11),3:4]
-f2$Npop[c(1,11),3:4]
+f2=wildlift_forecast(wildlift_settings("mat.pen"), fpen.inds = 90)
 
 f1$fpen.prop.vec
 f2$fpen.prop.vec
+
+stopifnot(all(abs(f1$Npop[c(1,11),3:4] - f2$Npop[c(1,11),3:4]) < 0.000001))
 
