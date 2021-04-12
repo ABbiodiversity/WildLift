@@ -78,3 +78,20 @@ df[1L,] <- df[1L,]*100
 #p <- plot_ly(df, x = ~Years, y = ~Npen, name = 'Penned', type = 'scatter', mode = 'lines') %>%
 #  add_trace(y = ~Nnopen, name = 'Baseline (no pen)', mode = 'lines')
 #p
+
+
+
+library(WildLift)
+settings=wildlift_settings("mat.pen")
+## proportion
+f1=.wildlift_forecast(settings, fpen.prop = 0.9)
+## fpen.prop <- (fpen.inds.vec[i] + fpen.prop*N1[4,]) / N1[4,]
+## starting in year 2
+f2=.wildlift_forecast(settings, fpen.inds = 90)
+
+f1$Npop[c(1,11),3:4]
+f2$Npop[c(1,11),3:4]
+
+f1$fpen.prop.vec
+f2$fpen.prop.vec
+

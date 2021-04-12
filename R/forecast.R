@@ -10,7 +10,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
 
 .wildlift_forecast <-
 function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds,
-         tot_is_af=FALSE, adjust_inds=TRUE) {
+         tot_is_af=FALSE) {
     if (tmax < 1)
         stop("Argument tmax must be >= 1.")
     if (abs(round(tmax) - tmax) > 0.0001)
@@ -99,16 +99,23 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds,
     # starting populations for time loop
     N1 <- N2 <- Nstart
 
+    fpen.prop.vec <- numeric(tmax)
+
     # loop through time to project population
     for(i in seq_len(tmax)) {
         ## reset prop for later years (divide by rep.adult.pen)
-        if (!USE_PROP && adjust_inds) {
+        if (!USE_PROP) {
             ## original code says: fpen.prop <- fpen.inds.vec[i] / N1[4,]
             ## but I think it should be the cumulative number,
             ## but we need to incorporate mortality,
             ## therefore new penned inds added to fpen.prop*N1[4,]
-            fpen.prop <- (fpen.inds.vec[i] + fpen.prop*N1[4,]) / N1[4,]
+            if (i > 1)
+                fpen.prop <- (fpen.inds.vec[i] + fpen.prop*N1[4,]) / N1[4,]
+            #fpen.prop <- fpen.inds.vec[i] / N1[4,]
         }
+
+        fpen.prop.vec[i] <- fpen.prop
+
         # .f1 denotes vitals for pop that's partially penned
         surv.f1 <- fpen.prop*f.surv.capt + (1-fpen.prop)*f.surv.wild
         preg.f1 <- fpen.prop*f.preg.capt + (1-fpen.prop)*preg
@@ -251,6 +258,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds,
         pop.start=pop.start,
         fpen.prop=NULL,
         fpen.inds=NULL,
+        fpen.prop.vec=fpen.prop.vec,
         npens=Npop$pens.needed[tmax + 1L],
         lam.pen=Npop$lam.pen[tmax + 1L],
         lam.nopen=Npop$lam.nopen[tmax + 1L],
@@ -263,6 +271,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds,
         out$fpen.prop <- fpen.prop
     } else {
         out$fpen.inds <- fpen.inds
+        out$fpen.inds.vec <- fpen.inds.vec
     }
 
     out
