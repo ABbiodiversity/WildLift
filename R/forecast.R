@@ -9,8 +9,8 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds)
 }
 
 .wildlift_forecast <-
-function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, tot_is_af=FALSE)
-{
+function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds,
+         tot_is_af=FALSE, adjust_inds=TRUE) {
     if (tmax < 1)
         stop("Argument tmax must be >= 1.")
     if (abs(round(tmax) - tmax) > 0.0001)
@@ -102,7 +102,7 @@ function(settings, tmax=20, pop.start=100, fpen.prop, fpen.inds, tot_is_af=FALSE
     # loop through time to project population
     for(i in seq_len(tmax)) {
         ## reset prop for later years (divide by rep.adult.pen)
-        if (!USE_PROP) {
+        if (!USE_PROP && adjust_inds) {
             ## original code says: fpen.prop <- fpen.inds.vec[i] / N1[4,]
             ## but I think it should be the cumulative number,
             ## but we need to incorporate mortality,
