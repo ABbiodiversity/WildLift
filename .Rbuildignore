@@ -13,4 +13,4 @@
 .gif
 ^COMPLIANCE\.yaml$
 ^submit\.sh$
-docs
+^docs/*$
